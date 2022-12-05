@@ -2,12 +2,14 @@ import { StatusBar } from "expo-status-bar";
 import { StyleSheet, Text, View } from "react-native";
 import React, { useState, useEffect, Suspense } from "react";
 import Menu from "./components/Menu";
+import { Provider } from 'react-redux';
+import store from './redux/store'
 import { NativeBaseProvider, Box } from "native-base";
 const LazyLoadLanding = React.lazy(() => import("./components/Landing"));
 const LazyLoadDashboard = React.lazy(() => import("./components/Dashboard"));
 
 export default function App() {
-  const [currentView, updateCurrentView] = useState("landing");
+  const [currentView, updateCurrentView] = useState("dashboard");
 
   //Lazy load the view
   function conditionalRender() {
@@ -20,20 +22,20 @@ export default function App() {
   // }, [currentView])
 
   return (
-    <NativeBaseProvider>
-      <View style={styles.container}>
-        <Menu />
-        <Suspense
-          fallback={
-            <View>
-              <Text>Loading..</Text>
-            </View>
-          }
-        >
-          {conditionalRender()}
-        </Suspense>
-      </View>
-    </NativeBaseProvider>
+      <NativeBaseProvider>
+        <Provider store={store} >
+          <View style={styles.container}>
+            <Menu />
+            <Suspense
+              fallback={
+                <View>
+                  <Text>Loading..</Text>
+                </View>}>
+                {conditionalRender()}
+            </Suspense>
+          </View>
+      </Provider>
+      </NativeBaseProvider>
   );
 }
 
@@ -43,5 +45,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     alignItems: "center",
     justifyContent: "center",
+    flexDirection: "column",
   },
 });
