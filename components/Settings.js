@@ -1,7 +1,7 @@
 import React from 'react'
 import {View, Text} from 'native-base'
 
-function Today() {
+function Settings() {
   return (
     <View>
       <Text>hi</Text>
@@ -9,4 +9,4 @@ function Today() {
   )
 }
 
-export default Today
+export default Settings

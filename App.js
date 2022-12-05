@@ -7,6 +7,9 @@ import store from './redux/store'
 import { NativeBaseProvider, Box } from "native-base";
 const LazyLoadLanding = React.lazy(() => import("./components/Landing"));
 const LazyLoadDashboard = React.lazy(() => import("./components/Dashboard"));
+const LazyLoadCalendar = React.lazy(() => import("./components/Calendar"));
+const LazyLoadToday = React.lazy(() => import("./components/Today"));
+const LazyLoadSettings = React.lazy(() => import("./components/Settings"));
 
 export default function App() {
   const [currentView, updateCurrentView] = useState("dashboard");
@@ -15,6 +18,9 @@ export default function App() {
   function conditionalRender() {
     if (currentView === "landing") return <LazyLoadLanding />;
     else if (currentView === "dashboard") return <LazyLoadDashboard />;
+    else if (currentView === "calendar") return <LazyLoadCalendar />;
+    else if (currentView === "today") return <LazyLoadToday />;
+    else if (currentView === "settings") return <LazyLoadSettings />;
   }
 
   // useEffect(() => {
@@ -25,7 +31,7 @@ export default function App() {
       <NativeBaseProvider>
         <Provider store={store} >
           <View style={styles.container}>
-            <Menu />
+            <Menu currentView={currentView} updateCurrentView={updateCurrentView} />
             <Suspense
               fallback={
                 <View>

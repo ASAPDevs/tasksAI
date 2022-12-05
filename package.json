@@ -9,6 +9,7 @@
     "web": "expo start --web"
   },
   "dependencies": {
+    "@expo/vector-icons": "^13.0.0",
     "@reduxjs/toolkit": "^1.9.1",
     "expo": "~47.0.8",
     "expo-status-bar": "~1.4.2",

@@ -2,7 +2,18 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 
 const initialState = {
-  username: 'Jackie'
+  username: 'Jackie',
+  avatar: '',
+  tasks: {
+    daily: [],
+    weekly: [],
+    yearly: [],
+    all: [],
+  },
+  recommendations: [],
+  settings: {
+    darkMode: false,
+  }
 }
 
 
