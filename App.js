@@ -2,6 +2,7 @@ import { StatusBar } from "expo-status-bar";
 import { StyleSheet, Text, View } from "react-native";
 import React, { useState, useEffect, Suspense } from "react";
 import Menu from "./components/Menu";
+import { NativeBaseProvider, Box } from "native-base";
 const LazyLoadLanding = React.lazy(() => import("./components/Landing"));
 const LazyLoadDashboard = React.lazy(() => import("./components/Dashboard"));
 
@@ -19,6 +20,7 @@ export default function App() {
   // }, [currentView])
 
   return (
+    <NativeBaseProvider>
       <View style={styles.container}>
         <Menu />
         <Suspense
@@ -31,6 +33,7 @@ export default function App() {
           {conditionalRender()}
         </Suspense>
       </View>
+    </NativeBaseProvider>
   );
 }
 
