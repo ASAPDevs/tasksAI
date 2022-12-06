@@ -2,16 +2,18 @@ import { Text, View } from 'native-base';
 import { StyleSheet, TouchableOpacity } from 'react-native';
 import React, { useState, useContext } from 'react';
 
-function Calendar() {
+function Calendar(props) {
     const months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
     const days = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+    const date = new Date(...props.date.split('-'));
     const today = new Date();
-    const [activeDay, setActiveDay] = useState(today.getDate());
-    const firstMonthDate = new Date(today.getFullYear(), today.getMonth(), 1);
-    const lastMonthDate = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+    const [activeDay, setActiveDay] = useState(date.getDate());
+    const firstMonthDate = new Date(date.getFullYear(), date.getMonth(), 1);
+    const lastMonthDate = new Date(date.getFullYear(), date.getMonth() + 1, 0);
     const firstMonthDay = firstMonthDate.getDay(); // 0 based
+    changeMonth = props.changeMonth;
 
-    // This section creates empty dates at the beginning of the month starting Sunday
+    // This function creates empty dates at the beginning of the month starting Sunday
     const addEmptyDays = () => {
         const listOfDays = [];
         for (let i = 0; i < firstMonthDay; i++) {
@@ -26,13 +28,16 @@ function Calendar() {
         return listOfDays;
     };
 
-    // This section creates this month's dates
+    // This function creates this month's dates
     const addActualDays = () => {
         const listOfDays = [];
         for (let i = 1; i <= lastMonthDate.getDate(); i++) {
             listOfDays.push(
                 <TouchableOpacity
-                    style={(i !== activeDay) ? styles.day : styles.activeDay}
+                    style={(i === activeDay
+                        && today.getMonth() === date.getMonth()
+                        && today.getFullYear() === date.getFullYear())
+                        ? styles.activeDay : styles.day}
                     onPress={() => { setActiveDay(i) }}>
                     <Text>{i}</Text>
                 </TouchableOpacity>
@@ -43,20 +48,21 @@ function Calendar() {
 
     return (
         <View style={styles.container}>
+
             {/* Header displays month, year and month control */}
             <View style={styles.month}>
                 <TouchableOpacity
                     style={styles.monthControl}
-                    onPress={() => { console.log('last month') }}>
+                    onPress={() => { changeMonth('prev') }}>
                     <Text style={styles.monthControl.text}>&#8249;</Text>
                 </TouchableOpacity>
                 <View>
-                    <Text style={styles.centerText}>{months[today.getMonth()]}</Text>
-                    <Text style={styles.centerText}>{today.getFullYear()}</Text>
+                    <Text style={styles.centerText}>{months[date.getMonth()]}</Text>
+                    <Text style={styles.centerText}>{date.getFullYear()}</Text>
                 </View>
                 <TouchableOpacity
                     style={styles.monthControl}
-                    onPress={() => { console.log('next month') }}>
+                    onPress={() => { changeMonth('next') }}>
                     <Text style={styles.monthControl.text}>&#8250;</Text>
                 </TouchableOpacity>
             </View>
@@ -89,7 +95,7 @@ const styles = StyleSheet.create({
         borderWidth: 4,
         backgroundColor: "#fff",
         position: 'absolute',
-        top: 100,
+        top: 120,
         width: '100%',
         height: '100%',
         flexDirection: 'column',
