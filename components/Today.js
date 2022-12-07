@@ -15,6 +15,7 @@ import {
 } from "native-base";
 import { ImageBackground, StyleSheet } from "react-native";
 import { FontAwesome } from "@expo/vector-icons";
+import DateTimePickerModal from "react-native-modal-datetime-picker";
 import banner from "../assets/banner.jpg";
 
 function Today() {
@@ -33,19 +34,20 @@ function Today() {
   //       .catch((err) => console.log(err));
   //   }, [date]);
 
-  const addTask = () => {
-    // post req to backend
-    // setTasks w new tasksArr
-    setTasks([
-      {
-        title: "task1",
-        description: "description",
-        startTime: 1000,
-        endTime: 1200,
-        completed: "false",
-      },
-    ]);
-  };
+  //   const addTask = () => {
+  //     // post req to backend
+  //     // setTasks w new tasksArr
+  //     setTasks([
+  //       {
+  //         title: "task1",
+  //         description: "description",
+  //         startTime: 1000,
+  //         endTime: 1200,
+  //         completed: "false",
+  //       },
+  //     ]);
+  //     openNewTask(false);
+  //   };
 
   return (
     <View style={styles.mainContainer}>
@@ -68,14 +70,7 @@ function Today() {
         <Heading>Tasks:</Heading>
         <Box style={styles.box}>
           {tasks.map((task) => (
-            <View style={styles.taskContainer} key={task.title}>
-              <Text>{task.title}</Text>
-              <Text>{task.description}</Text>
-              <Text>{task.startTime}</Text>
-              <Text>{task.endTime}</Text>
-              <Text>{task.completed}</Text>
-              {/* <CheckBox value="test" /> */}
-            </View>
+            <Task description={task.description} title={task.title} startTime={task.startTime} completed={task.completed} endTime={task.endTime}/>
           ))}
           <Pressable
             onPress={() => openNewTask(true)}
@@ -83,53 +78,193 @@ function Today() {
           >
             <Text>Create a new task..</Text>
           </Pressable>
-         {newTask ? <NewTaskModal newTask={newTask} openNewTask={openNewTask} /> : ''}
+          {newTask ? (
+            <NewTaskModal
+              setTasks={setTasks}
+              newTask={newTask}
+              openNewTask={openNewTask}
+            />
+          ) : (
+            ""
+          )}
         </Box>
       </View>
-      <Button onPress={() => addTask()} style={styles.btn}>
+      {/* <Button onPress={() => addTask()} style={styles.btn}>
         +
-      </Button>
+      </Button> */}
     </View>
   );
 }
 
+const Task = ({ title, description, startTime, endTime, completed }) => {
 
-const NewTaskModal = ({newTask, openNewTask}) => {
+
+  return (
+    <View style={styles.taskContainer} key={title}>
+      <Text>{title}</Text>
+      <Text>{description}</Text>
+      <Text>{startTime}</Text>
+      <Text>{endTime}</Text>
+      <Text>{completed}</Text>
+      {/* <CheckBox value="test" /> */}
+    </View>
+  );
+};
+
+const NewTaskModal = ({ newTask, openNewTask, setTasks }) => {
+  const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+  const [startTime, updateStartTime] = useState("");
+  const [endTime, updateEndTime] = useState("");
+  const [taskTitle, updateTaskTitle] = useState("");
+  const [taskDescription, updateTaskDescription] = useState("");
+
+  const showDatePicker = () => {
+    console.log("pressing date picker");
+    setDatePickerVisibility(true);
+  };
+
+  const hideDatePicker = () => {
+    setDatePickerVisibility(false);
+  };
+
+  const handleSetStartTime = (date) => {
+    console.warn("A date has been picked: ", date);
+    updateStartTime(date.toLocaleTimeString());
+    hideDatePicker();
+  };
+
+  const handleSetEndTime = (date) => {
+    console.warn("A date has been picked: ", date);
+    updateEndTime(date.toLocaleTimeString());
+    hideDatePicker();
+  };
+
+  const addTask = () => {
+    let newTask = {
+      title: taskTitle,
+      description: taskDescription,
+      startTime: startTime,
+      endTime: endTime,
+    };
+    setTasks((task) => [...task, newTask]);
+    openNewTask(false);
+  };
+
+  useEffect(() => {}, [isDatePickerVisible]);
+
   return (
     <Modal isOpen={newTask} onClose={() => openNewTask(false)} size="lg">
-    <Modal.Content
-      maxWidth="400"
-      height="400"
-      display="flex"
-      flexDirection="column"
-      alignItems="center"
-      safeAreaTop={true}
-    >
-      <Modal.CloseButton />
-      <Modal.Body>
-        <FormControl>
-          <FormControl.Label>Task Title:</FormControl.Label>
-          <Input placeholder="Title" minWidth={"100%"} />
-        </FormControl>
-        <FormControl>
-          <FormControl.Label>Task Description:</FormControl.Label>
-          <Input minWidth={"100%"} />
-        </FormControl>
-        <FormControl>
-          <FormControl.Label>Start Time:</FormControl.Label>
-          <Input minWidth={"100%"} />
-        </FormControl>
-        <FormControl>
-          <FormControl.Label>End Time:</FormControl.Label>
-          <Input minWidth={"100%"} />
-        </FormControl>
-      </Modal.Body>
-      <Text>test</Text>
-    </Modal.Content>
-  </Modal>
-  )
-}
+      <Modal.Content
+        maxWidth="400"
+        height="400"
+        display="flex"
+        flexDirection="column"
+        alignItems="center"
+        safeAreaTop={true}
+      >
+        <Modal.CloseButton />
+        <Modal.Body>
+          <FormControl>
+            <FormControl.Label>Task Title:</FormControl.Label>
+            <Input
+              value={taskTitle}
+              onChange={(e) => updateTaskTitle(e.target.value)}
+              placeholder="Title"
+              minWidth={"100%"}
+            />
+          </FormControl>
+          <FormControl>
+            <FormControl.Label>Task Description:</FormControl.Label>
+            <Input
+              value={taskDescription}
+              onChange={(e) => updateTaskDescription(e.target.value)}
+              placeholder="Description"
+              minWidth={"100%"}
+            />
+          </FormControl>
+          <StartTimeInput
+            startTime={startTime}
+            updateStartTime={updateStartTime}
+          />
+          <EndTimeInput endTime={endTime} updateEndTime={updateEndTime} />
+          <Button onPress={addTask} marginTop={5}>
+            <Text>Add Task</Text>
+          </Button>
+        </Modal.Body>
+      </Modal.Content>
+    </Modal>
+  );
+};
 
+const StartTimeInput = ({ startTime, updateStartTime }) => {
+  const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+
+  const handleSetStartTime = (date) => {
+    updateStartTime(date.toLocaleString());
+    setDatePickerVisibility(false);
+  };
+
+  return (
+    <FormControl>
+      <FormControl.Label>Start Time:</FormControl.Label>
+      <Pressable>
+        <Input
+          isReadOnly
+          value={startTime}
+          // onChange={(e) => setStartTime(e.target.value.toLocaleString())}
+          minWidth={"100%"}
+          InputRightElement={
+            <Button onPress={() => setDatePickerVisibility(true)} size="sm">
+              Pick Time
+            </Button>
+          }
+        />
+      </Pressable>
+      <DateTimePickerModal
+        isVisible={isDatePickerVisible}
+        mode="time"
+        onConfirm={handleSetStartTime}
+        onCancel={() => setDatePickerVisibility(false)}
+        is24Hour={false}
+      />
+    </FormControl>
+  );
+};
+
+const EndTimeInput = ({ endTime, updateEndTime }) => {
+  const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+
+  const handleSetEndTime = (date) => {
+    updateEndTime(date.toLocaleString());
+    setDatePickerVisibility(false);
+  };
+
+  return (
+    <FormControl>
+      <FormControl.Label>End Time:</FormControl.Label>
+      <Pressable>
+        <Input
+          isReadOnly
+          value={endTime}
+          // onChange={(e) => setStartTime(e.target.value.toLocaleString())}
+          minWidth={"100%"}
+          InputRightElement={
+            <Button onPress={() => setDatePickerVisibility(true)} size="sm">
+              Pick Time
+            </Button>
+          }
+        />
+      </Pressable>
+      <DateTimePickerModal
+        isVisible={isDatePickerVisible}
+        mode="time"
+        onConfirm={handleSetEndTime}
+        onCancel={() => setDatePickerVisibility(false)}
+        is24Hour={false}
+      />
+    </FormControl>
+  );
+};
 const styles = StyleSheet.create({
   mainContainer: {
     display: "flex",
@@ -194,6 +329,7 @@ const styles = StyleSheet.create({
     borderColor: "black",
     borderWidth: 2,
     padding: 5,
+    height: 50,
   },
 });
 
