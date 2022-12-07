@@ -12,7 +12,7 @@ const LazyLoadToday = React.lazy(() => import("./components/Today"));
 const LazyLoadSettings = React.lazy(() => import("./components/Settings"));
 
 export default function App() {
-  const [currentView, updateCurrentView] = useState("dashboard");
+  const [currentView, updateCurrentView] = useState("landing");
 
   //Lazy load the view
   function conditionalRender() {
@@ -23,15 +23,12 @@ export default function App() {
     else if (currentView === "settings") return <LazyLoadSettings />;
   }
 
-  // useEffect(() => {
-  //   updateCurrentView(currentView)
-  // }, [currentView])
-
   return (
       <NativeBaseProvider>
         <Provider store={store} >
           <View style={styles.container}>
-            <Menu currentView={currentView} updateCurrentView={updateCurrentView} />
+            {/* Only show hamburger menu when user successfully logs in */}
+            {currentView !== "landing" && <Menu currentView={currentView} updateCurrentView={updateCurrentView} />}
             <Suspense
               fallback={
                 <View>
