@@ -1,22 +1,32 @@
 import { Text, View } from 'native-base';
 import { StyleSheet, TouchableOpacity } from 'react-native';
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 
 function Calendar(props) {
     const months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
     const days = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
     const date = new Date(...props.date.split('-'));
     const today = new Date();
-    const [activeDay, setActiveDay] = useState(date.getDate());
+    const [activeDay, setActiveDay] = useState(`${today.getFullYear()}-${today.getMonth()}-${today.getDate()}`);
     const firstMonthDate = new Date(date.getFullYear(), date.getMonth(), 1);
     const lastMonthDate = new Date(date.getFullYear(), date.getMonth() + 1, 0);
     const firstMonthDay = firstMonthDate.getDay(); // 0 based
+    const lastMonthDay = lastMonthDate.getDay(); // 0 based
     changeMonth = props.changeMonth;
 
+    // This useEffect changes the default highlighted day to today
+    // if the month on the calendar matches the current month
+    useEffect(() => {
+        if (date.getFullYear() === today.getFullYear() && date.getMonth() == today.getMonth()) {
+            setActiveDay(`${today.getFullYear()}-${today.getMonth()}-${today.getDate()}`);
+        }
+    }, [props.date]);
+
     // This function creates empty dates at the beginning of the month starting Sunday
-    const addEmptyDays = () => {
+    const addEmptyDays = (option) => {
         const listOfDays = [];
-        for (let i = 0; i < firstMonthDay; i++) {
+        const numberOfDays = option === 'start' ? firstMonthDay : 6 - lastMonthDay;
+        for (let i = 0; i < numberOfDays; i++) {
             listOfDays.push(
                 <TouchableOpacity
                     style={styles.day}
@@ -32,13 +42,16 @@ function Calendar(props) {
     const addActualDays = () => {
         const listOfDays = [];
         for (let i = 1; i <= lastMonthDate.getDate(); i++) {
+            const day = [date.getFullYear(), date.getMonth(), i];
             listOfDays.push(
                 <TouchableOpacity
-                    style={(i === activeDay
-                        && today.getMonth() === date.getMonth()
-                        && today.getFullYear() === date.getFullYear())
-                        ? styles.activeDay : styles.day}
-                    onPress={() => { setActiveDay(i) }}>
+                    style={(activeDay === day.join('-')) ? styles.activeDay : styles.day}
+                    onPress={() => {
+                        setActiveDay(day.join('-'));
+                        console.log('active day', activeDay)
+                        console.log('day', day)
+                    }}
+                >
                     <Text>{i}</Text>
                 </TouchableOpacity>
             );
@@ -80,10 +93,12 @@ function Calendar(props) {
 
             {/* This section shows the days of the month with corresponding day of the week */}
             <View style={styles.days}>
-                {/* add empty days at the beginning of month */}
-                {addEmptyDays()}
+                {/* add empty days at the beginning of month if any */}
+                {addEmptyDays('start')}
                 {/* add actual days of the months */}
                 {addActualDays()}
+                {/* add empty days at the end of the month if any */}
+                {addEmptyDays()}
             </View>
         </View >
     )

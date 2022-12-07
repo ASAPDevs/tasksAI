@@ -6,32 +6,23 @@ import Month from './Month';
 function Calendar() {
   const today = new Date();
   const [monthToShow, setMonthToShow] = useState([today.getFullYear(), today.getMonth()]);
-  const [lastMonth, setLastMonth] = useState([today.getFullYear(), today.getMonth() - 1]);
-  const [nextMonth, setNextMonth] = useState([today.getFullYear(), today.getMonth() + 1]);
-  const [lastMonthClicked, changeLastMonthClicked] = useState(false);
-  const [nextMonthClicked, changeNextMonthClicked] = useState(false);
-
-  console.log(lastMonthClicked)
 
   const changeMonth = (change) => {
     if (change === 'prev') {
-      changeLastMonthClicked(true);
-      console.log(lastMonthClicked);
+      const lastMonth = monthToShow.slice();
+      lastMonth[1] -= 1;
+      setMonthToShow(lastMonth);
     } else if (change === 'next') {
-      changeNextMonthClicked(true);
+      const nextMonth = monthToShow.slice();
+      nextMonth[1] += 1;
+      setMonthToShow(nextMonth);
     }
   }
 
   return (
     <>
-      <View style={lastMonthClicked ? [{ left: 0 }] : [styles.container, styles.prevMonth]}>
-        <Month changeMonth={changeMonth} date={`${lastMonth.join('-')}-01`} />
-      </View>
-      <View style={lastMonthClicked ? [{ left: '100%' }] : [styles.container]}>
-        <Month date={`${monthToShow.join('-')}-${today.getDate()}`} />
-      </View>
-      <View style={[styles.container, styles.nextMonth]}>
-        <Month changeMonth={changeMonth} date={`${nextMonth.join('-')}-01`} />
+      <View style={[styles.container]}>
+        <Month changeMonth={changeMonth} date={`${monthToShow.join('-')}-${today.getDate()}`} />
       </View>
     </>
   )
@@ -49,17 +40,6 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     alignItems: "center",
     justifyContent: "flex-start"
-  },
-  prevMonth: {
-    left: '-100%',
-    backgroundColor: 'yellow'
-  },
-  nextMonth: {
-    left: '100%',
-    backgroundColor: 'cyan'
-  },
-  showLastMonth: {
-    left: 0
   }
 });
 
