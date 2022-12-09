@@ -26,10 +26,10 @@ function Today() {
   const [newTask, openNewTask] = useState(false);
   const [tasks, setTasks] = useState([
     {
-      title: "Task Title",
+      title: "Test Task Title",
       description: "Task Description",
-      startTime: "8:20 AM",
-      endTime: "10:00 AM",
+      startTime: 1670547604000,
+      endTime: 1670548888888,
     },
   ]);
 
@@ -110,18 +110,18 @@ function Today() {
 const Task = ({ title, description, startTime, endTime, completed }) => {
   const [openTask, toggleOpenTask] = useState(false);
 
-  //Don't delete this
-  // let displayStartTime = startTime.split(',')[1].trim();
-  // let displayEndTime = endTime.split(',')[1].trim();
+  // //Don't delete this
+  // let displayStartTime = new Date(startTime).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+  // let displayEndTime = new Date(endTime).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
 
   return (
     <Pressable onPress={() => toggleOpenTask(true)}>
       <View style={styles.taskContainer} key={title}>
         <Heading style={styles.taskHeading}>{title}</Heading>
         <View style={styles.taskContainerTimeContainer}>
-          <Text>{startTime}</Text>
+          <Text>{new Date(startTime).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</Text>
           <Text>to</Text>
-          <Text>{endTime}</Text>
+          <Text>{new Date(endTime).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</Text>
         </View>
         <Modal isOpen={openTask} onClose={() => toggleOpenTask(false)}>
           <Modal.CloseButton />
@@ -137,9 +137,9 @@ const Task = ({ title, description, startTime, endTime, completed }) => {
           >
             <View style={styles.taskContainerTimeContainer}>
               <Heading style={styles.taskHeading}>{title}</Heading>
-              <Text>{startTime}</Text>
+              <Text>{new Date(startTime).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</Text>
               <Text>to</Text>
-              <Text>{endTime}</Text>
+              <Text>{new Date(endTime).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</Text>
               <View style={styles.modalTaskDescriptionContainer}>
                 <Text>{description}</Text>
               </View>
@@ -153,7 +153,6 @@ const Task = ({ title, description, startTime, endTime, completed }) => {
 };
 
 const NewTaskModal = ({ newTask, openNewTask, setTasks, addTask }) => {
-  const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const [startTime, updateStartTime] = useState("");
   const [endTime, updateEndTime] = useState("");
   const [taskTitle, updateTaskTitle] = useState("");
@@ -169,6 +168,13 @@ const NewTaskModal = ({ newTask, openNewTask, setTasks, addTask }) => {
   //   setTasks((task) => [...task, newTask]);
   //   openNewTask(false);
   // };
+
+
+  useEffect(() => {
+    console.log("START TIME: " + startTime)
+    console.log("START TIME: " + endTime)
+  }, [startTime, endTime])
+
   return (
     <Modal isOpen={newTask} onClose={() => openNewTask(false)} size="lg">
       <Modal.Content
@@ -223,7 +229,7 @@ const StartTimeInput = ({ startTime, updateStartTime }) => {
 
   const handleSetStartTime = (date) => {
     updateStartTime(
-      date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+      date.getTime()
     );
     setDatePickerVisibility(false);
   };
@@ -234,7 +240,7 @@ const StartTimeInput = ({ startTime, updateStartTime }) => {
       <Pressable>
         <Input
           isReadOnly
-          value={startTime}
+          value={new Date(startTime).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
           // onChange={(e) => setStartTime(e.target.value.toLocaleString())}
           minWidth={"100%"}
           InputRightElement={
@@ -260,7 +266,7 @@ const EndTimeInput = ({ endTime, updateEndTime }) => {
 
   const handleSetEndTime = (date) => {
     updateEndTime(
-      date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+      date.getTime()
     );
     setDatePickerVisibility(false);
   };
@@ -271,7 +277,7 @@ const EndTimeInput = ({ endTime, updateEndTime }) => {
       <Pressable>
         <Input
           isReadOnly
-          value={endTime}
+          value={new Date(endTime).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
           // onChange={(e) => setStartTime(e.target.value.toLocaleString())}
           minWidth={"100%"}
           InputRightElement={
