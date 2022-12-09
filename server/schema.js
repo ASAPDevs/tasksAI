@@ -93,7 +93,8 @@ const resolvers = {
       RETURNING *
       `)
       console.log("Checking new task: ", newTask.rows[0])
-      return newTask.rows[0]
+      return newTask.rows[0];
+      
     },
       
   }
