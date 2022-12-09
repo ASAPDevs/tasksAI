@@ -92,9 +92,9 @@ const resolvers = {
       ('${task_name}', '${task_description}', '${date}', '${time_start}', '${time_finished}', ${completed}, ${user_id}) 
       RETURNING *
       `)
-      console.log("Checking new task: ", newTask.rows[0])
+      console.log("Checking new task:  ", newTask.rows[0])
       return newTask.rows[0];
-      
+
     },
       
   }
