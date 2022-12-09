@@ -24,7 +24,14 @@ function Today() {
   // Need alg to read and determine (completed tasks) / (total tasks)
   const [progress, setProgress] = useState(0);
   const [newTask, openNewTask] = useState(false);
-  const [tasks, setTasks] = useState([{title: 'Task Title', description: 'Task Description', startTime: '8:20 AM', endTime: '10:00 AM'}]);
+  const [tasks, setTasks] = useState([
+    {
+      title: "Task Title",
+      description: "Task Description",
+      startTime: "8:20 AM",
+      endTime: "10:00 AM",
+    },
+  ]);
 
   // get req to backend to grab tasks for that day (Post req?) or shape what we need in initial gql req
   //   useEffect(() => {
@@ -41,7 +48,7 @@ function Today() {
       startTime: startTime,
       endTime: endTime,
     };
-    console.log("Checking task props: ", newTask)
+    console.log("Checking task props: ", newTask);
     setTasks((task) => [...task, newTask]);
     openNewTask(false);
   };
@@ -67,7 +74,13 @@ function Today() {
         <Heading>Tasks:</Heading>
         <Box style={styles.box}>
           {tasks.map((task) => (
-            <Task description={task.description} title={task.title} startTime={task.startTime} completed={task.completed} endTime={task.endTime}/>
+            <Task
+              description={task.description}
+              title={task.title}
+              startTime={task.startTime}
+              completed={task.completed}
+              endTime={task.endTime}
+            />
           ))}
           <Pressable
             onPress={() => openNewTask(true)}
@@ -102,42 +115,40 @@ const Task = ({ title, description, startTime, endTime, completed }) => {
   // let displayEndTime = endTime.split(',')[1].trim();
 
   return (
-   <Pressable onPress={() => toggleOpenTask(true)}>
-     <View style={styles.taskContainer} key={title}>
-      <Heading style={styles.taskHeading}>{title}</Heading>
-      <View style={styles.taskContainerTimeContainer}>
-        <Text>{startTime}</Text>
-        <Text>to</Text>
-        <Text>{endTime}</Text>
-      </View>
-      <Modal isOpen={openTask} onClose={() => toggleOpenTask(false)}>
-        <Modal.CloseButton />
-        <Modal.Content
-          width="95%"
-          height="400"
-          display="flex"
-          flexDirection="column"
-          borderColor="grey"
-          borderWidth={2}
-          alignItems="center"
-          safeAreaTop={true}
-        >
-          <View style={styles.taskContainerTimeContainer}>
-            <Heading style={styles.taskHeading}>{title}</Heading>
-            <Text>{startTime}</Text>
-            <Text>to</Text>
-            <Text>{endTime}</Text>
-            <View style={styles.modalTaskDescriptionContainer}>
-              <Text>{description}</Text>
-            </View>
+    <Pressable onPress={() => toggleOpenTask(true)}>
+      <View style={styles.taskContainer} key={title}>
+        <Heading style={styles.taskHeading}>{title}</Heading>
+        <View style={styles.taskContainerTimeContainer}>
+          <Text>{startTime}</Text>
+          <Text>to</Text>
+          <Text>{endTime}</Text>
         </View>
-        </Modal.Content>
-        
-        
-      </Modal>
-      {/* <CheckBox value="test" /> */}
-    </View>
-   </Pressable>
+        <Modal isOpen={openTask} onClose={() => toggleOpenTask(false)}>
+          <Modal.CloseButton />
+          <Modal.Content
+            width="95%"
+            height="400"
+            display="flex"
+            flexDirection="column"
+            borderColor="grey"
+            borderWidth={2}
+            alignItems="center"
+            safeAreaTop={true}
+          >
+            <View style={styles.taskContainerTimeContainer}>
+              <Heading style={styles.taskHeading}>{title}</Heading>
+              <Text>{startTime}</Text>
+              <Text>to</Text>
+              <Text>{endTime}</Text>
+              <View style={styles.modalTaskDescriptionContainer}>
+                <Text>{description}</Text>
+              </View>
+            </View>
+          </Modal.Content>
+        </Modal>
+        {/* <CheckBox value="test" /> */}
+      </View>
+    </Pressable>
   );
 };
 
@@ -147,7 +158,6 @@ const NewTaskModal = ({ newTask, openNewTask, setTasks, addTask }) => {
   const [endTime, updateEndTime] = useState("");
   const [taskTitle, updateTaskTitle] = useState("");
   const [taskDescription, updateTaskDescription] = useState("");
-
 
   // const addTask = () => {
   //   let newTask = {
@@ -194,7 +204,12 @@ const NewTaskModal = ({ newTask, openNewTask, setTasks, addTask }) => {
             updateStartTime={updateStartTime}
           />
           <EndTimeInput endTime={endTime} updateEndTime={updateEndTime} />
-          <Button onPress={() => addTask(taskTitle, taskDescription, startTime, endTime)} marginTop={5}>
+          <Button
+            onPress={() =>
+              addTask(taskTitle, taskDescription, startTime, endTime)
+            }
+            marginTop={5}
+          >
             <Text>Add Task</Text>
           </Button>
         </Modal.Body>
@@ -207,7 +222,9 @@ const StartTimeInput = ({ startTime, updateStartTime }) => {
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
 
   const handleSetStartTime = (date) => {
-    updateStartTime(date.toLocaleString());
+    updateStartTime(
+      date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+    );
     setDatePickerVisibility(false);
   };
 
@@ -242,7 +259,9 @@ const EndTimeInput = ({ endTime, updateEndTime }) => {
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
 
   const handleSetEndTime = (date) => {
-    updateEndTime(date.toLocaleString());
+    updateEndTime(
+      date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+    );
     setDatePickerVisibility(false);
   };
 
@@ -281,9 +300,10 @@ const styles = StyleSheet.create({
     position: "absolute",
     width: "100%",
     height: "100%",
-    borderColor: "green",
-    borderWidth: 3,
+    // borderColor: "green",
+    // borderWidth: 3,
     // maxWidth: "100%",
+    zIndex: -1,
   },
   topContainer: {
     // bottom: 700,
@@ -307,8 +327,8 @@ const styles = StyleSheet.create({
     // color: "white",
   },
   bottomContainer: {
-    borderColor: "cyan",
-    borderWidth: 3,
+    // borderColor: "cyan",
+    // borderWidth: 3,
     position: "relative",
     top: 120,
     // bottom: 600,
@@ -338,6 +358,8 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     padding: 10,
     height: 70,
+    margin: 10,
+    borderRadius: 10,
   },
   taskContainerTimeContainer: {
     display: "flex",
@@ -348,11 +370,11 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
   modalTaskDescriptionContainer: {
-    borderColor: 'grey',
+    borderColor: "grey",
     borderWidth: 5,
-    minWidth: '100%',
-    height: '75%'
-  }
+    minWidth: "100%",
+    height: "75%",
+  },
 });
 
 export default Today;
