@@ -7,7 +7,8 @@
     "start": "expo start & nodemon server/server.js",
     "android": "expo start --android",
     "ios": "expo start --ios",
-    "web": "expo start --web"
+    "web": "expo start --web",
+    "test": "jest"
   },
   "dependencies": {
     "@apollo/client": "^3.7.2",
@@ -17,6 +18,7 @@
     "@reduxjs/toolkit": "^1.9.1",
     "apollo-server-express": "^3.11.1",
     "dotenv": "^16.0.3",
+    "easygraphql-tester": "^6.0.1",
     "env": "^0.0.2",
     "expo": "^47.0.0",
     "expo-status-bar": "~1.4.2",
@@ -34,7 +36,8 @@
   },
   "devDependencies": {
     "@babel/core": "^7.19.3",
-    "@types/react-redux": "^7.1.24"
+    "@types/react-redux": "^7.1.24",
+    "jest": "^29.3.1"
   },
   "private": true
 }

@@ -11,7 +11,7 @@ const typeDefs = gql`
   }
 
   type Mutation {
-    login(username: String, password: String): User!
+    login(username: String!, password: String!): User!
     signup(email: String!, username: String!, password: String!): User!
     createTask(task: TaskInput): Task!
     updateTask(task: TaskInput): Task
@@ -87,6 +87,15 @@ const resolvers = {
       console.log("username: " + username)
       const result = await db.query('SELECT * FROM users WHERE username = $1;', [username]);
       const user = result.rows[0];
+      // if (!user) {
+      //   if (user.password !== password) {
+      //     throw new GraphQLError('No user', {
+      //       extensions: {
+      //         code: 'BAD_USER_INPUT'
+      //       }
+      //     });
+      //   }
+      // }
       if (user.password !== password) {
         throw new GraphQLError('Password is incorrect', {
           extensions: {
