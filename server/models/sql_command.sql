@@ -10,9 +10,9 @@ CREATE TABLE tasks(
     id serial PRIMARY KEY,
     task_name varchar NOT NULL,
     task_description varchar,
-    date varchar NOT NULL,
-    time_start varchar NOT NULL,
-    time_finished varchar NOT NULL,
+    date BIGINT NOT NULL,
+    time_start BIGINT NOT NULL,
+    time_finished BIGINT NOT NULL,
     completed boolean NOT NULL,
     user_id integer NOT NULL
 );

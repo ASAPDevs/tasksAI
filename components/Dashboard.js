@@ -1,7 +1,7 @@
 import { StyleSheet } from "react-native";
 import { View, Text, Heading, Center, Switch } from "native-base";
 import { useEffect, useState } from "react";
-import {updateUsername} from '../redux/slices/storageSlice'
+import { updateUsername } from '../redux/slices/storageSlice'
 import { useSelector } from "react-redux";
 import Emoji from './helpers/Emoji'
 import * as Font from 'expo-font';
@@ -30,9 +30,9 @@ const Dashboard = () => {
     return (
       <View style={styles.mainContainer}>
         <View style={styles.headingContainer}>
-         <Heading style={styles.heading}>Hello, {<Heading style={styles.username}>{username}.</Heading>} <Emoji symbol={0x1F44B} /></Heading>
+          <Heading style={styles.heading}>Hello, {<Heading style={styles.username}>{username}.</Heading>} <Emoji symbol={0x1F44B} /></Heading>
         </View>
-        
+
       </View>
     )
   } else {

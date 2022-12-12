@@ -1,16 +1,45 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Heading } from "native-base";
 import { StyleSheet, Text, View, TextInput, SafeAreaView, Image, TouchableOpacity } from "react-native";
 import logo from '../assets/todo-ai-logo.png'
+import { gql, useMutation } from "@apollo/client";
 
-export default function LandingPage() {
+
+const LOGIN_MUTATION = gql`
+  mutation login($username: String, $password: String) {
+    login(username: $username, password: $password) {
+      id
+      username
+      password
+    }
+}
+`
+
+export default function LandingPage({ updateCurrentView }) {
   const [currentView, setCurrentView] = useState("landing");
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
+  // data received from useMutation
+  const [login, { data }] = useMutation(LOGIN_MUTATION, {
+    onCompleted: () => {
+      console.log('Complete login')
+    }
+  });
+
+  // if (loading) return <p>Loading...</p>
+  // if (error) return <p>Error! {error.message}</p>
   // Change input style when the input is focus
   const [focus, setFocus] = useState("");
+
+  function LoginHandler() {
+    console.log(username, password)
+    login({ variables: { username: username.toLowerCase(), password: password.toLowerCase() } })
+    console.log("DATA from FRONTEND: ", data)
+    updateCurrentView("dashboard")
+  }
+
 
   return (
     <SafeAreaView style={styles.mainContainer}>
@@ -23,14 +52,15 @@ export default function LandingPage() {
 
           <TextInput
             autoFocus={true}
-            style={focus === "email" ? styles.inputFocus : styles.input}
-            value={email}
-            placeholder="Email"
-            onChangeText={setEmail}
-            onFocus={() => setFocus("email")}
+            style={focus === "username" ? styles.inputFocus : styles.input}
+            value={username}
+            placeholder="Username"
+            onChangeText={setUsername}
+            onFocus={() => setFocus("username")}
           />
           <TextInput
             style={focus === "password" ? styles.inputFocus : styles.input}
+            secureTextEntry={true}
             value={password}
             placeholder="Password"
             onChangeText={setPassword}
@@ -39,18 +69,20 @@ export default function LandingPage() {
 
           {currentView === "register" && (
             <TextInput
-            style={focus === "confirm-password" ? styles.inputFocus : styles.input}
-            value={confirmPassword}
-            placeholder="Confirm password"
-            onChangeText={setConfirmPassword}
-            onFocus={() => setFocus("confirm-password")}
-          />
+              style={focus === "confirm-password" ? styles.inputFocus : styles.input}
+              value={confirmPassword}
+              placeholder="Confirm password"
+              onChangeText={setConfirmPassword}
+              onFocus={() => setFocus("confirm-password")}
+            />
           )}
 
-          {/* Sign in button will appears when user types in both email and password */}
-          {(email !== '' && password !== '') && 
-            <TouchableOpacity style={styles.signInButton}>
-              <Text style={styles.buttonText}>
+          {/* Sign in button will appears when user types in both username and password */}
+          {(username !== '' && password !== '') &&
+            <TouchableOpacity onPress={() => LoginHandler()} style={styles.signInButton}>
+              <Text
+                style={styles.buttonText}
+              >
                 {currentView === "landing" ? "Sign in" : "Sign up"}
               </Text>
             </TouchableOpacity>

@@ -2,6 +2,7 @@
   "name": "todo",
   "version": "1.0.0",
   "main": "node_modules/expo/AppEntry.js",
+  "proxy": "http://localhost:3000",
   "scripts": {
     "start": "expo start & nodemon server/server.js",
     "android": "expo start --android",
@@ -9,6 +10,7 @@
     "web": "expo start --web"
   },
   "dependencies": {
+    "@apollo/client": "^3.7.2",
     "@apollo/server": "^4.2.2",
     "@expo/vector-icons": "^13.0.0",
     "@react-native-community/datetimepicker": "6.5.2",
