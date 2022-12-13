@@ -12,7 +12,7 @@ const LOGIN_MUTATION = gql`
       username
       password
     }
-}
+  }
 `
 
 export default function LandingPage({ updateCurrentView }) {
