@@ -1,7 +1,7 @@
 const EasyGraphQLTester = require('easygraphql-tester');
-const { typeDefs, resolvers } = require('../server/schema');
+const { typeDefs, resolvers } = require('../schema');
 const supertest = require('supertest');
-const app = require('../server/server.js');
+const app = require('../server.js');
 const request = require('supertest')
 
 app.server = app.listen(3333);
