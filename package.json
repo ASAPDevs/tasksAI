@@ -4,7 +4,7 @@
   "main": "node_modules/expo/AppEntry.js",
   "proxy": "http://localhost:3000",
   "scripts": {
-    "start": "expo start & nodemon server/server.js",
+    "start": "expo start --clear & nodemon server/server.js",
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
