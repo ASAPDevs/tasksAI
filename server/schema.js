@@ -11,7 +11,7 @@ const typeDefs = gql`
   }
 
   type Mutation {
-    login(username: String, password: String): User!
+    login(username: String!, password: String!): User!
     signup(email: String!, username: String!, password: String!): User!
     createTask(task: TaskInput): Task!
     updateTask(task: TaskInput): Task
@@ -70,7 +70,7 @@ const resolvers = {
       // grab day from args and use to get tasks for the day
       const { date, user_id } = args; //"1670522400000"
 
-      console.log('Args: ', args) // date: '2022-12-11'   1day = 86.4 mil ms
+      // date: '2022-12-11'   1day = 86.4 mil ms
       const dateToQuery = new Date(date.split('-').map(el => Number(el)));
       const startOfDay = dateToQuery.getTime();
       const endOfDay = startOfDay + 86400000;
@@ -84,17 +84,27 @@ const resolvers = {
     login: async (root, args, context, info) => {
       // grab username and password from args to verify >>> DB model
       const { username, password } = args;
-      console.log("username: " + username)
       const result = await db.query('SELECT * FROM users WHERE username = $1;', [username]);
       const user = result.rows[0];
+      // if (!user) {
+      //   if (user.password !== password) {
+      //     throw new GraphQLError('No user', {
+      //       extensions: {
+      //         code: 'BAD_USER_INPUT'
+      //       }
+      //     });
+      //   }
+      // }
       if (user.password !== password) {
         throw new GraphQLError('Password is incorrect', {
           extensions: {
-            code: 'BAD_USER_INPUT'
+            code: 'BAD_USER_INPUT',
+            http: {
+              status: 400
+            }
           }
         });
       }
-      console.log("RESULT: ", user)
       return user;
     },
     signup: async (root, args, context, info) => {
