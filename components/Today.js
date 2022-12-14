@@ -7,16 +7,22 @@ import {
   Box,
   Heading,
   Pressable,
+  ScrollView,
+  Icon
 } from "native-base";
-import { ImageBackground, StyleSheet } from "react-native";
+import { ImageBackground, SafeAreaView, StyleSheet } from "react-native";
 import { FontAwesome } from "@expo/vector-icons";
 import banner from "../assets/banner.jpg";
+import { MaterialCommunityIcons } from '@expo/vector-icons'; 
+import { Entypo } from '@expo/vector-icons'; 
 import { useSelector, useDispatch } from "react-redux";
 import {updateDailyTasks} from '../redux/slices/storageSlice'
 import { GET_TODAYS_TASKS } from "./helpers/queries";
 import { CREATE_TASKS } from "./helpers/mutations";
-import Task from "./Task";
+import { DELETE_TASK } from "./helpers/mutations";
+import Task, {DeleteTask} from "./Task";
 import NewTaskModal from "./NewTaskModal";
+import { SwipeListView } from "react-native-swipe-list-view";
 
 
 const Today = () => {
@@ -58,6 +64,20 @@ const Today = () => {
     }
   })
 
+  const [deleteTask] = useMutation(DELETE_TASK, {
+    onCompleted: () => {
+      refetch()
+    },
+    onError: (err) => {
+      console.log("Error Deleting Task: ", err)
+    }
+  })
+
+  const handleDeleteTask = (taskId) => {
+    deleteTask({
+      variables: { taskId: taskId }
+    })
+  }
 
   const addTask = (taskTitle, taskDescription, startTime, endTime) => {
     const newTask = {
@@ -73,6 +93,12 @@ const Today = () => {
     createTask({variables: {task: newTask}})
     openNewTask(false);
   };
+
+  // This data is needed to use for SwipeListView
+  const swipeListData = tasks.map((task, index) => ({
+    ...task,
+    key: index
+  }))
 
   return (
     <View style={styles.mainContainer}>
@@ -93,18 +119,36 @@ const Today = () => {
 
       <View style={styles.bottomContainer}>
         <Heading>Tasks:</Heading>
-        <Box style={styles.box}>
-          {tasks.map((task, index) => (
-            <Task
-              description={task.task_description}
-              title={task.task_name}
-              startTime={task.time_start}
-              completed={task.completed}
-              endTime={task.time_finished}
-              key={task.id}
-            />
-          ))}
-          <Pressable
+
+        <SwipeListView style={styles.box} 
+          data={swipeListData}
+          renderItem={({ item }, rowMap) => {
+            return (
+              <Task
+                description={item.task_description}
+                title={item.task_name}
+                startTime={item.time_start}
+                completed={item.completed}
+                endTime={item.time_finished}
+                taskId={item.id}
+                key={item.id}
+              />
+            )
+          }}
+
+          renderHiddenItem={({ item }, rowMap) => {
+            return (
+              <DeleteButton item={item} rowMap={rowMap} handleDeleteTask={handleDeleteTask} 
+              />
+            )
+          }}
+          // onRightActionStatusChange={() => {
+          //   console.log('Deleted')
+          // }}
+          // rightActivationValue={-100}
+          rightOpenValue={-100}
+        />
+        <Pressable
             onPress={() => openNewTask(true)}
             style={styles.taskContainer}
           >
@@ -119,14 +163,50 @@ const Today = () => {
           ) : (
             ""
           )}
-        </Box>
       </View>
-      {/* <Button onPress={() => addTask()} style={styles.btn}>
-        +
-      </Button> */}
     </View>
   );
 };
+
+export const DeleteButton = ({item, rowMap, handleDeleteTask}) => {
+  const [deleteConfirmation, toggleDeleteConfirmation] = useState(false);
+
+
+    useEffect(() => {
+      // toggleDeleteConfirmation(false)
+    }, [deleteConfirmation])
+
+    return (
+      <View style={styles.deleteTaskContainer}>
+                {!deleteConfirmation ? <Pressable onPress={() => {
+                  // handleDeleteTask(item.id)
+                  // rowMap[item.key].closeRow()
+                  toggleDeleteConfirmation(true)
+                }}>
+                  <Icon
+                    as={MaterialCommunityIcons}
+                    name="delete"
+                    color="white"
+                    size={"8"}
+                  />
+                </Pressable> :
+                <Pressable style={{display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center'}}onPress={() => {
+                  handleDeleteTask(item.id)
+                  rowMap[item.key].closeRow()
+                  // toggleDeleteConfirmation(true)
+                }}>
+                  <Text style={{color: 'white'}}>Delete? </Text>
+                  <Icon
+                    as={Entypo}
+                    name="circle-with-cross"
+                    color="white"
+                    size={"8"}
+                  />
+                </Pressable>
+                 }
+              </View>
+    );
+  }
 
 const styles = StyleSheet.create({
   mainContainer: {
@@ -198,6 +278,20 @@ const styles = StyleSheet.create({
     display: "flex",
     flexDirection: "column",
   },
+  deleteTaskContainer: {
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "flex-end",
+    borderColor: "black",
+    borderWidth: 2,
+    padding: 10,
+    height: 70,
+    margin: 10,
+    zIndex: 9,
+    backgroundColor: 'red',
+    borderRadius: 10,
+  }
 });
 
 export default Today;

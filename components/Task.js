@@ -6,18 +6,31 @@ import {
     Pressable,
     Modal
   } from "native-base";
-import { StyleSheet } from "react-native";
+import { StyleSheet, SafeAreaView } from "react-native";
+// import { DELETE_TASK } from "./helpers/mutations";
+// import { useMutation } from "@apollo/client";
 
 
-const Task = ({ title, description, startTime, endTime, completed }) => {
+const Task = ({ taskId, title, description, startTime, endTime, completed }) => {
     const [openTask, toggleOpenTask] = useState(false);
   
     // //Don't delete this
     // let displayStartTime = new Date(startTime).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
     // let displayEndTime = new Date(endTime).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+		// const [deleteTask] = useMutation(DELETE_TASK)
+
+		// const handleDeleteTask = (taskId) => {
+		// 	console.log('taskId', taskId)
+		// 	deleteTask({
+		// 		variables: { id: taskId }
+		// 	})
+			
+		// }
   
     return (
-      <Pressable onPress={() => toggleOpenTask(true)}>
+      <Pressable 
+        onPress={() => toggleOpenTask(true)}
+      >
         <View style={styles.taskContainer} key={title}>
           <Heading style={styles.taskHeading}>{title}</Heading>
           <View style={styles.taskContainerTimeContainer}>
@@ -65,7 +78,9 @@ const Task = ({ title, description, startTime, endTime, completed }) => {
       padding: 10,
       height: 70,
       margin: 10,
+      backgroundColor: "white",
       borderRadius: 10,
+      zIndex: 10,
     },
     taskContainerTimeContainer: {
       display: "flex",

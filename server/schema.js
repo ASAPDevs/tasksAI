@@ -12,7 +12,7 @@ const typeDefs = gql`
     signup(email: String!, username: String!, password: String!): User!
     createTask(task: TaskInput): Task!
     updateTask(task: TaskInput): Task
-    deleteTask(id: ID): Boolean
+    deleteTask(id: ID!): Boolean
   }
 
   input TaskInput {
@@ -46,11 +46,8 @@ const typeDefs = gql`
 
 
 const resolvers = {
-  User: {
-
-  },
   Task: {
-    user: async (parent, args, context, info) => {
+    user: async (parent, args) => {
       //Find User from UserTable using parent.userID
       const { user_id } = parent;
       const user = await db.query('SELECT * FROM users WHERE id = $1;', [user_id]);
@@ -59,10 +56,7 @@ const resolvers = {
     }
   },
   Query: {
-    // getUserData: async(root, args, context, info) => {
-    //   // grab username from args to grab user data 
-    // },
-    getTasksByDay: async (root, args, context, info) => {
+    getTasksByDay: async (_, args) => {
       // grab day from args and use to get tasks for the day
       const { date, user_id } = args; //"1670522400000"
 
@@ -81,20 +75,18 @@ const resolvers = {
     }
   },
   Mutation: {
-    login: async (root, args, context, info) => {
+    login: async (_, args) => {
       // grab username and password from args to verify >>> DB model
       const { username, password } = args;
       const result = await db.query('SELECT * FROM users WHERE username = $1;', [username]);
       const user = result.rows[0];
-      // if (!user) {
-      //   if (user.password !== password) {
-      //     throw new GraphQLError('No user', {
-      //       extensions: {
-      //         code: 'BAD_USER_INPUT'
-      //       }
-      //     });
-      //   }
-      // }
+      if (!user) {
+        throw new GraphQLError('No user', {
+          extensions: {
+            code: 'BAD_USER_INPUT'
+          }
+        });
+      }
       if (user.password !== password) {
         throw new GraphQLError('Password is incorrect', {
           extensions: {
@@ -107,20 +99,25 @@ const resolvers = {
       }
       return user;
     },
-    signup: async (root, args, context, info) => {
+    signup: async (_, args) => {
       // create user with email username and pass from args
       const { username, email, password } = args;
       const newUser = await db.query('INSERT INTO users (username, password, email) VALUES ($1, $2, $3) RETURNING *;', [username, password, email]);
       return newUser.rows[0];
     },
-    createTask: async (root, args, context, info) => {
+    createTask: async (_, args) => {
       // post req to Task db table
       const { task_name, task_description, date, time_start, time_finished, completed, user_id } = args.task;
-      console.log("Checking new task input: ", args.task)
+      // console.log("Checking new task input: ", args.task)
       const newTask = await db.query('INSERT INTO tasks (task_name, task_description, date, time_start, time_finished, completed, user_id) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *;', [task_name, task_description, date, time_start, time_finished, completed, user_id]);
       return newTask.rows[0];
     },
-    deleteTask: async (root, args, context, info) => {
+    // updateTask: async (_, args) => {
+    //   const { id, task_name, task_description, date, time_start, time_finished, completed} = args.task;
+    //   const updatedTask = await db.
+
+    // },
+    deleteTask: async (_, args) => {
       const { id } = args;
       const task = await db.query('DELETE FROM tasks WHERE id = $1 RETURNING *;', [id]);
       return task.rowCount < 1 ? false : true
