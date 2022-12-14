@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { gql, useQuery, useMutation } from "@apollo/client";
 import {
   View,
   Text,
@@ -17,6 +18,42 @@ import { ImageBackground, StyleSheet } from "react-native";
 import { FontAwesome } from "@expo/vector-icons";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import banner from "../assets/banner.jpg";
+import { useSelector, useDispatch } from "react-redux";
+import {updateDailyTasks} from '../redux/slices/storageSlice'
+
+
+
+const GET_TODAYS_TASKS = gql`
+  query getTasksByDay($date: String!, $user_id: Int) {
+    getTasksByDay(date: $date, user_id: $user_id) {
+      id
+      task_name
+      task_description
+      date
+      time_start
+      time_finished
+      completed
+      user_id
+    }
+}
+`
+
+const CREATE_TASKS = gql`
+  mutation CreateTask($task: TaskInput) {
+    createTask(task: $task) {
+      id
+      task_name
+      task_description
+      date
+      time_start
+      time_finished
+      completed
+      user_id
+    }
+}
+`
+
+
 
 function Today() {
   // Figure out where we pull date or refetch date
@@ -24,32 +61,46 @@ function Today() {
   // Need alg to read and determine (completed tasks) / (total tasks)
   const [progress, setProgress] = useState(0);
   const [newTask, openNewTask] = useState(false);
-  const [tasks, setTasks] = useState([
-    {
-      title: "Test Task Title",
-      description: "Task Description",
-      startTime: 1670547604000,
-      endTime: 1670548888888,
+  const tasks = useSelector((state) => state.storage.tasks.daily);
+  const userID = useSelector((state) => state.storage.user_id);
+  const dispatch = useDispatch();
+  //YYYY - MM - DD
+  const today = new Date().toISOString().split('T')[0];
+  const todayInMs = new Date(today).getTime();
+  // const today = new Date().getTime()
+  
+  const {data, error, loading, refetch} = useQuery(GET_TODAYS_TASKS, {
+    onCompleted: (data) => {
+      dispatch(updateDailyTasks(data.getTasksByDay))
     },
-  ]);
+    onError: (error) => {
+      console.log("Error in loading tasks: ", error);
+    },
+    //make dynamic
+    variables: {date: today, user_id: 2}
+  });
+  
+  const [createTask] = useMutation(CREATE_TASKS, {
+    onCompleted: (data) => {
+      refetch();
+    },
+    onError: (err) => {
+      console.log("Error Creating Task: ", err)
+    }
+  })
 
-  // get req to backend to grab tasks for that day (Post req?) or shape what we need in initial gql req
-  //   useEffect(() => {
-  //     fetch("/endpoint")
-  //       .then((res) => res.json())
-  //       .then((data) => setTasks(data))
-  //       .catch((err) => console.log(err));
-  //   }, [date]);
 
   const addTask = (taskTitle, taskDescription, startTime, endTime) => {
     let newTask = {
-      title: taskTitle,
-      description: taskDescription,
-      startTime: startTime,
-      endTime: endTime,
+      task_name: taskTitle,
+      task_description: taskDescription,
+      time_start: startTime.toString(),
+      date: todayInMs.toString(),
+      time_finished: endTime.toString(),
+      completed: false,
+      user_id: Number(userID)
     };
-    console.log("Checking task props: ", newTask);
-    setTasks((task) => [...task, newTask]);
+    createTask({variables: {task: newTask}})
     openNewTask(false);
   };
 
@@ -73,13 +124,14 @@ function Today() {
       <View style={styles.bottomContainer}>
         <Heading>Tasks:</Heading>
         <Box style={styles.box}>
-          {tasks.map((task) => (
+          {tasks.map((task, index) => (
             <Task
-              description={task.description}
-              title={task.title}
-              startTime={task.startTime}
+              description={task.task_description}
+              title={task.task_name}
+              startTime={task.time_start}
               completed={task.completed}
-              endTime={task.endTime}
+              endTime={task.time_finished}
+              key={index}
             />
           ))}
           <Pressable
@@ -90,7 +142,6 @@ function Today() {
           </Pressable>
           {newTask ? (
             <NewTaskModal
-              setTasks={setTasks}
               addTask={addTask}
               newTask={newTask}
               openNewTask={openNewTask}
@@ -119,9 +170,9 @@ const Task = ({ title, description, startTime, endTime, completed }) => {
       <View style={styles.taskContainer} key={title}>
         <Heading style={styles.taskHeading}>{title}</Heading>
         <View style={styles.taskContainerTimeContainer}>
-          <Text>{new Date(startTime).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</Text>
+          <Text>{new Date(Number(startTime)).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</Text>
           <Text>to</Text>
-          <Text>{new Date(endTime).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</Text>
+          <Text>{new Date(Number(endTime)).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</Text>
         </View>
         <Modal isOpen={openTask} onClose={() => toggleOpenTask(false)}>
           <Modal.CloseButton />
@@ -137,9 +188,9 @@ const Task = ({ title, description, startTime, endTime, completed }) => {
           >
             <View style={styles.taskContainerTimeContainer}>
               <Heading style={styles.taskHeading}>{title}</Heading>
-              <Text>{new Date(startTime).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</Text>
+              <Text>{new Date(Number(startTime)).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</Text>
               <Text>to</Text>
-              <Text>{new Date(endTime).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</Text>
+              <Text>{new Date(Number(endTime)).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</Text>
               <View style={styles.modalTaskDescriptionContainer}>
                 <Text>{description}</Text>
               </View>
@@ -171,8 +222,8 @@ const NewTaskModal = ({ newTask, openNewTask, setTasks, addTask }) => {
 
 
   useEffect(() => {
-    console.log("START TIME: " + startTime)
-    console.log("START TIME: " + endTime)
+    console.log("START TIME: " + typeof startTime)
+    console.log("START TIME: " + typeof endTime)
   }, [startTime, endTime])
 
   return (

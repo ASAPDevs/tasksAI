@@ -15,6 +15,10 @@ const LazyLoadSettings = React.lazy(() => import("./components/Settings"));
 const client = new ApolloClient({
   uri: 'http://localhost:3000/graphql',
   cache: new InMemoryCache(),
+  onError: ({ networkError, graphQLErrors }) => {
+    console.log('graphQLErrors', graphQLErrors)
+    console.log('networkError', networkError)
+  }
   // credentials: 'same-origin',
 });
 

@@ -32,7 +32,6 @@ const Dashboard = () => {
         <View style={styles.headingContainer}>
           <Heading style={styles.heading}>Hello, {<Heading style={styles.username}>{username}.</Heading>} <Emoji symbol={0x1F44B} /></Heading>
         </View>
-
       </View>
     )
   } else {

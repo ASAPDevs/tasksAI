@@ -3,14 +3,26 @@ import { Heading } from "native-base";
 import { StyleSheet, Text, View, TextInput, SafeAreaView, Image, TouchableOpacity } from "react-native";
 import logo from '../assets/todo-ai-logo.png'
 import { gql, useMutation } from "@apollo/client";
+import { useDispatch } from "react-redux";
+import { loginUser } from "../redux/slices/storageSlice";
 
 
 const LOGIN_MUTATION = gql`
-  mutation login($username: String, $password: String) {
+  mutation Login($username: String!, $password: String!) {
     login(username: $username, password: $password) {
       id
       username
-      password
+      email
+    }
+  }
+`
+
+const SIGNUP_MUTATION = gql`
+  mutation signup($email: String, $username: String, $password: String) {
+    signup(email: $email, password: $password, username: $username) {
+      id
+      username
+      email
     }
   }
 `
@@ -19,25 +31,47 @@ export default function LandingPage({ updateCurrentView }) {
   const [currentView, setCurrentView] = useState("landing");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [email, setEmail] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [focus, setFocus] = useState("");
+  const [wrongLogin, toggleWrongLogin] = useState(false);
+  const dispatch = useDispatch();
 
   // data received from useMutation
   const [login, { data }] = useMutation(LOGIN_MUTATION, {
-    onCompleted: () => {
+    onCompleted: (data) => {
       console.log('Complete login')
+      console.log("DATA FROM ONCOMPLETED: ", data.login)
+      console.log("username: ", data.login.username)
+      console.log("userid: ", data.login.id)
+      const userDetails = {username: data.login.username, user_id: data.login.id}
+      dispatch(loginUser(userDetails))
+      updateCurrentView('dashboard')
+    },
+    onError: (err) => {
+      console.log("Error in login mutation: ", err)
+      toggleWrongLogin(true)
     }
   });
+
+  const [signup, {signupData}] = useMutation(LOGIN_MUTATION, {
+    onCompleted: () => {
+      console.log('Completed Signup')
+    }
+  })
 
   // if (loading) return <p>Loading...</p>
   // if (error) return <p>Error! {error.message}</p>
   // Change input style when the input is focus
-  const [focus, setFocus] = useState("");
+  
 
   function LoginHandler() {
-    console.log(username, password)
-    login({ variables: { username: username.toLowerCase(), password: password.toLowerCase() } })
-    console.log("DATA from FRONTEND: ", data)
-    updateCurrentView("dashboard")
+    console.log("username/pw: ", username, password)
+    login({ variables: { username: username, password: password } })
+  }
+
+  function SignUpHandler() {
+    // signup({variables: {email, username, password}})
   }
 
 
@@ -49,9 +83,19 @@ export default function LandingPage({ updateCurrentView }) {
             <Heading size="xl" >Welcome to Todo-AI</Heading>
             <Image style={styles.logo} source={logo} />
           </View>
-
+          {currentView === "register" && (
+            <TextInput
+              autoCapitalize="none"
+              style={styles.input}
+              value={email}
+              placeholder="Email Address"
+              onChangeText={setEmail}
+              onFocus={() => setFocus("email")}
+            />
+          )}
           <TextInput
             autoFocus={true}
+            autoCapitalize="none"
             style={focus === "username" ? styles.inputFocus : styles.input}
             value={username}
             placeholder="Username"
@@ -59,6 +103,7 @@ export default function LandingPage({ updateCurrentView }) {
             onFocus={() => setFocus("username")}
           />
           <TextInput
+            autoCapitalize="none"
             style={focus === "password" ? styles.inputFocus : styles.input}
             secureTextEntry={true}
             value={password}
@@ -66,32 +111,47 @@ export default function LandingPage({ updateCurrentView }) {
             onChangeText={setPassword}
             onFocus={() => setFocus("password")}
           />
-
           {currentView === "register" && (
-            <TextInput
-              style={focus === "confirm-password" ? styles.inputFocus : styles.input}
-              value={confirmPassword}
-              placeholder="Confirm password"
-              onChangeText={setConfirmPassword}
-              onFocus={() => setFocus("confirm-password")}
-            />
+            <>
+              <TextInput
+                autoCapitalize="none"
+                style={focus === "confirm-password" ? styles.inputFocus : styles.input}
+                value={confirmPassword}
+                secureTextEntry={true}
+                placeholder="Confirm password"
+                onChangeText={setConfirmPassword}
+                onFocus={() => setFocus("confirm-password")}
+              />
+              {focus == 'confirm-password' & password !== confirmPassword ? <Text style={{color: 'red', marginLeft: 7.5}}>Passwords don't match!</Text> : null}
+            </>
           )}
 
-          {/* Sign in button will appears when user types in both username and password */}
-          {(username !== '' && password !== '') &&
-            <TouchableOpacity onPress={() => LoginHandler()} style={styles.signInButton}>
+          {/* Conditionally renders button according to signup/login state */}
+            {currentView == 'landing' && <TouchableOpacity disabled={!username || !password ? true : false} onPress={() => LoginHandler()} style={{...styles.signInButton, backgroundColor: `${!username || !password ? 'grey' : '#007bff'}`}}>
               <Text
                 style={styles.buttonText}
               >
-                {currentView === "landing" ? "Sign in" : "Sign up"}
+                Sign In
               </Text>
-            </TouchableOpacity>
-          }
+            </TouchableOpacity>}
+            {currentView == 'register' && <TouchableOpacity disabled={!username || !password || !email || !confirmPassword ? true : false} onPress={() => LoginHandler()} style={{...styles.signInButton, backgroundColor: `${!username || !password || !email || !confirmPassword ? 'grey' : '#007bff'}`}}>
+              <Text
+                style={styles.buttonText}
+              >
+                Sign Up
+              </Text>
+            </TouchableOpacity>}
+            {wrongLogin ? <Text style={{color: 'red', textAlign: 'center'}}>Invalid Login Credentials</Text> : null} 
         </View>
 
         <View style={styles.footer}>
           {currentView === "landing" ? (
-            <Text style={styles.footerText} onPress={() => setCurrentView("register")}>
+            <Text style={styles.footerText} onPress={() => {
+              setCurrentView("register")
+              setUsername('')
+              setPassword('')
+              toggleWrongLogin(false)
+            }}>
               Don't have an account? Sign up!
             </Text>
           ) : (
@@ -150,7 +210,7 @@ const styles = StyleSheet.create({
     margin: 8,
     borderWidth: 1,
     borderRadius: 7,
-    backgroundColor: '#007bff',
+    marginTop: 15
   },
   buttonText: {
     color: "#fff",
