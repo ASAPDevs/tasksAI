@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useQuery, useMutation } from "@apollo/client";
 import {
   View,
@@ -7,23 +7,16 @@ import {
   Box,
   Heading,
   Pressable,
-  ScrollView,
-  Icon
 } from "native-base";
 import { ImageBackground, SafeAreaView, StyleSheet } from "react-native";
-import { FontAwesome } from "@expo/vector-icons";
 import banner from "../assets/banner.jpg";
-import { MaterialCommunityIcons } from '@expo/vector-icons'; 
-import { Entypo } from '@expo/vector-icons'; 
 import { useSelector, useDispatch } from "react-redux";
 import {updateDailyTasks} from '../redux/slices/storageSlice'
 import { GET_TODAYS_TASKS } from "./helpers/queries";
-import { CREATE_TASKS } from "./helpers/mutations";
-import { DELETE_TASK } from "./helpers/mutations";
-import Task, {DeleteTask} from "./Task";
+import { CREATE_TASKS, DELETE_TASK } from "./helpers/mutations";
+import Task, { DeleteButton } from "./Task";
 import NewTaskModal from "./NewTaskModal";
 import { SwipeListView } from "react-native-swipe-list-view";
-
 
 const Today = () => {
   // Figure out where we pull date or refetch date
@@ -84,7 +77,6 @@ const Today = () => {
       task_name: taskTitle,
       task_description: taskDescription,
       time_start: startTime.toString(),
-      // date: todayInMs.toString(),
       date: new Date().getTime().toString(),
       time_finished: endTime.toString(),
       completed: false,
@@ -132,6 +124,7 @@ const Today = () => {
                 endTime={item.time_finished}
                 taskId={item.id}
                 key={item.id}
+                refetch={refetch}
               />
             )
           }}
@@ -142,11 +135,13 @@ const Today = () => {
               />
             )
           }}
+
+          rightOpenValue={-100}
+          
           // onRightActionStatusChange={() => {
           //   console.log('Deleted')
           // }}
           // rightActivationValue={-100}
-          rightOpenValue={-100}
         />
         <Pressable
             onPress={() => openNewTask(true)}
@@ -167,46 +162,6 @@ const Today = () => {
     </View>
   );
 };
-
-export const DeleteButton = ({item, rowMap, handleDeleteTask}) => {
-  const [deleteConfirmation, toggleDeleteConfirmation] = useState(false);
-
-
-    useEffect(() => {
-      // toggleDeleteConfirmation(false)
-    }, [deleteConfirmation])
-
-    return (
-      <View style={styles.deleteTaskContainer}>
-                {!deleteConfirmation ? <Pressable onPress={() => {
-                  // handleDeleteTask(item.id)
-                  // rowMap[item.key].closeRow()
-                  toggleDeleteConfirmation(true)
-                }}>
-                  <Icon
-                    as={MaterialCommunityIcons}
-                    name="delete"
-                    color="white"
-                    size={"8"}
-                  />
-                </Pressable> :
-                <Pressable style={{display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center'}}onPress={() => {
-                  handleDeleteTask(item.id)
-                  rowMap[item.key].closeRow()
-                  // toggleDeleteConfirmation(true)
-                }}>
-                  <Text style={{color: 'white'}}>Delete? </Text>
-                  <Icon
-                    as={Entypo}
-                    name="circle-with-cross"
-                    color="white"
-                    size={"8"}
-                  />
-                </Pressable>
-                 }
-              </View>
-    );
-  }
 
 const styles = StyleSheet.create({
   mainContainer: {
@@ -278,20 +233,6 @@ const styles = StyleSheet.create({
     display: "flex",
     flexDirection: "column",
   },
-  deleteTaskContainer: {
-    display: "flex",
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "flex-end",
-    borderColor: "black",
-    borderWidth: 2,
-    padding: 10,
-    height: 70,
-    margin: 10,
-    zIndex: 9,
-    backgroundColor: 'red',
-    borderRadius: 10,
-  }
 });
 
 export default Today;

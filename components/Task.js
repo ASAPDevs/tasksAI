@@ -4,28 +4,26 @@ import {
     Text,
     Heading,
     Pressable,
-    Modal
+    Icon
   } from "native-base";
-import { StyleSheet, SafeAreaView } from "react-native";
-// import { DELETE_TASK } from "./helpers/mutations";
-// import { useMutation } from "@apollo/client";
+import { StyleSheet } from "react-native";
+import { UPDATE_TASK } from "./helpers/mutations";
+import { useMutation } from "@apollo/client";
+import { MaterialCommunityIcons, Entypo } from '@expo/vector-icons'; 
+import TaskModal from "./TaskModal";
 
 
-const Task = ({ taskId, title, description, startTime, endTime, completed }) => {
+const Task = ({ taskId, title, description, startTime, endTime, completed, refetch }) => {
     const [openTask, toggleOpenTask] = useState(false);
-  
-    // //Don't delete this
-    // let displayStartTime = new Date(startTime).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
-    // let displayEndTime = new Date(endTime).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
-		// const [deleteTask] = useMutation(DELETE_TASK)
 
-		// const handleDeleteTask = (taskId) => {
-		// 	console.log('taskId', taskId)
-		// 	deleteTask({
-		// 		variables: { id: taskId }
-		// 	})
-			
-		// }
+    const [updateTask] = useMutation(UPDATE_TASK, {
+      onCompleted: () => {
+        refetch()
+      },
+      onError: (err) => {
+        console.log("Error Updating Task: ", err)
+      }
+    })
   
     return (
       <Pressable 
@@ -38,34 +36,53 @@ const Task = ({ taskId, title, description, startTime, endTime, completed }) => 
             <Text>to</Text>
             <Text>{new Date(Number(endTime)).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</Text>
           </View>
-          <Modal isOpen={openTask} onClose={() => toggleOpenTask(false)}>
-            <Modal.CloseButton />
-            <Modal.Content
-              width="95%"
-              height="400"
-              display="flex"
-              flexDirection="column"
-              borderColor="grey"
-              borderWidth={2}
-              alignItems="center"
-              safeAreaTop={true}
-            >
-              <View style={styles.taskContainerTimeContainer}>
-                <Heading style={styles.taskHeading}>{title}</Heading>
-                <Text>{new Date(Number(startTime)).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</Text>
-                <Text>to</Text>
-                <Text>{new Date(Number(endTime)).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</Text>
-                <View style={styles.modalTaskDescriptionContainer}>
-                  <Text>{description}</Text>
-                </View>
-              </View>
-            </Modal.Content>
-          </Modal>
-          {/* <CheckBox value="test" /> */}
+          <TaskModal 
+            updateTask={updateTask} openTask={openTask} 
+            toggleOpenTask={toggleOpenTask} taskTitle={title} 
+            taskDescription={description} 
+            taskStartTime={startTime} 
+            taskEndTime={endTime} 
+            taskId={taskId}
+            completed={completed}
+          />
         </View>
       </Pressable>
     );
   };
+
+  export const DeleteButton = ({item, rowMap, handleDeleteTask}) => {
+    const [deleteConfirmation, toggleDeleteConfirmation] = useState(false);
+  
+      return (
+        <View style={styles.deleteTaskContainer}>
+          {!deleteConfirmation ? (
+          <Pressable onPress={() => {
+            toggleDeleteConfirmation(true)
+          }}>
+            <Icon
+              as={MaterialCommunityIcons}
+              name="delete"
+              color="white"
+              size={"8"}
+            />
+          </Pressable>) :
+          <Pressable style={{display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center'}}onPress={() => {
+            handleDeleteTask(item.id)
+            rowMap[item.key].closeRow()
+            toggleDeleteConfirmation(false)
+          }}>
+            <Text style={{color: 'white'}}>Delete? </Text>
+            <Icon
+              as={Entypo}
+              name="circle-with-cross"
+              color="white"
+              size={"8"}
+            />
+          </Pressable>
+            }
+        </View>
+      );
+  }
 
   const styles = StyleSheet.create({
     taskContainer: {
@@ -90,11 +107,19 @@ const Task = ({ taskId, title, description, startTime, endTime, completed }) => 
     taskHeading: {
       fontSize: 18,
     },
-    modalTaskDescriptionContainer: {
-      borderColor: "grey",
-      borderWidth: 5,
-      minWidth: "100%",
-      height: "75%",
+    deleteTaskContainer: {
+      display: "flex",
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "flex-end",
+      borderColor: "black",
+      borderWidth: 2,
+      padding: 10,
+      height: 70,
+      margin: 10,
+      zIndex: 9,
+      backgroundColor: 'red',
+      borderRadius: 10,
     },
   });
 

@@ -35,6 +35,21 @@ export const CREATE_TASKS = gql`
   }
 `
 
+export const UPDATE_TASK = gql`
+  mutation UpdateTask($task: UpdateTaskInput) {
+    updateTask(task: $task) {
+      id
+      task_name
+      task_description
+      date
+      time_start
+      time_finished
+      completed
+      user_id
+    }
+  }
+`
+
 export const DELETE_TASK = gql`
   mutation DeleteTask($taskId: ID!) {
     deleteTask(id: $taskId)

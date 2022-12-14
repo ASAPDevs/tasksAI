@@ -11,11 +11,12 @@ const typeDefs = gql`
     login(username: String!, password: String!): User!
     signup(email: String!, username: String!, password: String!): User!
     createTask(task: TaskInput): Task!
-    updateTask(task: TaskInput): Task
+    updateTask(task: UpdateTaskInput): Task
     deleteTask(id: ID!): Boolean
   }
 
   input TaskInput {
+    id: ID,
     task_name: String,
     task_description: String,
     date: String,
@@ -24,7 +25,17 @@ const typeDefs = gql`
     completed: Boolean,
     user_id: Int 
   }
-  
+
+  input UpdateTaskInput {
+    id: ID,
+    task_name: String,
+    task_description: String,
+    date: String,
+    time_start: String,
+    time_finished: String,
+    completed: Boolean,
+  }
+
   type User {
     id: ID!,
     username: String,
@@ -43,8 +54,6 @@ const typeDefs = gql`
     user: User,
   }
 `
-
-
 const resolvers = {
   Task: {
     user: async (parent, args) => {
@@ -108,15 +117,17 @@ const resolvers = {
     createTask: async (_, args) => {
       // post req to Task db table
       const { task_name, task_description, date, time_start, time_finished, completed, user_id } = args.task;
-      // console.log("Checking new task input: ", args.task)
+
       const newTask = await db.query('INSERT INTO tasks (task_name, task_description, date, time_start, time_finished, completed, user_id) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *;', [task_name, task_description, date, time_start, time_finished, completed, user_id]);
       return newTask.rows[0];
     },
-    // updateTask: async (_, args) => {
-    //   const { id, task_name, task_description, date, time_start, time_finished, completed} = args.task;
-    //   const updatedTask = await db.
-
-    // },
+    updateTask: async (_, args) => {
+      const { id, task_name, task_description, date, time_start, time_finished, completed } = args.task;
+      
+      const queryString = `UPDATE tasks SET task_name = $1, task_description = $2, date = $3, time_start = $4, time_finished = $5, completed = $6 WHERE id = $7 RETURNING *;`;
+      const updatedTask = await db.query(queryString, [task_name, task_description, date, time_start, time_finished, completed, id])
+      return updatedTask.rows[0];
+    },
     deleteTask: async (_, args) => {
       const { id } = args;
       const task = await db.query('DELETE FROM tasks WHERE id = $1 RETURNING *;', [id]);
