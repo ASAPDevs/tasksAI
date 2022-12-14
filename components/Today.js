@@ -68,7 +68,7 @@ function Today() {
   const today = new Date().toISOString().split('T')[0];
   const todayInMs = new Date(today).getTime();
   // const today = new Date().getTime()
-  
+  console.log("USER ID: ", userID, typeof userID)
   const {data, error, loading, refetch} = useQuery(GET_TODAYS_TASKS, {
     onCompleted: (data) => {
       dispatch(updateDailyTasks(data.getTasksByDay))
@@ -77,7 +77,7 @@ function Today() {
       console.log("Error in loading tasks: ", error);
     },
     //make dynamic
-    variables: {date: today, user_id: 2}
+    variables: {date: '2022-12-13', user_id: 14}
   });
   
   const [createTask] = useMutation(CREATE_TASKS, {

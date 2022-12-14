@@ -5,27 +5,9 @@ import logo from '../assets/todo-ai-logo.png'
 import { gql, useMutation } from "@apollo/client";
 import { useDispatch } from "react-redux";
 import { loginUser } from "../redux/slices/storageSlice";
+import { SIGNUP_MUTATION, LOGIN_MUTATION } from "./helpers/mutations";
 
 
-const LOGIN_MUTATION = gql`
-  mutation Login($username: String!, $password: String!) {
-    login(username: $username, password: $password) {
-      id
-      username
-      email
-    }
-  }
-`
-
-const SIGNUP_MUTATION = gql`
-  mutation signup($email: String, $username: String, $password: String) {
-    signup(email: $email, password: $password, username: $username) {
-      id
-      username
-      email
-    }
-  }
-`
 
 export default function LandingPage({ updateCurrentView }) {
   const [currentView, setCurrentView] = useState("landing");
@@ -35,17 +17,13 @@ export default function LandingPage({ updateCurrentView }) {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [focus, setFocus] = useState("");
   const [wrongLogin, toggleWrongLogin] = useState(false);
+  const [wrongSignup, toggleWrongSignup] = useState(false); 
   const dispatch = useDispatch();
 
   // data received from useMutation
-  const [login, { data }] = useMutation(LOGIN_MUTATION, {
+  const [login] = useMutation(LOGIN_MUTATION, {
     onCompleted: (data) => {
-      console.log('Complete login')
-      console.log("DATA FROM ONCOMPLETED: ", data.login)
-      console.log("username: ", data.login.username)
-      console.log("userid: ", data.login.id)
-      const userDetails = {username: data.login.username, user_id: data.login.id}
-      dispatch(loginUser(userDetails))
+      dispatch(loginUser({username: data.login.username, user_id: Number(data.login.id)}))
       updateCurrentView('dashboard')
     },
     onError: (err) => {
@@ -54,9 +32,15 @@ export default function LandingPage({ updateCurrentView }) {
     }
   });
 
-  const [signup, {signupData}] = useMutation(LOGIN_MUTATION, {
-    onCompleted: () => {
-      console.log('Completed Signup')
+  const [signup] = useMutation(SIGNUP_MUTATION, {
+    onCompleted: (data) => {
+      console.log('Completed Signup: ', data)
+      dispatch(loginUser({username: data.signup.username, user_id: Number(data.signup.id)}))
+      updateCurrentView('dashboard');
+    },
+    onError: (err) => {
+      console.log("Error in signup mutation: ", err)
+      toggleWrongSignup(true)
     }
   })
 
@@ -71,7 +55,8 @@ export default function LandingPage({ updateCurrentView }) {
   }
 
   function SignUpHandler() {
-    // signup({variables: {email, username, password}})
+    console.log("username/pw: in signup ", email, username, password)
+    signup({variables: {email: email, password: password, username: username}})
   }
 
 
@@ -134,14 +119,15 @@ export default function LandingPage({ updateCurrentView }) {
                 Sign In
               </Text>
             </TouchableOpacity>}
-            {currentView == 'register' && <TouchableOpacity disabled={!username || !password || !email || !confirmPassword ? true : false} onPress={() => LoginHandler()} style={{...styles.signInButton, backgroundColor: `${!username || !password || !email || !confirmPassword ? 'grey' : '#007bff'}`}}>
+            {currentView == 'register' && <TouchableOpacity disabled={!username || !password || !email || !confirmPassword ? true : false} onPress={() => SignUpHandler()} style={{...styles.signInButton, backgroundColor: `${!username || !password || !email || !confirmPassword ? 'grey' : '#007bff'}`}}>
               <Text
                 style={styles.buttonText}
               >
                 Sign Up
               </Text>
             </TouchableOpacity>}
-            {wrongLogin ? <Text style={{color: 'red', textAlign: 'center'}}>Invalid Login Credentials</Text> : null} 
+            {wrongLogin ? <Text style={{color: 'red', textAlign: 'center'}}>Invalid Login Credentials.</Text> : null}
+            {wrongSignup ? <Text style={{color: 'red', textAlign: 'center'}}>Invalid Signup. Check All Inputs.</Text> : null}  
         </View>
 
         <View style={styles.footer}>
