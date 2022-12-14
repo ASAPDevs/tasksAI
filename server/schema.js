@@ -1,9 +1,6 @@
-const { ApolloServer, gql } = require('apollo-server-express');
+const { gql } = require('apollo-server-express');
 const { GraphQLError } = require('graphql');
 const db = require("./models/db")
-
-// import { startStandaloneServer } from '@apollo/server/standalone';
-
 
 const typeDefs = gql`
   type Query {
@@ -70,10 +67,14 @@ const resolvers = {
       const { date, user_id } = args; //"1670522400000"
 
       // date: '2022-12-11'   1day = 86.4 mil ms
-      const dateToQuery = new Date(date.split('-').map(el => Number(el)));
-      const startOfDay = dateToQuery.getTime();
+      // const dateToQuery = new Date(date.split('-').map(el => Number(el)));
+      // const startOfDay = dateToQuery.getTime();
+      const startOfDay = new Date(date).getTime();
       const endOfDay = startOfDay + 86400000;
-      const params = [startOfDay - 1, endOfDay + 1, user_id]
+      const params = [startOfDay - 1, endOfDay, user_id]
+      // console.log('date', date)
+      // console.log('startOfDay', startOfDay - 1)
+      // console.log('endOfDay', endOfDay)
       const task = await db.query('SELECT * FROM tasks WHERE date > $1 AND date < $2 AND user_id = ($3);', params)
       console.log("Checking Task in getTaskByday: " + task.rows)
       return task.rows;

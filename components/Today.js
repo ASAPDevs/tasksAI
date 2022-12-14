@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { gql, useQuery, useMutation } from "@apollo/client";
+import { useQuery, useMutation } from "@apollo/client";
 import {
   View,
   Text,
@@ -20,39 +20,8 @@ import DateTimePickerModal from "react-native-modal-datetime-picker";
 import banner from "../assets/banner.jpg";
 import { useSelector, useDispatch } from "react-redux";
 import {updateDailyTasks} from '../redux/slices/storageSlice'
-
-
-
-const GET_TODAYS_TASKS = gql`
-  query getTasksByDay($date: String!, $user_id: Int) {
-    getTasksByDay(date: $date, user_id: $user_id) {
-      id
-      task_name
-      task_description
-      date
-      time_start
-      time_finished
-      completed
-      user_id
-    }
-}
-`
-
-const CREATE_TASKS = gql`
-  mutation CreateTask($task: TaskInput) {
-    createTask(task: $task) {
-      id
-      task_name
-      task_description
-      date
-      time_start
-      time_finished
-      completed
-      user_id
-    }
-}
-`
-
+import { GET_TODAYS_TASKS } from "./helpers/queries";
+import { CREATE_TASKS } from "./helpers/mutations";
 
 
 function Today() {
@@ -61,23 +30,28 @@ function Today() {
   // Need alg to read and determine (completed tasks) / (total tasks)
   const [progress, setProgress] = useState(0);
   const [newTask, openNewTask] = useState(false);
+
   const tasks = useSelector((state) => state.storage.tasks.daily);
   const userID = useSelector((state) => state.storage.user_id);
+
   const dispatch = useDispatch();
+
   //YYYY - MM - DD
   const today = new Date().toISOString().split('T')[0];
+  console.log('today', today);
   const todayInMs = new Date(today).getTime();
-  // const today = new Date().getTime()
   console.log("USER ID: ", userID, typeof userID)
-  const {data, error, loading, refetch} = useQuery(GET_TODAYS_TASKS, {
+
+  const { data, error, loading, refetch } = useQuery(GET_TODAYS_TASKS, {
     onCompleted: (data) => {
+      console.log('after useQuery', data.getTasksByDay)
       dispatch(updateDailyTasks(data.getTasksByDay))
     },
     onError: (error) => {
       console.log("Error in loading tasks: ", error);
     },
     //make dynamic
-    variables: {date: '2022-12-13', user_id: 14}
+    variables: {date: today, user_id: userID}
   });
   
   const [createTask] = useMutation(CREATE_TASKS, {
@@ -95,7 +69,8 @@ function Today() {
       task_name: taskTitle,
       task_description: taskDescription,
       time_start: startTime.toString(),
-      date: todayInMs.toString(),
+      // date: todayInMs.toString(),
+      date: new Date().getTime().toString(),
       time_finished: endTime.toString(),
       completed: false,
       user_id: Number(userID)

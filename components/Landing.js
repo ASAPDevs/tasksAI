@@ -1,8 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Heading } from "native-base";
 import { StyleSheet, Text, View, TextInput, SafeAreaView, Image, TouchableOpacity } from "react-native";
 import logo from '../assets/todo-ai-logo.png'
-import { gql, useMutation } from "@apollo/client";
+import { useMutation } from "@apollo/client";
 import { useDispatch } from "react-redux";
 import { loginUser } from "../redux/slices/storageSlice";
 import { SIGNUP_MUTATION, LOGIN_MUTATION } from "./helpers/mutations";
@@ -18,6 +18,7 @@ export default function LandingPage({ updateCurrentView }) {
   const [focus, setFocus] = useState("");
   const [wrongLogin, toggleWrongLogin] = useState(false);
   const [wrongSignup, toggleWrongSignup] = useState(false); 
+  
   const dispatch = useDispatch();
 
   // data received from useMutation
@@ -49,12 +50,12 @@ export default function LandingPage({ updateCurrentView }) {
   // Change input style when the input is focus
   
 
-  function LoginHandler() {
+  const loginHandler = () => {
     console.log("username/pw: ", username, password)
     login({ variables: { username: username, password: password } })
   }
 
-  function SignUpHandler() {
+  const signupHandler = () => {
     console.log("username/pw: in signup ", email, username, password)
     signup({variables: {email: email, password: password, username: username}})
   }
@@ -96,6 +97,8 @@ export default function LandingPage({ updateCurrentView }) {
             onChangeText={setPassword}
             onFocus={() => setFocus("password")}
           />
+
+          {/* Signup View */}
           {currentView === "register" && (
             <>
               <TextInput
@@ -112,14 +115,14 @@ export default function LandingPage({ updateCurrentView }) {
           )}
 
           {/* Conditionally renders button according to signup/login state */}
-            {currentView == 'landing' && <TouchableOpacity disabled={!username || !password ? true : false} onPress={() => LoginHandler()} style={{...styles.signInButton, backgroundColor: `${!username || !password ? 'grey' : '#007bff'}`}}>
+            {currentView == 'landing' && <TouchableOpacity disabled={!username || !password ? true : false} onPress={loginHandler} style={{...styles.signInButton, backgroundColor: `${!username || !password ? 'grey' : '#007bff'}`}}>
               <Text
                 style={styles.buttonText}
               >
                 Sign In
               </Text>
             </TouchableOpacity>}
-            {currentView == 'register' && <TouchableOpacity disabled={!username || !password || !email || !confirmPassword ? true : false} onPress={() => SignUpHandler()} style={{...styles.signInButton, backgroundColor: `${!username || !password || !email || !confirmPassword ? 'grey' : '#007bff'}`}}>
+            {currentView == 'register' && <TouchableOpacity disabled={!username || !password || !email || !confirmPassword ? true : false} onPress={signupHandler} style={{...styles.signInButton, backgroundColor: `${!username || !password || !email || !confirmPassword ? 'grey' : '#007bff'}`}}>
               <Text
                 style={styles.buttonText}
               >
