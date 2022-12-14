@@ -32,13 +32,15 @@ export const storageSlice = createSlice({
       state.username = action.payload.username;
       state.user_id = action.payload.user_id;
     },
+    logoutUser: (state) => {
+      state = initialState
+    },
     updateDailyTasks: (state, action) => {
-      console.log("Checking payload: ", action.payload)
       state.tasks.daily = action.payload
     }
   }
 })
 
 
-export const {loginUser, updateDailyTasks} = storageSlice.actions;
+export const { loginUser, logoutUser, updateDailyTasks } = storageSlice.actions;
 export default storageSlice.reducer;

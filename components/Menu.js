@@ -9,10 +9,14 @@ import { useState, useEffect } from "react";
 import { Slide, Text, Button, Icon, Pressable } from "native-base";
 import { MaterialCommunityIcons, Ionicons } from "@expo/vector-icons";
 import * as Font from "expo-font";
+import { useDispatch } from "react-redux";
+import { logoutUser } from "../redux/slices/storageSlice";
 
-export default function Menu({ currentView, updateCurrentView }) {
+const Menu = ({ currentView, updateCurrentView }) => {
   const [menu, openMenu] = useState(false);
   const [fontsLoaded, updateFonts] = useState(false);
+
+  const dispatch = useDispatch();
 
   //FOR IMPORTING FONTS ASYNC
   async function loadFonts() {
@@ -30,6 +34,11 @@ export default function Menu({ currentView, updateCurrentView }) {
   useEffect(() => {
     openMenu(false);
   }, [currentView]);
+
+  const handleLogout = () => {
+    dispatch(logoutUser())
+    updateCurrentView('landing')
+  }
 
   const MenuComponent = () => {
     return (
@@ -71,6 +80,14 @@ export default function Menu({ currentView, updateCurrentView }) {
             colorScheme="white"
           >
             <Text style={styles.menuItemButtonText}>Settings</Text>
+          </Button>
+          <Button
+            justifyContent={"flex-start"}
+            variant="ghost"
+            onPress={handleLogout}
+            colorScheme="white"
+          >
+            <Text style={styles.menuItemButtonText}>Log out</Text>
           </Button>
         </View>
         <View
@@ -180,3 +197,5 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
 });
+
+export default Menu;
