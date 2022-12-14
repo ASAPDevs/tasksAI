@@ -7,7 +7,7 @@ const db = require("./models/db")
 
 const typeDefs = gql`
   type Query {
-    getTasksByDay(date: String, user_id: Int): [Task!]
+    getTasksByDay(date: String!, user_id: Int): [Task]
   }
 
   type Mutation {
@@ -32,7 +32,6 @@ const typeDefs = gql`
     id: ID!,
     username: String,
     email: String,
-    password: String
   }
 
   type Task {
@@ -116,7 +115,7 @@ const resolvers = {
     createTask: async (root, args, context, info) => {
       // post req to Task db table
       const { task_name, task_description, date, time_start, time_finished, completed, user_id } = args.task;
-      console.log("Checking new task input: ", args)
+      console.log("Checking new task input: ", args.task)
       const newTask = await db.query('INSERT INTO tasks (task_name, task_description, date, time_start, time_finished, completed, user_id) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *;', [task_name, task_description, date, time_start, time_finished, completed, user_id]);
       return newTask.rows[0];
     },
