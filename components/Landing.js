@@ -7,9 +7,7 @@ import { useDispatch } from "react-redux";
 import { loginUser } from "../redux/slices/storageSlice";
 import { SIGNUP_MUTATION, LOGIN_MUTATION } from "./helpers/mutations";
 
-
-
-export default function LandingPage({ updateCurrentView }) {
+const LandingPage = ({ updateCurrentView }) => {
   const [currentView, setCurrentView] = useState("landing");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -24,7 +22,10 @@ export default function LandingPage({ updateCurrentView }) {
   // data received from useMutation
   const [login] = useMutation(LOGIN_MUTATION, {
     onCompleted: (data) => {
-      dispatch(loginUser({username: data.login.username, user_id: Number(data.login.id)}))
+      dispatch(loginUser({
+        username: data.login.username, 
+        user_id: Number(data.login.id)
+      }))
       updateCurrentView('dashboard')
     },
     onError: (err) => {
@@ -35,8 +36,10 @@ export default function LandingPage({ updateCurrentView }) {
 
   const [signup] = useMutation(SIGNUP_MUTATION, {
     onCompleted: (data) => {
-      console.log('Completed Signup: ', data)
-      dispatch(loginUser({username: data.signup.username, user_id: Number(data.signup.id)}))
+      dispatch(loginUser({ 
+        username: data.signup.username, 
+        user_id: Number(data.signup.id)
+      }))
       updateCurrentView('dashboard');
     },
     onError: (err) => {
@@ -51,13 +54,11 @@ export default function LandingPage({ updateCurrentView }) {
   
 
   const loginHandler = () => {
-    console.log("username/pw: ", username, password)
     login({ variables: { username: username, password: password } })
   }
 
   const signupHandler = () => {
-    console.log("username/pw: in signup ", email, username, password)
-    signup({variables: {email: email, password: password, username: username}})
+    signup({ variables: { email: email, password: password, username: username } })
   }
 
 
@@ -110,27 +111,45 @@ export default function LandingPage({ updateCurrentView }) {
                 onChangeText={setConfirmPassword}
                 onFocus={() => setFocus("confirm-password")}
               />
-              {focus == 'confirm-password' & password !== confirmPassword ? <Text style={{color: 'red', marginLeft: 7.5}}>Passwords don't match!</Text> : null}
+              {focus == 'confirm-password' && confirmPassword.length > 0 && password !== confirmPassword ? <Text style={{color: 'red', marginLeft: 7.5}}>Passwords don't match!</Text> : null}
             </>
           )}
 
           {/* Conditionally renders button according to signup/login state */}
-            {currentView == 'landing' && <TouchableOpacity disabled={!username || !password ? true : false} onPress={loginHandler} style={{...styles.signInButton, backgroundColor: `${!username || !password ? 'grey' : '#007bff'}`}}>
-              <Text
-                style={styles.buttonText}
+            {currentView == 'landing' && 
+              <TouchableOpacity 
+                disabled={!username || !password ? true : false} 
+                onPress={loginHandler} 
+                style={{...styles.signInButton, backgroundColor: `${!username || !password ? 'grey' : '#007bff'}`}}
               >
-                Sign In
-              </Text>
-            </TouchableOpacity>}
-            {currentView == 'register' && <TouchableOpacity disabled={!username || !password || !email || !confirmPassword ? true : false} onPress={signupHandler} style={{...styles.signInButton, backgroundColor: `${!username || !password || !email || !confirmPassword ? 'grey' : '#007bff'}`}}>
-              <Text
-                style={styles.buttonText}
+                <Text style={styles.buttonText}>
+                  Sign In
+                </Text>
+              </TouchableOpacity>
+            }
+
+            {currentView == 'register' && 
+              <TouchableOpacity 
+                disabled={!username || !password || !email || !confirmPassword ? true : false} 
+                onPress={signupHandler} 
+                style={{...styles.signInButton, backgroundColor: `${!username || !password || !email || !confirmPassword ? 'grey' : '#007bff'}`}}
               >
-                Sign Up
-              </Text>
-            </TouchableOpacity>}
-            {wrongLogin ? <Text style={{color: 'red', textAlign: 'center'}}>Invalid Login Credentials.</Text> : null}
-            {wrongSignup ? <Text style={{color: 'red', textAlign: 'center'}}>Invalid Signup. Check All Inputs.</Text> : null}  
+                <Text style={styles.buttonText}>
+                  Sign Up
+                </Text>
+              </TouchableOpacity>
+            }
+
+            {wrongLogin ? 
+              <Text style={{color: 'red', textAlign: 'center'}}>
+                Invalid Login Credentials.
+              </Text> : null
+            }
+            {wrongSignup ? 
+              <Text style={{color: 'red', textAlign: 'center'}}>
+                Invalid Signup. Check All Inputs.
+              </Text> : null
+            }  
         </View>
 
         <View style={styles.footer}>
@@ -215,3 +234,5 @@ const styles = StyleSheet.create({
     color: "#007bff"
   }
 });
+
+export default LandingPage;

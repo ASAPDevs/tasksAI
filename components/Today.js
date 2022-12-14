@@ -5,26 +5,21 @@ import {
   Text,
   Progress,
   Box,
-  Button,
   Heading,
   Pressable,
-  Input,
-  Modal,
-  Icon,
-  FormControl,
-  CheckBox,
 } from "native-base";
 import { ImageBackground, StyleSheet } from "react-native";
 import { FontAwesome } from "@expo/vector-icons";
-import DateTimePickerModal from "react-native-modal-datetime-picker";
 import banner from "../assets/banner.jpg";
 import { useSelector, useDispatch } from "react-redux";
 import {updateDailyTasks} from '../redux/slices/storageSlice'
 import { GET_TODAYS_TASKS } from "./helpers/queries";
 import { CREATE_TASKS } from "./helpers/mutations";
+import Task from "./Task";
+import NewTaskModal from "./NewTaskModal";
 
 
-function Today() {
+const Today = () => {
   // Figure out where we pull date or refetch date
   const [date, setDate] = useState(new Date().toDateString());
   // Need alg to read and determine (completed tasks) / (total tasks)
@@ -39,12 +34,12 @@ function Today() {
   //YYYY - MM - DD
   const today = new Date().toISOString().split('T')[0];
   console.log('today', today);
-  const todayInMs = new Date(today).getTime();
-  console.log("USER ID: ", userID, typeof userID)
+  // const todayInMs = new Date(today).getTime();
+  // console.log("USER ID: ", userID, typeof userID)
 
   const { data, error, loading, refetch } = useQuery(GET_TODAYS_TASKS, {
     onCompleted: (data) => {
-      console.log('after useQuery', data.getTasksByDay)
+      // console.log('after useQuery', data.getTasksByDay)
       dispatch(updateDailyTasks(data.getTasksByDay))
     },
     onError: (error) => {
@@ -65,7 +60,7 @@ function Today() {
 
 
   const addTask = (taskTitle, taskDescription, startTime, endTime) => {
-    let newTask = {
+    const newTask = {
       task_name: taskTitle,
       task_description: taskDescription,
       time_start: startTime.toString(),
@@ -106,7 +101,7 @@ function Today() {
               startTime={task.time_start}
               completed={task.completed}
               endTime={task.time_finished}
-              key={index}
+              key={task.id}
             />
           ))}
           <Pressable
@@ -131,198 +126,8 @@ function Today() {
       </Button> */}
     </View>
   );
-}
-
-const Task = ({ title, description, startTime, endTime, completed }) => {
-  const [openTask, toggleOpenTask] = useState(false);
-
-  // //Don't delete this
-  // let displayStartTime = new Date(startTime).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
-  // let displayEndTime = new Date(endTime).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
-
-  return (
-    <Pressable onPress={() => toggleOpenTask(true)}>
-      <View style={styles.taskContainer} key={title}>
-        <Heading style={styles.taskHeading}>{title}</Heading>
-        <View style={styles.taskContainerTimeContainer}>
-          <Text>{new Date(Number(startTime)).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</Text>
-          <Text>to</Text>
-          <Text>{new Date(Number(endTime)).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</Text>
-        </View>
-        <Modal isOpen={openTask} onClose={() => toggleOpenTask(false)}>
-          <Modal.CloseButton />
-          <Modal.Content
-            width="95%"
-            height="400"
-            display="flex"
-            flexDirection="column"
-            borderColor="grey"
-            borderWidth={2}
-            alignItems="center"
-            safeAreaTop={true}
-          >
-            <View style={styles.taskContainerTimeContainer}>
-              <Heading style={styles.taskHeading}>{title}</Heading>
-              <Text>{new Date(Number(startTime)).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</Text>
-              <Text>to</Text>
-              <Text>{new Date(Number(endTime)).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</Text>
-              <View style={styles.modalTaskDescriptionContainer}>
-                <Text>{description}</Text>
-              </View>
-            </View>
-          </Modal.Content>
-        </Modal>
-        {/* <CheckBox value="test" /> */}
-      </View>
-    </Pressable>
-  );
 };
 
-const NewTaskModal = ({ newTask, openNewTask, setTasks, addTask }) => {
-  const [startTime, updateStartTime] = useState("");
-  const [endTime, updateEndTime] = useState("");
-  const [taskTitle, updateTaskTitle] = useState("");
-  const [taskDescription, updateTaskDescription] = useState("");
-
-  // const addTask = () => {
-  //   let newTask = {
-  //     title: taskTitle,
-  //     description: taskDescription,
-  //     startTime: startTime,
-  //     endTime: endTime,
-  //   };
-  //   setTasks((task) => [...task, newTask]);
-  //   openNewTask(false);
-  // };
-
-
-  useEffect(() => {
-    console.log("START TIME: " + typeof startTime)
-    console.log("START TIME: " + typeof endTime)
-  }, [startTime, endTime])
-
-  return (
-    <Modal isOpen={newTask} onClose={() => openNewTask(false)} size="lg">
-      <Modal.Content
-        maxWidth="400"
-        height="400"
-        display="flex"
-        flexDirection="column"
-        alignItems="center"
-        safeAreaTop={true}
-      >
-        <Modal.CloseButton />
-        <Modal.Body>
-          <FormControl>
-            <FormControl.Label>Task Title:</FormControl.Label>
-            <Input
-              value={taskTitle}
-              onChangeText={(text) => updateTaskTitle(text)}
-              placeholder="Title"
-              minWidth={"100%"}
-            />
-          </FormControl>
-          <FormControl>
-            <FormControl.Label>Task Description:</FormControl.Label>
-            <Input
-              value={taskDescription}
-              onChangeText={(text) => updateTaskDescription(text)}
-              placeholder="Description"
-              minWidth={"100%"}
-            />
-          </FormControl>
-          <StartTimeInput
-            startTime={startTime}
-            updateStartTime={updateStartTime}
-          />
-          <EndTimeInput endTime={endTime} updateEndTime={updateEndTime} />
-          <Button
-            onPress={() =>
-              addTask(taskTitle, taskDescription, startTime, endTime)
-            }
-            marginTop={5}
-          >
-            <Text>Add Task</Text>
-          </Button>
-        </Modal.Body>
-      </Modal.Content>
-    </Modal>
-  );
-};
-
-const StartTimeInput = ({ startTime, updateStartTime }) => {
-  const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
-
-  const handleSetStartTime = (date) => {
-    updateStartTime(
-      date.getTime()
-    );
-    setDatePickerVisibility(false);
-  };
-
-  return (
-    <FormControl>
-      <FormControl.Label>Start Time:</FormControl.Label>
-      <Pressable>
-        <Input
-          isReadOnly
-          value={new Date(startTime).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-          // onChange={(e) => setStartTime(e.target.value.toLocaleString())}
-          minWidth={"100%"}
-          InputRightElement={
-            <Button onPress={() => setDatePickerVisibility(true)} size="sm">
-              Pick Time
-            </Button>
-          }
-        />
-      </Pressable>
-      <DateTimePickerModal
-        isVisible={isDatePickerVisible}
-        mode="time"
-        onConfirm={handleSetStartTime}
-        onCancel={() => setDatePickerVisibility(false)}
-        is24Hour={false}
-      />
-    </FormControl>
-  );
-};
-
-const EndTimeInput = ({ endTime, updateEndTime }) => {
-  const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
-
-  const handleSetEndTime = (date) => {
-    updateEndTime(
-      date.getTime()
-    );
-    setDatePickerVisibility(false);
-  };
-
-  return (
-    <FormControl>
-      <FormControl.Label>End Time:</FormControl.Label>
-      <Pressable>
-        <Input
-          isReadOnly
-          value={new Date(endTime).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-          // onChange={(e) => setStartTime(e.target.value.toLocaleString())}
-          minWidth={"100%"}
-          InputRightElement={
-            <Button onPress={() => setDatePickerVisibility(true)} size="sm">
-              Pick Time
-            </Button>
-          }
-        />
-      </Pressable>
-      <DateTimePickerModal
-        isVisible={isDatePickerVisible}
-        mode="time"
-        onConfirm={handleSetEndTime}
-        onCancel={() => setDatePickerVisibility(false)}
-        is24Hour={false}
-      />
-    </FormControl>
-  );
-};
 const styles = StyleSheet.create({
   mainContainer: {
     display: "flex",
@@ -368,19 +173,6 @@ const styles = StyleSheet.create({
     // height: 100,
     width: "100%",
   },
-  btn: {
-    position: "absolute",
-    bottom: 100,
-    right: "50%",
-  },
-  box: {
-    // height: 400,
-    position: "relative",
-    // bottom: 100,
-    // bottom: 600,
-    display: "flex",
-    flexDirection: "column",
-  },
   taskContainer: {
     display: "flex",
     flexDirection: "row",
@@ -393,19 +185,18 @@ const styles = StyleSheet.create({
     margin: 10,
     borderRadius: 10,
   },
-  taskContainerTimeContainer: {
+  btn: {
+    position: "absolute",
+    bottom: 100,
+    right: "50%",
+  },
+  box: {
+    // height: 400,
+    position: "relative",
+    // bottom: 100,
+    // bottom: 600,
     display: "flex",
     flexDirection: "column",
-    alignItems: "center",
-  },
-  taskHeading: {
-    fontSize: 18,
-  },
-  modalTaskDescriptionContainer: {
-    borderColor: "grey",
-    borderWidth: 5,
-    minWidth: "100%",
-    height: "75%",
   },
 });
 
