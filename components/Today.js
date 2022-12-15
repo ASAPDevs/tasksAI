@@ -7,6 +7,7 @@ import {
   Box,
   Heading,
   Pressable,
+  ScrollView
 } from "native-base";
 import { ImageBackground, SafeAreaView, StyleSheet } from "react-native";
 import banner from "../assets/banner.jpg";
@@ -32,7 +33,15 @@ const Today = () => {
 
   //YYYY - MM - DD
   const today = new Date().toISOString().split('T')[0];
-  console.log('today', today);
+ //FOR IMPORTING FONTS ASYNC
+ async function loadFonts() {
+  await Font.loadAsync({
+    Sofia: require("../assets/fonts/sofiapro-light.ttf"),
+    FamiljenGrotesk: require('../assets/fonts/FamiljenGrotesk-Regular.ttf'),
+    FamiljenBold: require('../assets/fonts/FamiljenGrotesk-SemiBold.ttf')
+  });
+  updateFonts(true);
+}
   // const todayInMs = new Date(today).getTime();
   // console.log("USER ID: ", userID, typeof userID)
 
@@ -109,10 +118,11 @@ const Today = () => {
         </Box>
       </ImageBackground>
 
-      <View style={styles.bottomContainer}>
-        <Heading>Tasks:</Heading>
+      <SafeAreaView style={styles.bottomContainer}>
+        <Heading style={styles.bottomContainerHeading}>Task List </Heading>
 
-        <SwipeListView style={styles.box} 
+       <ScrollView style={styles.taskListContainer}>
+       <SwipeListView style={styles.box} 
           data={swipeListData}
           renderItem={({ item }, rowMap) => {
             return (
@@ -143,11 +153,13 @@ const Today = () => {
           // }}
           // rightActivationValue={-100}
         />
+       </ScrollView>
+
         <Pressable
             onPress={() => openNewTask(true)}
-            style={styles.taskContainer}
+            style={{...styles.taskContainer, backgroundColor: 'orange'}}
           >
-            <Text>Create a new task..</Text>
+            <Text style={{fontFamily: 'FamiljenBold', fontWeight: 'bold', textAlign: 'center'}}>CREATE A NEW TASK</Text>
           </Pressable>
           {newTask ? (
             <NewTaskModal
@@ -158,7 +170,7 @@ const Today = () => {
           ) : (
             ""
           )}
-      </View>
+      </SafeAreaView>
     </View>
   );
 };
@@ -171,7 +183,8 @@ const styles = StyleSheet.create({
     // textAlign: "center",
     position: "absolute",
     width: "100%",
-    height: "100%",
+    height: "100%", 
+    alignItems: "center",
     // borderColor: "green",
     // borderWidth: 3,
     // maxWidth: "100%",
@@ -196,29 +209,49 @@ const styles = StyleSheet.create({
   topContainerText: {
     fontSize: 30,
     paddingVertical: 18,
+    fontFamily: "FamiljenGrotesk"
     // color: "white",
   },
   bottomContainer: {
-    // borderColor: "cyan",
-    // borderWidth: 3,
+    borderColor: "cyan",
+    borderWidth: 3,
     position: "relative",
     top: 120,
+    paddingTop: 20,
+    display: 'flex',
+    alignContent: "center",
+    flexDirection: "column",
+    justifyContent: 'center',
     // bottom: 600,
     // left: -214,
     // height: 100,
     width: "100%",
   },
+  bottomContainerHeading: {
+    fontFamily: "FamiljenGrotesk",
+    fontWeight: "bold",
+    fontSize: 25,
+    marginTop: 10,
+    marginBottom: 5,
+    textAlign: "center",
+  },
   taskContainer: {
     display: "flex",
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
+    justifyContent: "center",
     borderColor: "black",
-    borderWidth: 2,
+    alignItems: 'center',
+    borderWidth: 0,
     padding: 10,
     height: 70,
     margin: 10,
     borderRadius: 10,
+  },
+  taskListContainer: {
+    borderColor: 'black',
+    borderWidth: 2,
+    height: '50%',
   },
   btn: {
     position: "absolute",

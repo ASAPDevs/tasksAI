@@ -24,6 +24,17 @@ const Task = ({ taskId, title, description, startTime, endTime, completed, refet
         console.log("Error Updating Task: ", err)
       }
     })
+
+
+    //FOR IMPORTING FONTS ASYNC
+   async function loadFonts() {
+    await Font.loadAsync({
+      Sofia: require("../assets/fonts/sofiapro-light.ttf"),
+      FamiljenGrotesk: require('../assets/fonts/FamiljenGrotesk-Regular.ttf'),
+      FamiljenBold: require('../assets/fonts/FamiljenGrotesk-SemiBold.ttf')
+    });
+    updateFonts(true);
+  }
   
     return (
       <Pressable 
@@ -32,9 +43,9 @@ const Task = ({ taskId, title, description, startTime, endTime, completed, refet
         <View style={styles.taskContainer} key={title}>
           <Heading style={styles.taskHeading}>{title}</Heading>
           <View style={styles.taskContainerTimeContainer}>
-            <Text>{new Date(Number(startTime)).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</Text>
-            <Text>to</Text>
-            <Text>{new Date(Number(endTime)).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</Text>
+            <Text style={{...styles.timeContainerText, ...styles.timeText}}>{new Date(Number(startTime)).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</Text>
+            <Text style={styles.timeContainerText}>to</Text>
+            <Text style={{...styles.timeContainerText, ...styles.timeText}}>{new Date(Number(endTime)).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</Text>
           </View>
           <TaskModal 
             updateTask={updateTask} openTask={openTask} 
@@ -87,25 +98,49 @@ const Task = ({ taskId, title, description, startTime, endTime, completed, refet
   const styles = StyleSheet.create({
     taskContainer: {
       display: "flex",
-      flexDirection: "row",
+      flexDirection: "column",
       alignItems: "center",
       justifyContent: "space-between",
       borderColor: "black",
-      borderWidth: 2,
+      borderBottomWidth: 1,
+      topBorderWidth: 1,
       padding: 10,
-      height: 70,
-      margin: 10,
+      height: 90,
+      
+      width: '100%',
       backgroundColor: "white",
-      borderRadius: 10,
       zIndex: 10,
     },
     taskContainerTimeContainer: {
       display: "flex",
-      flexDirection: "column",
+      flexDirection: "row",
+      fontSize: 17,
+      marginTop: 2,
+      gap: 15,
+      width: '70%',
       alignItems: "center",
+      justifyContent: "space-around",
+      borderColor: "black",
+      borderWidth: 0
+    },
+    timeContainerText: {
+      fontSize: 17,
+      textAlign: 'center',
+      fontFamily: 'FamiljenBold',
+      fontWeight: 'bold'
+    },
+    timeText: {
+      color: '#30C0E3',
+      borderColor: 'black',
+      borderWidth: 0,
+      padding: 3,
+      borderRadius: '2%',
+
     },
     taskHeading: {
       fontSize: 18,
+      fontFamily: "FamiljenGrotesk",
+      textDecorationLine: "underline"
     },
     deleteTaskContainer: {
       display: "flex",

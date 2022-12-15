@@ -22,9 +22,12 @@ const Menu = ({ currentView, updateCurrentView }) => {
   async function loadFonts() {
     await Font.loadAsync({
       Sofia: require("../assets/fonts/sofiapro-light.ttf"),
+      FamiljenGrotesk: require('../assets/fonts/FamiljenGrotesk-Regular.ttf')
     });
     updateFonts(true);
   }
+
+  
 
   //Loads Font On FIRST/Initial Mount
   useEffect(() => {
