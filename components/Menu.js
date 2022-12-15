@@ -18,21 +18,7 @@ const Menu = ({ currentView, updateCurrentView }) => {
 
   const dispatch = useDispatch();
 
-  //FOR IMPORTING FONTS ASYNC
-  async function loadFonts() {
-    await Font.loadAsync({
-      Sofia: require("../assets/fonts/sofiapro-light.ttf"),
-      FamiljenGrotesk: require('../assets/fonts/FamiljenGrotesk-Regular.ttf')
-    });
-    updateFonts(true);
-  }
 
-  
-
-  //Loads Font On FIRST/Initial Mount
-  useEffect(() => {
-    loadFonts();
-  }, []);
   //Whenever currentView updates, we will close the menu with this useEffect
   useEffect(() => {
     openMenu(false);
@@ -110,7 +96,6 @@ const Menu = ({ currentView, updateCurrentView }) => {
     );
   };
 
-  if (fontsLoaded) {
     return (
       <View style={styles.container}>
         <TouchableOpacity
@@ -124,9 +109,6 @@ const Menu = ({ currentView, updateCurrentView }) => {
         </Slide>
       </View>
     );
-  } else {
-    return null;
-  }
 }
 
 const styles = StyleSheet.create({

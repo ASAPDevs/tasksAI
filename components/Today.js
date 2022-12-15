@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useQuery, useMutation } from "@apollo/client";
 import {
   View,
@@ -7,7 +7,8 @@ import {
   Box,
   Heading,
   Pressable,
-  ScrollView
+  ScrollView,
+  FlatList
 } from "native-base";
 import { ImageBackground, SafeAreaView, StyleSheet } from "react-native";
 import banner from "../assets/banner.jpg";
@@ -15,6 +16,7 @@ import { useSelector, useDispatch } from "react-redux";
 import {updateDailyTasks} from '../redux/slices/storageSlice'
 import { GET_TODAYS_TASKS } from "./helpers/queries";
 import { CREATE_TASKS, DELETE_TASK } from "./helpers/mutations";
+import * as Font from "expo-font";
 import Task, { DeleteButton } from "./Task";
 import NewTaskModal from "./NewTaskModal";
 import { SwipeListView } from "react-native-swipe-list-view";
@@ -33,15 +35,6 @@ const Today = () => {
 
   //YYYY - MM - DD
   const today = new Date().toISOString().split('T')[0];
- //FOR IMPORTING FONTS ASYNC
- async function loadFonts() {
-  await Font.loadAsync({
-    Sofia: require("../assets/fonts/sofiapro-light.ttf"),
-    FamiljenGrotesk: require('../assets/fonts/FamiljenGrotesk-Regular.ttf'),
-    FamiljenBold: require('../assets/fonts/FamiljenGrotesk-SemiBold.ttf')
-  });
-  updateFonts(true);
-}
   // const todayInMs = new Date(today).getTime();
   // console.log("USER ID: ", userID, typeof userID)
 
@@ -118,11 +111,10 @@ const Today = () => {
         </Box>
       </ImageBackground>
 
-      <SafeAreaView style={styles.bottomContainer}>
+      <View style={styles.bottomContainer}>
         <Heading style={styles.bottomContainerHeading}>Task List </Heading>
 
-       <ScrollView style={styles.taskListContainer}>
-       <SwipeListView style={styles.box} 
+        <SwipeListView style={styles.taskListContainer} 
           data={swipeListData}
           renderItem={({ item }, rowMap) => {
             return (
@@ -146,14 +138,13 @@ const Today = () => {
             )
           }}
 
-          rightOpenValue={-100}
+          rightOpenValue={-190}
           
           // onRightActionStatusChange={() => {
           //   console.log('Deleted')
           // }}
           // rightActivationValue={-100}
         />
-       </ScrollView>
 
         <Pressable
             onPress={() => openNewTask(true)}
@@ -170,7 +161,7 @@ const Today = () => {
           ) : (
             ""
           )}
-      </SafeAreaView>
+      </View>
     </View>
   );
 };
@@ -213,8 +204,8 @@ const styles = StyleSheet.create({
     // color: "white",
   },
   bottomContainer: {
-    borderColor: "cyan",
-    borderWidth: 3,
+    // borderColor: "cyan",
+    // borderWidth: 3,
     position: "relative",
     top: 120,
     paddingTop: 20,
@@ -225,7 +216,7 @@ const styles = StyleSheet.create({
     // bottom: 600,
     // left: -214,
     // height: 100,
-    width: "100%",
+    width: "120%",
   },
   bottomContainerHeading: {
     fontFamily: "FamiljenGrotesk",
@@ -257,14 +248,6 @@ const styles = StyleSheet.create({
     position: "absolute",
     bottom: 100,
     right: "50%",
-  },
-  box: {
-    // height: 400,
-    position: "relative",
-    // bottom: 100,
-    // bottom: 600,
-    display: "flex",
-    flexDirection: "column",
   },
 });
 

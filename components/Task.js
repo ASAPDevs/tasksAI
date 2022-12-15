@@ -26,26 +26,23 @@ const Task = ({ taskId, title, description, startTime, endTime, completed, refet
     })
 
 
-    //FOR IMPORTING FONTS ASYNC
-   async function loadFonts() {
-    await Font.loadAsync({
-      Sofia: require("../assets/fonts/sofiapro-light.ttf"),
-      FamiljenGrotesk: require('../assets/fonts/FamiljenGrotesk-Regular.ttf'),
-      FamiljenBold: require('../assets/fonts/FamiljenGrotesk-SemiBold.ttf')
-    });
-    updateFonts(true);
-  }
+  
   
     return (
       <Pressable 
         onPress={() => toggleOpenTask(true)}
       >
         <View style={styles.taskContainer} key={title}>
-          <Heading style={styles.taskHeading}>{title}</Heading>
-          <View style={styles.taskContainerTimeContainer}>
-            <Text style={{...styles.timeContainerText, ...styles.timeText}}>{new Date(Number(startTime)).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</Text>
-            <Text style={styles.timeContainerText}>to</Text>
-            <Text style={{...styles.timeContainerText, ...styles.timeText}}>{new Date(Number(endTime)).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</Text>
+          <View style={styles.taskContainerInnerWrapper}>
+            <Heading style={styles.taskHeading}>{title}</Heading>
+            <View style={styles.taskContainerTimeContainer}>
+              <Text style={{...styles.timeContainerText, ...styles.timeText}}>{new Date(Number(startTime)).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</Text>
+              <Text style={styles.timeContainerText}>to</Text>
+              <Text style={{...styles.timeContainerText, ...styles.timeText}}>{new Date(Number(endTime)).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</Text>
+            </View>
+            <View style={styles.swipeRightIcon}>
+              <Icon as={Entypo} name="chevron-small-right" size={5} />
+            </View>
           </View>
           <TaskModal 
             updateTask={updateTask} openTask={openTask} 
@@ -67,9 +64,10 @@ const Task = ({ taskId, title, description, startTime, endTime, completed, refet
       return (
         <View style={styles.deleteTaskContainer}>
           {!deleteConfirmation ? (
-          <Pressable onPress={() => {
+          <Pressable style={{display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center'}} onPress={() => {
             toggleDeleteConfirmation(true)
           }}>
+            <Text style={{color: 'white'}}>Delete </Text>
             <Icon
               as={MaterialCommunityIcons}
               name="delete"
@@ -82,7 +80,7 @@ const Task = ({ taskId, title, description, startTime, endTime, completed, refet
             rowMap[item.key].closeRow()
             toggleDeleteConfirmation(false)
           }}>
-            <Text style={{color: 'white'}}>Delete? </Text>
+            <Text style={{color: 'white'}}>Are you sure? </Text>
             <Icon
               as={Entypo}
               name="circle-with-cross"
@@ -98,9 +96,9 @@ const Task = ({ taskId, title, description, startTime, endTime, completed, refet
   const styles = StyleSheet.create({
     taskContainer: {
       display: "flex",
-      flexDirection: "column",
+      flexDirection: "row",
       alignItems: "center",
-      justifyContent: "space-between",
+      justifyContent: "center",
       borderColor: "black",
       borderBottomWidth: 1,
       topBorderWidth: 1,
@@ -111,17 +109,30 @@ const Task = ({ taskId, title, description, startTime, endTime, completed, refet
       backgroundColor: "white",
       zIndex: 10,
     },
+    taskContainerInnerWrapper: {
+      display: 'flex',
+      width: '80%',
+      borderColor: 'red',
+      borderWidth: 0,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      padding: 5,
+    },
     taskContainerTimeContainer: {
       display: "flex",
-      flexDirection: "row",
+      flexDirection: "column",
       fontSize: 17,
       marginTop: 2,
-      gap: 15,
-      width: '70%',
+      gap: 20,
+      height: '110%',
+      width: '25%',
       alignItems: "center",
+      justifyItems: 'center',
       justifyContent: "space-around",
       borderColor: "black",
-      borderWidth: 0
+      borderWidth: 0,
+      marginRight: 5
     },
     timeContainerText: {
       fontSize: 17,
@@ -130,7 +141,7 @@ const Task = ({ taskId, title, description, startTime, endTime, completed, refet
       fontWeight: 'bold'
     },
     timeText: {
-      color: '#30C0E3',
+      color: '#0B486B',
       borderColor: 'black',
       borderWidth: 0,
       padding: 3,
@@ -148,14 +159,20 @@ const Task = ({ taskId, title, description, startTime, endTime, completed, refet
       alignItems: "center",
       justifyContent: "flex-end",
       borderColor: "black",
-      borderWidth: 2,
+      borderBottomWidth: 1,
+      topBorderWidth: 1,
       padding: 10,
-      height: 70,
-      margin: 10,
+      paddingRight: 30,
+      height: 90,
+      width: '95%',
       zIndex: 9,
       backgroundColor: 'red',
       borderRadius: 10,
     },
+    swipeRightIcon: {
+      position: "absolute",
+      right: -18.5
+    }
   });
 
 export default Task;
