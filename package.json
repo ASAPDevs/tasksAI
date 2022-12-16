@@ -19,6 +19,7 @@
     "@react-native-community/datetimepicker": "6.5.2",
     "@reduxjs/toolkit": "^1.9.1",
     "apollo-server-express": "^3.11.1",
+    "bcrypt": "^5.1.0",
     "dotenv": "^16.0.3",
     "easygraphql-tester": "^6.0.1",
     "env": "^0.0.2",
@@ -33,7 +34,9 @@
     "react-native": "0.70.5",
     "react-native-modal-datetime-picker": "^14.0.0",
     "react-native-safe-area-context": "4.4.1",
-    "react-native-svg": "13.4.0",
+    "react-native-svg": "^13.4.0",
+    "react-native-svg-transformer": "^1.0.0",
+    "react-native-swipe-list-view": "^3.2.9",
     "react-redux": "^8.0.5"
   },
   "devDependencies": {

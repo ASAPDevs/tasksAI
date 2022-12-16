@@ -4,22 +4,8 @@ const supertest = require('supertest');
 const app = require('../server.js');
 const request = require('supertest')
 
-app.server = app.listen(3333);
-
-
-// console.log('typeDefs: ', typeDefs)
-// console.log('resolvers', resolvers)
-// const tester = new EasyGraphQLTester(typeDefs, resolvers)
-
-// //arguments: query, rootValue, contextValue, and variableValues
-// tester.graphql(signUpQuery, undefined, undefined, {email: 'testing@test.com', username: 'tester1', password: 'tester1'})
-// .then(result => console.log(result))
-// .catch(err => console.log(err));
-
-
 describe('Schema testing', () => {
     let tester
-
     beforeEach(() => {
         tester = new EasyGraphQLTester(typeDefs, resolvers)
     })
@@ -104,12 +90,13 @@ describe('Schema testing', () => {
 
 
 describe('Login Resolver', () => {
+    beforeEach(() => app.server = app.listen(3333))
     afterEach(() => app.server.close())
 
     it('Should login and send back a user if information is correct', (done) => {
         const loginQuery = `
             mutation {
-                login(username: "jack", password: "abc") {
+                login(username: "testuser", password: "a123") {
                     id
                     username
                 }
@@ -126,8 +113,8 @@ describe('Login Resolver', () => {
                 if (err) return done(err)
                 expect(res.body && typeof res.body === 'object').toBe(true)
                 expect(res.body).toHaveProperty('data')
-                expect(res.body.data.login.id).toBe('2')
-                expect(res.body.data.login.username).toBe('jack')
+                expect(res.body.data.login.id).toBe('20')
+                expect(res.body.data.login.username).toBe('testuser')
                 return done()
             })
     })
@@ -135,7 +122,7 @@ describe('Login Resolver', () => {
     it('Should return error message array and data is null', (done) => {
         const loginQuery = `
             mutation {
-                login(username: "brian", password: "abc") {
+                login(username: "testuser", password: "abc") {
                     id
                     username
                 }
@@ -159,12 +146,13 @@ describe('Login Resolver', () => {
 
 
 describe('Testing GetTasks Resolver', () => {
+    beforeEach(() => app.server = app.listen(3333))
     afterEach(() => app.server.close())
 
     it('Should return an array of tasks of the given date for a specific user', (done) => {
         const getTasksQuery = `
         query {
-            getTasksByDay(date: "2022-12-08", user_id: 2) {
+            getTasksByDay(date: "2022-12-15", user_id: 21) {
                 id
                 task_name
                 task_description
@@ -187,29 +175,31 @@ describe('Testing GetTasks Resolver', () => {
                 if (err) return done(err)
                 expect(res.body.data).toBeTruthy()
                 expect(res.body.errors).not.toBe(null)
-                expect(res.body.data.getTasksByDay).toHaveLength(2)
-                expect(res.body.data.getTasksByDay[0].id).toEqual('2')
-                expect(res.body.data.getTasksByDay[0].task_name).toEqual('make portfolio')
-                expect(res.body.data.getTasksByDay[0].date).toEqual('1670518800000')
+                expect(res.body.data.getTasksByDay).toHaveLength(3)
+                expect(res.body.data.getTasksByDay[0].id).toEqual('75')
+                expect(res.body.data.getTasksByDay[0].task_name).toMatch(/react/i)
+                expect(res.body.data.getTasksByDay[0].task_description).toMatch(/learn react/i)
+                expect(res.body.data.getTasksByDay[0].date).toEqual('1671129416553')
                 return done()
             })
     })
 })
 
 describe('Testing CreateTask Resolver', () => {
+    beforeEach(() => app.server = app.listen(3333))
     afterEach(() => app.server.close());
 
     it('Should return a newly created task', (done) => {
         // COMMENT: create another db for testing
         const taskInput = `
             {
-                task_name: "make project",
-                task_description: "make a cool project", 
-                date: "1670518800000", 
-                time_start: "1670518800000", 
-                time_finished: "1670522400000", 
+                task_name: "test project",
+                task_description: "make a test project", 
+                date: "1671129296702", 
+                time_start: "1671129299999", 
+                time_finished: "1671129399999", 
                 completed: false, 
-                user_id: 1
+                user_id: 20
             }
         `
         const createTaskQuery = `
@@ -236,8 +226,8 @@ describe('Testing CreateTask Resolver', () => {
             .end((err, res) => {
                 if (err) return done(err)
                 expect(res.body).toHaveProperty('data')
-                expect(res.body.data.createTask.task_name).toEqual('make project')
-                expect(res.body.data.createTask.user_id).toEqual(1)
+                expect(res.body.data.createTask.task_name).toEqual('test project')
+                expect(res.body.data.createTask.user_id).toEqual(20)
                 return done()
             })
     })

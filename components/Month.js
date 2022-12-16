@@ -25,13 +25,13 @@ function Calendar(props) {
     // This function creates empty dates at the beginning of the month starting Sunday
     const addEmptyDays = (option) => {
         const listOfDays = [];
-        const numberOfDays = option === 'start' ? firstMonthDay : 6 - lastMonthDay;
-        for (let i = 0; i < numberOfDays; i++) {
+        const lastMonthLastDate = new Date(date.getFullYear(), date.getMonth(), 0);
+        const start = option === 'start' ? lastMonthLastDate.getDate() - firstMonthDay + 1 : 1;
+        const end = option === 'start' ? lastMonthLastDate.getDate() : 6 - lastMonthDay;
+        for (let i = start; i <= end; i++) {
             listOfDays.push(
-                <TouchableOpacity
-                    style={styles.day}
-                    onPress={() => { console.log('hi') }}>
-                    <Text>null</Text>
+                <TouchableOpacity style={styles.day}>
+                    <Text style={{color: 'grey'}}>{i}</Text>
                 </TouchableOpacity>
             );
         }
@@ -82,9 +82,9 @@ function Calendar(props) {
 
             {/* This section shows the title of weekdays */}
             <View style={styles.weekdays}>
-                {days.map(day => {
+                {days.map((day, index) => {
                     return (
-                        <View style={{ ...styles.day, borderWidth: 0 }}>
+                        <View key={`${props.date}-${index}`} style={{ ...styles.day, borderWidth: 0 }}>
                             <Text>{day}</Text>
                         </View>
                     )
@@ -108,6 +108,7 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         borderWidth: 4,
+        borderRadius: 5,
         backgroundColor: "#fff",
         position: 'absolute',
         top: 120,

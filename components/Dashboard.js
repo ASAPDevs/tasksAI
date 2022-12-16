@@ -14,10 +14,12 @@ const Dashboard = () => {
   const username = useSelector((state) => state.storage.username)
 
 
-  async function loadFonts() {
+   //FOR IMPORTING FONTS ASYNC
+   async function loadFonts() {
     await Font.loadAsync({
-      'Sofia': require('../assets/fonts/sofiapro-bold.ttf')
-    })
+      Sofia: require("../assets/fonts/sofiapro-light.ttf"),
+      FamiljenGrotesk: require('../assets/fonts/FamiljenGrotesk-Regular.ttf')
+    });
     updateFonts(true);
   }
 
@@ -65,7 +67,7 @@ const styles = StyleSheet.create({
   },
   heading: {
     textAlign: 'center',
-    fontFamily: 'Sofia',
+    fontFamily: 'FamiljenGrotesk',
     padding: 10,
     fontSize: 35,
     width: '100%',
@@ -73,10 +75,11 @@ const styles = StyleSheet.create({
     letterSpacing: 0
   },
   username: {
-    fontFamily: 'Sofia',
+    fontFamily: 'FamiljenGrotesk',
     padding: 10,
     flexWrap: 'wrap',
     fontSize: 35,
+    height: 25,
     width: '100%',
     lineHeight: 50,
     letterSpacing: 0,
