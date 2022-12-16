@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, Divider, Heading, Pressable } from "native-base";
+import { View, Text, Divider, Heading, Circle,  Pressable } from "native-base";
 import { StyleSheet, ActivityIndicator } from "react-native";
 import Task, { DeleteButton } from "./Task";
 import NewTaskModal from "./NewTaskModal";
 import { SwipeListView } from "react-native-swipe-list-view";
 import TaskListTabGroup from "./TaskListTabGroup";
+import CreateTaskCircle from "./CreateTaskCircle";
 
 const TaskListContainer = ({
   addTask,
@@ -164,11 +165,12 @@ const TaskListContainer = ({
       )}
       {/* Tasks List */}
       {!loading && tabRender()}
-      <View style={styles.createTaskButtonContainer}>
-        <Pressable
+     
+        {/* <Pressable
           onPress={() => openNewTask(true)}
-          style={{ ...styles.createTaskButton }}
+           style={{ ...styles.createTaskButtonContainer } }
         >
+           <Circle style={{ ...styles.createTaskButton }}>
           <Text
             style={{
               fontFamily: "FamiljenGrotesk",
@@ -177,10 +179,19 @@ const TaskListContainer = ({
               fontSize: 18,
             }}
           >
-            CREATE A NEW TASK
+            CREATE A{"\n"} NEW TASK
+            
           </Text>
-        </Pressable>
-      </View>
+          </Circle>
+        </Pressable> */}
+        <CreateTaskCircle
+      radius={50}
+      borderWidth={2}
+      color="#00FF00"
+      text="Hello"
+      icon="clock"
+      onPress={() => openNewTask(true)}
+    />
       {newTask ? (
         <NewTaskModal
           addTask={addTask}
@@ -234,17 +245,15 @@ const styles = StyleSheet.create({
   },
   createTaskButtonContainer: {
     position: "absolute",
-    width: "100%",
-    bottom: -110,
-    height: 120,
-    display: "flex",
-    flexDirection: "column",
-    alignContent: "center",
-    justifyContent: "center",
+    width:  150,
+    height: 150,
   },
   createTaskButton: {
     borderColor: "black",
-    borderWidth: 1,
+    borderWidth: 0,
+    borderRadius: "50%",
+    borderWidth: 2,
+    borderColor: "black",
     paddingTop: 5,
     backgroundColor: "orange",
     position: "relative",
