@@ -74,6 +74,8 @@ const Today = () => {
     });
   };
 
+  //this handler creates a new task using the current state inputs and sends it to the useMutation function
+  //then closes the modal
   const addTask = (taskTitle, taskDescription, startTime, endTime) => {
     const newTask = {
       task_name: taskTitle,
@@ -102,11 +104,7 @@ const Today = () => {
     setProgress(((completed.length / tasks.length) * 100).toFixed(2));
   }, [tasks]);
 
-  // // This data is needed to use for SwipeListView
-  // const swipeListData = tasks.map((task, index) => ({
-  //   ...task,
-  //   key: index
-  // }))
+
 
   return (
     <View style={styles.mainContainer}>

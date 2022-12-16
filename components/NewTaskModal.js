@@ -1,15 +1,14 @@
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
     Text,
     Button,
     Pressable,
     Input,
-    View,
     Modal,
     FormControl,
-    Icon
+    Icon,
 } from "native-base";
-import {StyleSheet} from 'react-native';
+import {StyleSheet, Animated, View} from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 
@@ -19,6 +18,79 @@ const NewTaskModal = ({ newTask, openNewTask, setTasks, addTask }) => {
     const [endTime, updateEndTime] = useState("");
     const [taskTitle, updateTaskTitle] = useState("");
     const [taskDescription, updateTaskDescription] = useState("");
+    const [invalidSubmission, toggleInvalidSubmission] = useState(false);
+
+
+
+    //handles main functionality of onPress
+    const onPress = () => {
+        if (taskTitle == '') toggleInvalidSubmission(true)
+        else addTask(taskTitle, taskDescription, startTime, endTime)
+    }
+
+    const CreateButton = ({onPress}) => {
+        const [animatedValue, setAnimatedValue] = useState(new Animated.Value(1));
+        
+
+        const onPressIn = () => {
+          Animated.spring(animatedValue, {
+            toValue: 0.98,
+            friction: 7,
+            tension: 50,
+            useNativeDriver: true,
+          }).start();
+        };
+    
+        const onPressOut = () => {
+          Animated.spring(animatedValue, {
+            toValue: 1,
+            friction: 7,
+            tension: 30,
+            useNativeDriver: true,
+          }).start();
+        };
+
+        
+    
+        const buttonStyle = {
+          transform: [{ scale: animatedValue }],
+        };
+    
+        return (
+          <Pressable
+            onPressIn={onPressIn}
+            onPressOut={onPressOut}
+            onPress={onPress}
+          >
+            <Animated.View
+              style={{
+                ...buttonStyle,
+                marginTop: 15,
+                alignSelf: 'center',
+                width: '30%',
+                height: 50,
+                borderRadius: 10,
+                backgroundColor: '#FAA946',
+                flexDirection: 'column',
+                display: 'flex',
+                borderColor: '#E8EEF7',
+                borderWidth: 3,
+                justifyContent: 'center',
+              }}
+            >
+              <Icon marginTop={0.5} alignSelf="center" as={FontAwesome} name="plus" size={3} color="#E8EEF7" />
+            </Animated.View>
+          </Pressable>
+        );
+      };
+
+
+    
+    useEffect(() => {
+        if (invalidSubmission) setTimeout(() => toggleInvalidSubmission(false), 5000)
+    }, [invalidSubmission])
+
+
 
     return (
         <Modal top={5} isOpen={newTask} onClose={() => openNewTask(false)} size="xl">
@@ -58,14 +130,16 @@ const NewTaskModal = ({ newTask, openNewTask, setTasks, addTask }) => {
                 <FormControl style={styles.taskNameContainer}>
                     <FormControl.Label style={{fontFamily: 'FamiljenGrotesk'}}>Title:</FormControl.Label>
                     <Input
+                    invalidOutlineColor="red.500"
+                    isInvalid={invalidSubmission ? true : false}
                     borderColor="black"
                     value={taskTitle}
                     focusOutlineColor="black"
                     _focus={{
-                        bgColor: 'rgb(243,228,197)'
+                        bgColor: `${invalidSubmission ? "white" : 'rgb(243,228,197)'}`
                     }}
                     onChangeText={(text) => updateTaskTitle(text)}
-                    placeholder="Title"
+                    placeholder={invalidSubmission ? "A title is needed for a new task!" : "Title"}
                     style={{fontFamily: 'FamiljenGrotesk'}}
                     minWidth={"100%"}
                     />
@@ -94,27 +168,7 @@ const NewTaskModal = ({ newTask, openNewTask, setTasks, addTask }) => {
                     <StartTimeInput startTime={startTime} updateStartTime={updateStartTime}/>
                     <EndTimeInput endTime={endTime} updateEndTime={updateEndTime} />
                 </View>
-                <Button
-                    size="md"
-                    alignSelf="center"
-                    width="50%"
-                    height="15.5%"
-                    maxHeight="15.5%"
-                    display="flex"
-                    bgColor="#FAA946"
-                    justifyContent="center"
-                    flexDirection="column"
-                    rightIcon={""}
-                    borderColor="black"
-                    borderWidth={1}
-                    onPress={() =>
-                    addTask(taskTitle, taskDescription, startTime, endTime)
-                    }
-                    marginTop={5}
-                >
-                    <Text style={{fontFamily: 'FamiljenBold', color: 'black'}}>CREATE</Text>
-                    <Icon marginTop={0.5} alignSelf="center" as={FontAwesome} name="plus" size={3} color="black" />
-                </Button>
+                <CreateButton onPress={onPress} />
                 </Modal.Body>
             </Modal.Content>
         </Modal>

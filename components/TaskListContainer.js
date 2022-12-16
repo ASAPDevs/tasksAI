@@ -6,6 +6,8 @@ import NewTaskModal from "./NewTaskModal";
 import { SwipeListView } from "react-native-swipe-list-view";
 import TaskListTabGroup from "./TaskListTabGroup";
 import CreateTaskCircle from "./CreateTaskCircle";
+import Blockloadingsvg from '../assets/blocksloading.svg'
+import { Svg } from 'react-native-svg';
 
 const TaskListContainer = ({
   addTask,
@@ -160,7 +162,10 @@ const TaskListContainer = ({
             justifyContent: "center",
           }}
         >
-          <ActivityIndicator size="large" />
+          {/* <ActivityIndicator size="large" /> */}
+          <Svg width={24} height={24} viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+ <Blockloadingsvg />
+</Svg>
         </View>
       )}
       {/* Tasks List */}
@@ -192,7 +197,7 @@ const TaskListContainer = ({
       icon="clock"
       onPress={() => openNewTask(true)}
     />
-      {newTask ? (
+      {/* {newTask ? (
         <NewTaskModal
           addTask={addTask}
           newTask={newTask}
@@ -200,7 +205,12 @@ const TaskListContainer = ({
         />
       ) : (
         ""
-      )}
+      )} */}
+       <NewTaskModal
+          addTask={addTask}
+          newTask={newTask}
+          openNewTask={openNewTask}
+        />
     </View>
   );
 };
