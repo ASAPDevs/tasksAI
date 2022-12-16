@@ -19,6 +19,7 @@
     "@react-native-community/datetimepicker": "6.5.2",
     "@reduxjs/toolkit": "^1.9.1",
     "apollo-server-express": "^3.11.1",
+    "bcrypt": "^5.1.0",
     "dotenv": "^16.0.3",
     "easygraphql-tester": "^6.0.1",
     "env": "^0.0.2",
