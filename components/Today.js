@@ -110,11 +110,7 @@ const Today = () => {
 
   return (
     <View style={styles.mainContainer}>
-      <ImageBackground
-        style={styles.topContainer}
-        // source={banner}
-        resizeMode="cover"
-      >
+      <ImageBackground style={styles.topContainer} resizeMode="cover">
         <View>
           <Text style={styles.topContainerText}>Today:</Text>
           <Text>{date}</Text>
