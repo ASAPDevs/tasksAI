@@ -11,7 +11,7 @@ const typeDefs = gql`
   type Mutation {
     login(username: String!, password: String!): User!
     signup(email: String!, username: String!, password: String!): User!
-    changePassword(userInput: ChangePassWordInput!): User!
+    changePassword(userInput: ChangePassWordInput): User!
     createTask(task: TaskInput): Task!
     updateTask(task: UpdateTaskInput): Task
     deleteTask(id: ID!): Boolean
@@ -107,16 +107,16 @@ const resolvers = {
       }
 
       // Verify password against hased password in database
-      // if (await bcrypt.compare(password, user.password)) {
-      //   return user;
-      // } else {
-      //   throw new GraphQLError('Password is incorrect');
-      // }
-
-      if (user.password !== password) {
+      if (await bcrypt.compare(password, user.password)) {
+        return user;
+      } else {
         throw new GraphQLError('Password is incorrect');
       }
-      return user;
+
+      // if (user.password !== password) {
+      //   throw new GraphQLError('Password is incorrect');
+      // }
+      // return user;
     },
     signup: async (_, args) => {
       // create user with email username and pass from args
@@ -146,8 +146,9 @@ const resolvers = {
 
       return newUser.rows[0];
     },
-    changePassword: async(_, { userInput }) => {
-      const { username, oldPassword, newPassword } = userInput;
+    changePassword: async(_, args) => {
+      const { username, oldPassword, newPassword } = args.userInput;
+      console.log(username, oldPassword, newPassword)
       // Check if there is a same username exists in database. Throw error if not
       const dbResult = await db.query('SELECT * FROM users WHERE username = $1', [username]);
       const existingUser = dbResult.rows[0];
@@ -155,9 +156,16 @@ const resolvers = {
         throw new GraphQLError('User does not exist');
       }
 
-      // Verify password against hashed password in database
-    }
-    ,
+      // Verify old password against hashed password in database
+      if (await bcrypt.compare(oldPassword, existingUser.password)) {
+        const salt = await bcrypt.genSalt(10);
+        const newHashedPassword = await bcrypt.hash(newPassword, salt);
+        const updatedUser = await db.query('UPDATE users SET password = $1 WHERE username = $2 RETURNING id, username, email;', [newHashedPassword, username]);
+        return updatedUser.rows[0]
+      } else {
+        throw new GraphQLError('Invalid password. Please provide correct password');
+      }
+    },
     createTask: async (_, args) => {
       // post req to Task db table
       const { task_name, task_description, date, time_start, time_finished, completed, user_id } = args.task;

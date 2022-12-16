@@ -20,6 +20,16 @@ export const SIGNUP_MUTATION = gql`
   }
 `
 
+export const CHANGE_PASSWORD = gql`
+  mutation ChangePassword($userInput: ChangePassWordInput!) {
+    changePassword(userInput: $userInput) {
+      id
+      username
+      email
+    }
+  }
+`;
+
 export const CREATE_TASKS = gql`
   mutation CreateTask($task: TaskInput) {
     createTask(task: $task) {

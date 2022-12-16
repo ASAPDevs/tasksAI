@@ -12,6 +12,7 @@ const LazyLoadDashboard = React.lazy(() => import("./components/Dashboard"));
 const LazyLoadCalendar = React.lazy(() => import("./components/Calendar"));
 const LazyLoadToday = React.lazy(() => import("./components/Today"));
 const LazyLoadSettings = React.lazy(() => import("./components/Settings"));
+const LazyChangePasswordForm = React.lazy(() => import("./components/ChangePasswordForm"));
 
 const client = new ApolloClient({
   uri: 'http://localhost:3000/graphql',
@@ -35,7 +36,8 @@ export default function App() {
     else if (currentView === "dashboard") return <LazyLoadDashboard />;
     else if (currentView === "calendar") return <LazyLoadCalendar />;
     else if (currentView === "today") return <LazyLoadToday />;
-    else if (currentView === "settings") return <LazyLoadSettings />;
+    else if (currentView === "settings") return <LazyLoadSettings updateCurrentView={updateCurrentView}/>;
+    else if (currentView === 'change-password') return <LazyChangePasswordForm />
   }
 
   async function loadFonts() {
