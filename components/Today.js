@@ -5,23 +5,28 @@ import {
   Text,
   Progress,
   Box,
+  Divider,
+  Icon,
   Heading,
+  IconButton,
   Pressable,
-  ScrollView,
-  FlatList
+  Button,
 } from "native-base";
-import { ImageBackground, SafeAreaView, StyleSheet } from "react-native";
+import { MaterialCommunityIcons } from '@expo/vector-icons'; 
+import { ImageBackground, StyleSheet, ActivityIndicator } from "react-native";
 import banner from "../assets/banner.jpg";
 import { useSelector, useDispatch } from "react-redux";
 import {updateDailyTasks} from '../redux/slices/storageSlice'
 import { GET_TODAYS_TASKS } from "./helpers/queries";
 import { CREATE_TASKS, DELETE_TASK } from "./helpers/mutations";
-import * as Font from "expo-font";
 import Task, { DeleteButton } from "./Task";
 import NewTaskModal from "./NewTaskModal";
 import { SwipeListView } from "react-native-swipe-list-view";
+import { render } from "react-dom";
+
 
 const Today = () => {
+
   // Figure out where we pull date or refetch date
   const [date, setDate] = useState(new Date().toDateString());
   // Need alg to read and determine (completed tasks) / (total tasks)
@@ -39,13 +44,14 @@ const Today = () => {
   // console.log("USER ID: ", userID, typeof userID)
 
   const { data, error, loading, refetch } = useQuery(GET_TODAYS_TASKS, {
+    notifyOnNetworkStatusChange: true,
     onCompleted: (data) => {
-      // console.log('after useQuery', data.getTasksByDay)
       dispatch(updateDailyTasks(data.getTasksByDay))
     },
     onError: (error) => {
       console.log("Error in loading tasks: ", error);
     },
+    
     //make dynamic
     variables: {date: today, user_id: userID}
   });
@@ -88,11 +94,11 @@ const Today = () => {
     openNewTask(false);
   };
 
-  // This data is needed to use for SwipeListView
-  const swipeListData = tasks.map((task, index) => ({
-    ...task,
-    key: index
-  }))
+  // // This data is needed to use for SwipeListView
+  // const swipeListData = tasks.map((task, index) => ({
+  //   ...task,
+  //   key: index
+  // }))
 
   return (
     <View style={styles.mainContainer}>
@@ -110,61 +116,189 @@ const Today = () => {
           <Text> Daily Progress: {progress}%</Text>
         </Box>
       </ImageBackground>
+      <TaskListContainer addTask={addTask} loading={loading} newTask={newTask} tasks={tasks} openNewTask={openNewTask} handleDeleteTask={handleDeleteTask} />
+    </View>
+  );
+};
 
-      <View style={styles.bottomContainer}>
-        <Heading style={styles.bottomContainerHeading}>Task List </Heading>
+const TaskListContainer = ({addTask, tasks, refetch, openNewTask, newTask, handleDeleteTask, loading}) => {
+  //Selected Tab/View for the container
+  //Default is "inprogress", other two are "completed" and "all"
+  const [currentTab, switchTab] = useState('inprogress')
 
-        <SwipeListView style={styles.taskListContainer} 
-          data={swipeListData}
+
+   // This data is needed to use for SwipeListView
+   const swipeListData = tasks.map((task, index) => ({
+    ...task,
+    key: index
+  }))
+
+  const swipeListDataInProgress = tasks.filter((task, index) => {
+    return task.completed === false
+  }).map((task, index) => ({
+    ...task,
+    key: index
+  }))
+
+  const swipeDataCompleted = tasks.filter((task, index) => {
+    return task.completed === true
+  }).map((task, index) => ({
+    ...task,
+    key: index
+  }))
+
+
+  //THIS FUNCTION CONDITIONALLY RENDERS THE SELECTED TAB
+  const tabRender = () => {
+    switch(currentTab) {
+      case 'inprogress':
+        return (<SwipeListView style={styles.taskListContainer} 
+          data={swipeListDataInProgress}
           renderItem={({ item }, rowMap) => {
-            return (
-              <Task
-                description={item.task_description}
-                title={item.task_name}
-                startTime={item.time_start}
-                completed={item.completed}
-                endTime={item.time_finished}
-                taskId={item.id}
-                key={item.id}
-                refetch={refetch}
-              />
-            )
+              return (
+                <Task
+                  description={item.task_description}
+                  title={item.task_name}
+                  startTime={item.time_start}
+                  completed={item.completed}
+                  endTime={item.time_finished}
+                  taskId={item.id}
+                  key={item.id}
+                  refetch={refetch}
+                />
+              )
+            
           }}
-
+    
           renderHiddenItem={({ item }, rowMap) => {
             return (
               <DeleteButton item={item} rowMap={rowMap} handleDeleteTask={handleDeleteTask} 
               />
             )
           }}
-
+    
           rightOpenValue={-190}
-          
-          // onRightActionStatusChange={() => {
-          //   console.log('Deleted')
-          // }}
-          // rightActivationValue={-100}
         />
+        )
+      case 'completed':
+        return (<SwipeListView style={styles.taskListContainer} 
+          data={swipeDataCompleted}
+          renderItem={({ item }, rowMap) => {
+              return (
+                <Task
+                  description={item.task_description}
+                  title={item.task_name}
+                  startTime={item.time_start}
+                  completed={item.completed}
+                  endTime={item.time_finished}
+                  taskId={item.id}
+                  key={item.id}
+                  refetch={refetch}
+                />
+              )
+          }}
+    
+          renderHiddenItem={({ item }, rowMap) => {
+            return (
+              <DeleteButton item={item} rowMap={rowMap} handleDeleteTask={handleDeleteTask} 
+              />
+            )
+          }}
+    
+          rightOpenValue={-190}
+        />
+        )
+      case 'all':
+        return (<SwipeListView style={styles.taskListContainer} 
+          data={swipeListData}
+          renderItem={({ item }, rowMap) => {
+              return (
+                <Task
+                  description={item.task_description}
+                  title={item.task_name}
+                  startTime={item.time_start}
+                  completed={item.completed}
+                  endTime={item.time_finished}
+                  taskId={item.id}
+                  key={item.id}
+                  refetch={refetch}
+                />
+              )
+          }}
+    
+          renderHiddenItem={({ item }, rowMap) => {
+            return (
+              <DeleteButton item={item} rowMap={rowMap} handleDeleteTask={handleDeleteTask} 
+              />
+            )
+          }}
+    
+          rightOpenValue={-190}
+        />
+        )
+    }
+  }
 
-        <Pressable
-            onPress={() => openNewTask(true)}
-            style={{...styles.taskContainer, backgroundColor: 'orange'}}
-          >
-            <Text style={{fontFamily: 'FamiljenBold', fontWeight: 'bold', textAlign: 'center'}}>CREATE A NEW TASK</Text>
-          </Pressable>
-          {newTask ? (
-            <NewTaskModal
-              addTask={addTask}
-              newTask={newTask}
-              openNewTask={openNewTask}
-            />
-          ) : (
-            ""
-          )}
-      </View>
+
+  return (
+    <View style={styles.bottomContainer}>
+    <View style={{minHeight: '4%'}}>
+      <Heading style={styles.bottomContainerHeading}>Task List</Heading>
+      <TaskListTabGroup currentTab={currentTab} switchTab={switchTab} />
+      <Divider bgColor="black" thickness={1} orientation="horizontal"/>
     </View>
-  );
-};
+    {/* Fallback Loading for Tasks List */}
+    {loading && <View style={{height: '55%', display: 'flex', alignItems: 'center', justifyContent: 'center'}}><ActivityIndicator size="large" /></View>}
+    {/* Tasks List */}
+    {!loading && tabRender()}
+    <View style={styles.createTaskButtonContainer}>
+    <Pressable
+        onPress={() => openNewTask(true)}
+        style={{...styles.createTaskButton}}
+      >
+        <Text style={{fontFamily: 'FamiljenGrotesk', fontWeight: 'bold', textAlign: 'center', fontSize: 18}}>CREATE A NEW TASK</Text>
+      </Pressable>
+    </View>
+      {newTask ? (
+        <NewTaskModal
+          addTask={addTask}
+          newTask={newTask}
+          openNewTask={openNewTask}
+        />
+      ) : (
+        ""
+      )}
+  </View>
+  )
+}
+
+const TaskListTabGroup = ({currentTab, switchTab}) => {
+
+  useEffect(() => {
+
+  }, [currentTab])
+  
+  return (
+    <Button.Group colorScheme="grey" variant="ghost" isAttached  size="sm" style={{ top: 4, position: 'absolute', right: 50}}>
+      <IconButton
+      onPress={() => switchTab('inprogress')} 
+      icon={<Icon color={currentTab === 'inprogress' ? 'orange.400' : 'grey'} 
+      as={MaterialCommunityIcons} 
+      name="progress-clock" size={5}/>} />
+
+      <IconButton 
+       onPress={() => switchTab('completed')}
+      icon={<Icon color={currentTab === 'completed' ? 'orange.400' : 'grey'}  
+      as={MaterialCommunityIcons} name="progress-check" size={5}/>} />
+      <Button 
+       onPress={() => switchTab('all')}
+      _text={{
+        color: `${currentTab == 'all' ? 'orange.400' : 'grey'}`
+      }}
+      fontFamily="FamiljenGrotesk" >All</Button>
+    </Button.Group>
+  )
+}
 
 const styles = StyleSheet.create({
   mainContainer: {
@@ -186,7 +320,7 @@ const styles = StyleSheet.create({
     // left: -214,
     position: "relative",
     top: 120,
-    width: "100%",
+    width: "110%",
     borderBottomColor: "black",
     borderWidth: 2,
     maxHeight: 120,
@@ -208,11 +342,11 @@ const styles = StyleSheet.create({
     // borderWidth: 3,
     position: "relative",
     top: 120,
-    paddingTop: 20,
+    paddingTop: 0,
     display: 'flex',
     alignContent: "center",
     flexDirection: "column",
-    justifyContent: 'center',
+    
     // bottom: 600,
     // left: -214,
     // height: 100,
@@ -222,8 +356,9 @@ const styles = StyleSheet.create({
     fontFamily: "FamiljenGrotesk",
     fontWeight: "bold",
     fontSize: 25,
-    marginTop: 10,
-    marginBottom: 5,
+    marginTop: 5,
+    
+    marginBottom: 10,
     textAlign: "center",
   },
   taskContainer: {
@@ -241,14 +376,27 @@ const styles = StyleSheet.create({
   },
   taskListContainer: {
     borderColor: 'black',
-    borderWidth: 2,
-    height: '50%',
+    height: '55%',
   },
-  btn: {
-    position: "absolute",
-    bottom: 100,
-    right: "50%",
+  createTaskButtonContainer: {
+    position: 'absolute',
+    width: '100%',
+    bottom: -110,
+    height: 120,
+    display: 'flex',
+    flexDirection: 'column',
+    alignContent: 'center',
+    justifyContent: 'center'
   },
+  createTaskButton: {
+    borderColor: 'black', borderWidth: 1, paddingTop: 5, backgroundColor: 'orange',
+    position: 'relative',
+    height: '100%',
+    display: 'flex',
+    flexDirection: 'column',
+    alignContent: 'center',
+    justifyContent: 'center'
+  }
 });
 
 export default Today;
