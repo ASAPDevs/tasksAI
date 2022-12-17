@@ -2,19 +2,15 @@ import {
   StyleSheet,
   View,
   TouchableOpacity,
-  FlatList,
-  Dimensions,
 } from "react-native";
 import { useState, useEffect } from "react";
 import { Slide, Text, Button, Icon, Pressable } from "native-base";
 import { MaterialCommunityIcons, Ionicons } from "@expo/vector-icons";
-import * as Font from "expo-font";
 import { useDispatch } from "react-redux";
 import { logoutUser } from "../redux/slices/storageSlice";
 
 const Menu = ({ currentView, updateCurrentView }) => {
   const [menu, openMenu] = useState(false);
-  const [fontsLoaded, updateFonts] = useState(false);
 
   const dispatch = useDispatch();
 

@@ -1,12 +1,15 @@
-import { StatusBar } from "expo-status-bar";
 import { StyleSheet, Text, View } from "react-native";
 import React, { useState, useEffect, Suspense } from "react";
 import Menu from "./components/Menu";
 import { Provider } from "react-redux";
+import { createDrawerNavigator } from '@react-navigation/drawer';
+import { NavigationContainer } from '@react-navigation/native';
 import * as Font from "expo-font";
+import LandingPage from "./components/Landing";
 import store from "./redux/store";
 import { ApolloClient, InMemoryCache, ApolloProvider, gql } from '@apollo/client';
 import { NativeBaseProvider, Box } from "native-base";
+import { useSelector } from "react-redux";
 const LazyLoadLanding = React.lazy(() => import("./components/Landing"));
 const LazyLoadDashboard = React.lazy(() => import("./components/Dashboard"));
 const LazyLoadCalendar = React.lazy(() => import("./components/Calendar"));
@@ -27,18 +30,19 @@ const client = new ApolloClient({
 
 
 
+
 export default function App() {
-  const [currentView, updateCurrentView] = useState("landing");
   const [fontsLoaded, updateFontsLoaded] = useState(false);
-  //Lazy load the view
-  function conditionalRender() {
-    if (currentView === "landing") return <LazyLoadLanding updateCurrentView={updateCurrentView} />;
-    else if (currentView === "dashboard") return <LazyLoadDashboard />;
-    else if (currentView === "calendar") return <LazyLoadCalendar />;
-    else if (currentView === "today") return <LazyLoadToday />;
-    else if (currentView === "settings") return <LazyLoadSettings updateCurrentView={updateCurrentView}/>;
-    else if (currentView === 'change-password') return <LazyChangePasswordForm />
-  }
+  
+  // //Lazy load the view
+  // function conditionalRender() {
+  //   if (currentView === "landing") return <LazyLoadLanding updateCurrentView={updateCurrentView} />;
+  //   else if (currentView === "dashboard") return <LazyLoadDashboard />;
+  //   else if (currentView === "calendar") return <LazyLoadCalendar />;
+  //   else if (currentView === "today") return <LazyLoadToday />;
+  //   else if (currentView === "settings") return <LazyLoadSettings updateCurrentView={updateCurrentView}/>;
+  //   else if (currentView === 'change-password') return <LazyChangePasswordForm />
+  // }
 
   async function loadFonts() {
     await Font.loadAsync({
@@ -59,24 +63,12 @@ export default function App() {
       <ApolloProvider client={client}>
         <NativeBaseProvider>
           <Provider store={store}>
-            <View style={styles.container}>
-              {/* Only show hamburger menu when user successfully logs in */}
-              {currentView !== "landing" && (
-                <Menu
-                  currentView={currentView}
-                  updateCurrentView={updateCurrentView}
-                />
-              )}
-              <Suspense
-                fallback={
-                  <View>
-                    <Text>Loading..</Text>
-                  </View>
-                }
-              >
-                {conditionalRender()}
+            <NavigationContainer>
+              <LandingPage />
+              <Suspense>
+                <Text>Loading</Text>
               </Suspense>
-            </View>
+            </NavigationContainer>
           </Provider>
         </NativeBaseProvider>
       </ApolloProvider>
@@ -85,12 +77,12 @@ export default function App() {
   else return null;
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
-    flexDirection: "column",
-  },
-});
+// const styles = StyleSheet.create({
+//   container: {
+//     flex: 1,
+//     backgroundColor: "#fff",
+//     alignItems: "center",
+//     justifyContent: "center",
+//     flexDirection: "column",
+//   },
+// });

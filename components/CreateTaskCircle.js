@@ -1,9 +1,9 @@
-import React, {useEffect, useState} from 'react';
-import { Icon, Pressable} from 'native-base';
+import React, { useState} from 'react';
+import { Icon } from 'native-base';
 import { TouchableOpacity, Animated } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons'; 
 
-const CreateTaskCircle = ({ radius, borderWidth, color, text, icon, onPress }) => {
+const CreateTaskCircle = ({ radius, onPress }) => {
   const [animatedValue] = useState(new Animated.Value(1));
 
   const onPressIn = () => {

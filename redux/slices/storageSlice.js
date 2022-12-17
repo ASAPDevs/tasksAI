@@ -10,6 +10,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 const initialState = {
   username: '',
   user_id: null,
+  loggedIn: false,
   avatar: '',
   tasks: {
     daily: [],
@@ -31,6 +32,7 @@ export const storageSlice = createSlice({
     loginUser: (state, action) => {
       state.username = action.payload.username;
       state.user_id = action.payload.user_id;
+      state.loggedIn = true;
     },
     logoutUser: (state) => {
       state = initialState

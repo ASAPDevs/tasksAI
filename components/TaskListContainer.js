@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { View, Text, Divider, Heading, Circle,  Pressable } from "native-base";
+import React, { useState } from "react";
+import { View, Text, Divider, Heading } from "native-base";
 import { StyleSheet, ActivityIndicator } from "react-native";
 import Task, { DeleteButton } from "./Task";
 import NewTaskModal from "./NewTaskModal";
@@ -28,6 +28,7 @@ const TaskListContainer = ({
     key: index,
   }));
 
+  //this data filters from swipeListData for in-progress tasks
   const swipeListDataInProgress = tasks
     .filter((task, index) => {
       return task.completed === false;
@@ -37,6 +38,7 @@ const TaskListContainer = ({
       key: index,
     }));
 
+ //this data filters from swipeListData for complete tasks
   const swipeDataCompleted = tasks
     .filter((task, index) => {
       return task.completed === true;
@@ -170,25 +172,6 @@ const TaskListContainer = ({
       )}
       {/* Tasks List */}
       {!loading && tabRender()}
-     
-        {/* <Pressable
-          onPress={() => openNewTask(true)}
-           style={{ ...styles.createTaskButtonContainer } }
-        >
-           <Circle style={{ ...styles.createTaskButton }}>
-          <Text
-            style={{
-              fontFamily: "FamiljenGrotesk",
-              fontWeight: "bold",
-              textAlign: "center",
-              fontSize: 18,
-            }}
-          >
-            CREATE A{"\n"} NEW TASK
-            
-          </Text>
-          </Circle>
-        </Pressable> */}
         <CreateTaskCircle
       radius={50}
       borderWidth={2}
@@ -197,15 +180,6 @@ const TaskListContainer = ({
       icon="clock"
       onPress={() => openNewTask(true)}
     />
-      {/* {newTask ? (
-        <NewTaskModal
-          addTask={addTask}
-          newTask={newTask}
-          openNewTask={openNewTask}
-        />
-      ) : (
-        ""
-      )} */}
        <NewTaskModal
           addTask={addTask}
           newTask={newTask}
@@ -217,8 +191,6 @@ const TaskListContainer = ({
 
 const styles = StyleSheet.create({
   bottomContainer: {
-    // borderColor: "cyan",
-    // borderWidth: 3,
     position: "relative",
     top: 120,
     paddingTop: 0,
