@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { View, Text, Divider, Heading } from "native-base";
+import React, { useEffect, useState } from "react";
+import { View, Text, Divider, Heading, Circle, Pressable } from "native-base";
 import { StyleSheet, ActivityIndicator } from "react-native";
 import Task, { DeleteButton } from "./Task";
 import NewTaskModal from "./NewTaskModal";
@@ -38,7 +38,7 @@ const TaskListContainer = ({
       key: index,
     }));
 
- //this data filters from swipeListData for complete tasks
+  //this data filters from swipeListData for complete tasks
   const swipeDataCompleted = tasks
     .filter((task, index) => {
       return task.completed === true;
@@ -239,7 +239,7 @@ const styles = StyleSheet.create({
   },
   createTaskButtonContainer: {
     position: "absolute",
-    width:  150,
+    width: 150,
     height: 150,
   },
   createTaskButton: {

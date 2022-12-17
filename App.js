@@ -34,6 +34,7 @@ const client = new ApolloClient({
 export default function App() {
   const [fontsLoaded, updateFontsLoaded] = useState(false);
 
+
   async function loadFonts() {
     await Font.loadAsync({
       Sofia: require("./assets/fonts/sofiapro-light.ttf"),
@@ -42,7 +43,7 @@ export default function App() {
     });
     updateFontsLoaded(true)
   }
-  
+
   //load fonts
   useEffect(() => {
     loadFonts()
