@@ -77,7 +77,7 @@ const LandingPage = ({ updateCurrentView }) => {
       <View style={styles.innerContainer}>
         <View>
           <View style={styles.heading}>
-            <Heading size="xl" >Welcome to Todo-AI</Heading>
+            <Heading size="xl" ></Heading>
             <Image style={styles.logo} source={logo} />
           </View>
           {currentView === "register" && (
