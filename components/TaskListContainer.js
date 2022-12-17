@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, {useMemo, useState } from "react";
 import { View, Divider, Heading } from "native-base";
 import { StyleSheet, ActivityIndicator } from "react-native";
 import Task, { DeleteButton } from "./Task";
@@ -21,132 +21,18 @@ const TaskListContainer = ({
   //Default is "inprogress", other two are "completed" and "all"
   const [currentTab, switchTab] = useState("inprogress");
 
-  // This data is needed to use for SwipeListView
-  const swipeListData = tasks.map((task, index) => ({
-    ...task,
-    key: index,
-  }));
+    const filterTasks = useMemo(() => {
+      return tasks.filter((task) => {
+        if (currentTab === "inprogress") {
+          return !task.completed;
+        } else if (currentTab === "completed") {
+          return task.completed;
+        } else {
+          return true;
+        }
+      });
+    }, [tasks, currentTab]);
 
-  //this data filters from swipeListData for in-progress tasks
-  const swipeListDataInProgress = tasks
-    .filter((task, index) => {
-      return task.completed === false;
-    })
-    .map((task, index) => ({
-      ...task,
-      key: index,
-    }));
-
-  //this data filters from swipeListData for complete tasks
-  const swipeDataCompleted = tasks
-    .filter((task, index) => {
-      return task.completed === true;
-    })
-    .map((task, index) => ({
-      ...task,
-      key: index,
-    }));
-
-    
-  //THIS FUNCTION CONDITIONALLY RENDERS THE SELECTED TAB
-  const tabRender = () => {
-    switch (currentTab) {
-      case "inprogress":
-        return (
-          <SwipeListView
-            style={styles.taskListContainer}
-            data={swipeListDataInProgress}
-            renderItem={({ item }, rowMap) => {
-              return (
-                <Task
-                  description={item.task_description}
-                  title={item.task_name}
-                  startTime={item.time_start}
-                  completed={item.completed}
-                  endTime={item.time_finished}
-                  taskId={item.id}
-                  key={item.id}
-                  refetch={refetch}
-                />
-              );
-            }}
-            renderHiddenItem={({ item }, rowMap) => {
-              return (
-                <DeleteButton
-                  item={item}
-                  rowMap={rowMap}
-                  handleDeleteTask={handleDeleteTask}
-                />
-              );
-            }}
-            rightOpenValue={-190}
-            
-          />
-        );
-      case "completed":
-        return (
-          <SwipeListView
-            style={styles.taskListContainer}
-            data={swipeDataCompleted}
-            renderItem={({ item }, rowMap) => {
-              return (
-                <Task
-                  description={item.task_description}
-                  title={item.task_name}
-                  startTime={item.time_start}
-                  completed={item.completed}
-                  endTime={item.time_finished}
-                  taskId={item.id}
-                  key={item.id}
-                  refetch={refetch}
-                />
-              );
-            }}
-            renderHiddenItem={({ item }, rowMap) => {
-              return (
-                <DeleteButton
-                  item={item}
-                  rowMap={rowMap}
-                  handleDeleteTask={handleDeleteTask}
-                />
-              );
-            }}
-            rightOpenValue={-190}
-          />
-        );
-      case "all":
-        return (
-          <SwipeListView
-            style={styles.taskListContainer}
-            data={swipeListData}
-            renderItem={({ item }, rowMap) => {
-              return (
-                <Task
-                  description={item.task_description}
-                  title={item.task_name}
-                  startTime={item.time_start}
-                  completed={item.completed}
-                  endTime={item.time_finished}
-                  taskId={item.id}
-                  key={item.id}
-                  refetch={refetch}
-                />
-              );
-            }}
-            renderHiddenItem={({ item }, rowMap) => {
-              return (
-                <DeleteButton
-                  item={item}
-                  rowMap={rowMap}
-                  handleDeleteTask={handleDeleteTask}
-                />
-              );
-            }}
-            rightOpenValue={-190}
-          />
-        );
-    }
-  };
 
   return (
     <View style={styles.bottomContainer}>
@@ -172,7 +58,35 @@ const TaskListContainer = ({
         </View>
       )}
       {/* Tasks List */}
-      {!loading && tabRender()}
+      {!loading &&  <SwipeListView
+            style={styles.taskListContainer}
+            data={filterTasks}
+            renderItem={({ item }, rowMap) => {
+              return (
+                <Task
+                  description={item.task_description}
+                  title={item.task_name}
+                  startTime={item.time_start}
+                  completed={item.completed}
+                  endTime={item.time_finished}
+                  taskId={item.id}
+                  key={item.id}
+                  refetch={refetch}
+                />
+              );
+            }}
+            renderHiddenItem={({ item }, rowMap) => {
+              return (
+                <DeleteButton
+                  item={item}
+                  rowMap={rowMap}
+                  handleDeleteTask={handleDeleteTask}
+                />
+              );
+            }}
+            rightOpenValue={-190}
+            
+          />}
         
        <NewTaskModal
           addTask={addTask}

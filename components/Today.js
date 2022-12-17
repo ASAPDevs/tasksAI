@@ -96,7 +96,7 @@ const Today = () => {
       time_start: startTime.toString(),
       date: date.getTime().toString(),
       time_finished: endTime.toString(),
-      completed: false,
+      completed: true,
       user_id: Number(userID),
     };
     createTask({ variables: { task: newTask } });
