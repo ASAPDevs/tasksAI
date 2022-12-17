@@ -2,7 +2,7 @@ import Dashboard from "./Dashboard";
 import Today from "./Today";
 import Calendar from "./Calendar";
 import Settings from "./Settings";
-import {createDrawerNavigator} from '@react-navigation/drawer'
+import { createDrawerNavigator } from '@react-navigation/drawer'
 
 const DrawerNavigatorConfig = {
   intialRouteName: 'Dashboard',
@@ -34,19 +34,19 @@ const Drawer = createDrawerNavigator();
 function Navigation() {
   return (
     <Drawer.Navigator
-    initialRouteName="Dashboard" 
-    screenOptions={{
-      headerTintColor: "#FAA946",
-      headerTitleStyle: {
-        color: 'black'
-      },
-      drawerActiveTintColor: "#FAA946",
-      drawerInactiveTintColor: "black",
-    }}
+      initialRouteName="Dashboard"
+      screenOptions={{
+        headerTintColor: "#FAA946",
+        headerTitleStyle: {
+          color: 'black'
+        },
+        drawerActiveTintColor: "#FAA946",
+        drawerInactiveTintColor: "black",
+      }}
     >
       <Drawer.Screen name="Dashboard" component={Dashboard} />
       <Drawer.Screen name="Today" component={Today} />
-      <Drawer.Screen name="Calendar" component={Calendar} />
+      {/* <Drawer.Screen name="Calendar" component={Calendar} /> */}
       <Drawer.Screen name="Settings" component={Settings} />
     </Drawer.Navigator>
   );

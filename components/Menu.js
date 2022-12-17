@@ -92,19 +92,19 @@ const Menu = ({ currentView, updateCurrentView }) => {
     );
   };
 
-    return (
-      <View style={styles.container}>
-        <TouchableOpacity
-          style={styles.menuButton}
-          onPress={() => openMenu(!menu)}
-        >
-          <Icon as={Ionicons} size={8} name="ios-menu" color="black" />
-        </TouchableOpacity>
-        <Slide duration={150} in={menu} out={menu} placement="left">
-          <MenuComponent />
-        </Slide>
-      </View>
-    );
+  return (
+    <View style={styles.container}>
+      <TouchableOpacity
+        style={styles.menuButton}
+        onPress={() => openMenu(!menu)}
+      >
+        <Icon as={Ionicons} size={8} name="ios-menu" color="black" />
+      </TouchableOpacity>
+      <Slide duration={150} in={menu} out={menu} placement="left">
+        <MenuComponent />
+      </Slide>
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
