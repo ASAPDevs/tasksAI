@@ -33,16 +33,6 @@ const client = new ApolloClient({
 
 export default function App() {
   const [fontsLoaded, updateFontsLoaded] = useState(false);
-  
-  // //Lazy load the view
-  // function conditionalRender() {
-  //   if (currentView === "landing") return <LazyLoadLanding updateCurrentView={updateCurrentView} />;
-  //   else if (currentView === "dashboard") return <LazyLoadDashboard />;
-  //   else if (currentView === "calendar") return <LazyLoadCalendar />;
-  //   else if (currentView === "today") return <LazyLoadToday />;
-  //   else if (currentView === "settings") return <LazyLoadSettings updateCurrentView={updateCurrentView}/>;
-  //   else if (currentView === 'change-password') return <LazyChangePasswordForm />
-  // }
 
   async function loadFonts() {
     await Font.loadAsync({
@@ -73,13 +63,3 @@ export default function App() {
   }
   else return null;
 }
-
-// const styles = StyleSheet.create({
-//   container: {
-//     flex: 1,
-//     backgroundColor: "#fff",
-//     alignItems: "center",
-//     justifyContent: "center",
-//     flexDirection: "column",
-//   },
-// });

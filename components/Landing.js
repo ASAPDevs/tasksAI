@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Heading } from "native-base";
 import { StyleSheet, Text, View, TextInput, SafeAreaView, Image, TouchableOpacity } from "react-native";
-import logo from '../assets/todo-ai-logo.png'
+import logo from '../assets/AI-TODO.png'
 import { useMutation } from "@apollo/client";
 import { useDispatch } from "react-redux";
 import { loginUser } from "../redux/slices/storageSlice";
@@ -82,6 +82,7 @@ const LandingPage = ({ updateCurrentView }) => {
           </View>
           {currentView === "register" && (
             <TextInput
+              autoFocus={currentView === 'register' ? true : false}
               autoCapitalize="none"
               style={styles.input}
               value={email}
@@ -91,7 +92,7 @@ const LandingPage = ({ updateCurrentView }) => {
             />
           )}
           <TextInput
-            autoFocus={true}
+            autoFocus={currentView === 'login' ? true : false}
             autoCapitalize="none"
             style={focus === "username" ? styles.inputFocus : styles.input}
             value={username}
@@ -130,7 +131,7 @@ const LandingPage = ({ updateCurrentView }) => {
               <TouchableOpacity 
                 disabled={!username || !password ? true : false} 
                 onPress={loginHandler} 
-                style={{...styles.signInButton, backgroundColor: `${!username || !password ? 'grey' : '#007bff'}`}}
+                style={{...styles.signInButton, backgroundColor: `${!username || !password ? 'grey' : '#FAA946'}`}}
               >
                 <Text style={styles.buttonText}>
                   Sign In
@@ -142,7 +143,7 @@ const LandingPage = ({ updateCurrentView }) => {
               <TouchableOpacity 
                 disabled={!username || !password || !email || !confirmPassword ? true : false} 
                 onPress={signupHandler} 
-                style={{...styles.signInButton, backgroundColor: `${!username || !password || !email || !confirmPassword ? 'grey' : '#007bff'}`}}
+                style={{...styles.signInButton, backgroundColor: `${!username || !password || !email || !confirmPassword ? 'grey' : '#FAA946'}`}}
               >
                 <Text style={styles.buttonText}>
                   Sign Up
@@ -168,12 +169,17 @@ const LandingPage = ({ updateCurrentView }) => {
               setCurrentView("register")
               setUsername('')
               setPassword('')
+              setFocus("email")
               toggleWrongLogin(false)
             }}>
               Don't have an account? Sign up!
             </Text>
           ) : (
-            <Text style={styles.footerText} onPress={() => setCurrentView("landing")}>
+            <Text style={styles.footerText} onPress={() => {
+              setCurrentView("landing")
+              setUsername('')
+              setPassword('')
+            }}>
               Already have account? Sign in!
             </Text>
           )}
