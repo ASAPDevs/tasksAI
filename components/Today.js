@@ -104,8 +104,6 @@ const Today = () => {
     setProgress(((completed.length / tasks.length) * 100).toFixed(2));
   }, [tasks]);
 
-
-
   return (
     <View style={styles.mainContainer}>
       <ImageBackground style={styles.topContainer} resizeMode="cover">
