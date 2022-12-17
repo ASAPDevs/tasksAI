@@ -42,11 +42,11 @@ const CreateTaskCircle = ({ radius, onPress }) => {
          borderWidth: 1,
          borderColor: "#E8EEF7",
          backgroundColor: "#FAA946",
-         bottom: -50,
-         right: 55,
+         bottom: 30,
+         left: 190,
          alignItems: 'center',
          justifyContent: 'center',
-         position: 'absolute',
+         position: 'relative',
          transform: [{ scale: animatedValue }]
       }}>
         <Icon as={MaterialIcons} color="white" marginLeft={0} name="library-add" size={8} />

@@ -80,6 +80,7 @@ const TaskListContainer = ({
               );
             }}
             rightOpenValue={-190}
+            shouldItemUpdate={false}
           />
         );
       case "completed":
@@ -149,7 +150,7 @@ const TaskListContainer = ({
 
   return (
     <View style={styles.bottomContainer}>
-      <View style={{ minHeight: "4%" }}>
+      <View style={{ minHeight: "4%", borderColor: 'black', borderTopWidth: 1, borderBottomWidth: 2 }}>
         <Heading style={styles.bottomContainerHeading}>Task List</Heading>
         <TaskListTabGroup currentTab={currentTab} switchTab={switchTab} />
         <Divider bgColor="black" thickness={1} orientation="horizontal" />
@@ -158,46 +159,48 @@ const TaskListContainer = ({
       {loading && (
         <View
           style={{
-            height: "55%",
+            borderColor: 'black',
+            borderWidth: 3,
+            minHeight: "85%",
+            maxHeight: "85%",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
           }}
         >
-          {/* <ActivityIndicator size="large" /> */}
-          <Svg width={24} height={24} viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <Blockloadingsvg />
-          </Svg>
+          <ActivityIndicator size="large" />
         </View>
       )}
       {/* Tasks List */}
       {!loading && tabRender()}
-      <CreateTaskCircle
-        radius={50}
-        borderWidth={2}
-        color="#00FF00"
-        text="Hello"
-        icon="clock"
-        onPress={() => openNewTask(true)}
-      />
-      <NewTaskModal
-        addTask={addTask}
-        newTask={newTask}
-        openNewTask={openNewTask}
-      />
+        
+       <NewTaskModal
+          addTask={addTask}
+          newTask={newTask}
+          openNewTask={openNewTask}
+        />
+        <CreateTaskCircle
+      radius={45}
+      borderWidth={2}
+      color="#00FF00"
+      text="Hello"
+      icon="clock"
+      onPress={() => openNewTask(true)}
+    />
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   bottomContainer: {
-    position: "relative",
-    top: 120,
     paddingTop: 0,
     display: "flex",
     alignContent: "center",
     flexDirection: "column",
     width: "120%",
+    minHeight: "77.5%",
+    maxHeight: "77.5%",
+    
   },
   bottomContainerHeading: {
     fontFamily: "FamiljenGrotesk",
@@ -214,6 +217,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     borderColor: "black",
+    
     // alignItems: "center",
     borderWidth: 0,
     padding: 10,
@@ -222,8 +226,16 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   taskListContainer: {
-    borderColor: "black",
-    height: "55%",
+    borderColor: "#E8EEF7",
+    shadowColor: '#000',
+  shadowOffset: { width: 0, height: 2 },
+  shadowOpacity: 0.5,
+  shadowRadius: 2,
+  elevation: 2,
+    minHeight: "85%",
+    maxHeight: "85%",
+    borderWidth: 1,
+    elevation: 5,
   },
   createTaskButtonContainer: {
     position: "absolute",

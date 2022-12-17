@@ -155,15 +155,14 @@ const styles = StyleSheet.create({
   mainContainer: {
     display: "flex",
     flexDirection: "column",
-    position: "absolute",
     width: "100%",
     height: "100%",
     alignItems: "center",
     zIndex: -1,
   },
   topContainer: {
-    position: "relative",
-    top: 120,
+    // position: "relative",
+    
     width: "110%",
     borderBottomColor: "black",
     borderWidth: 2,
