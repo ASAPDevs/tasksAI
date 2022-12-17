@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import {
     View,
     Text,
@@ -175,4 +175,4 @@ const Task = ({ taskId, title, description, startTime, endTime, completed, refet
     }
   });
 
-export default Task;
+export default React.memo(Task);

@@ -9,7 +9,7 @@ import {
     Icon,
 } from "native-base";
 import { StyleSheet, Animated, View } from 'react-native';
-import { FontAwesome } from '@expo/vector-icons';
+import { FontAwesome, Octicons } from '@expo/vector-icons';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 
 
@@ -66,17 +66,17 @@ const NewTaskModal = ({ newTask, openNewTask, setTasks, addTask }) => {
                         marginTop: 15,
                         alignSelf: 'center',
                         width: '30%',
-                        height: 50,
-                        borderRadius: 10,
+                        height: 42.5,
+                        borderRadius: 5,
                         backgroundColor: '#FAA946',
                         flexDirection: 'column',
                         display: 'flex',
-                        borderColor: '#E8EEF7',
-                        borderWidth: 3,
+                        borderColor: 'black',
+                        borderWidth: 1,
                         justifyContent: 'center',
                     }}
                 >
-                    <Icon marginTop={0.5} alignSelf="center" as={FontAwesome} name="plus" size={3} color="#E8EEF7" />
+                    <Icon marginTop={0.5} alignSelf="center" as={Octicons} name="diff-added"size={5} color="white" />
                 </Animated.View>
             </Pressable>
         );
