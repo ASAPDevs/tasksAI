@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import {
     View,
     Text,
@@ -9,7 +9,7 @@ import {
 import { StyleSheet } from "react-native";
 import { UPDATE_TASK } from "./helpers/mutations";
 import { useMutation } from "@apollo/client";
-import { MaterialCommunityIcons, Entypo } from '@expo/vector-icons'; 
+import { MaterialCommunityIcons, Entypo, AntDesign } from '@expo/vector-icons'; 
 import TaskModal from "./TaskModal";
 
 
@@ -63,8 +63,16 @@ const Task = ({ taskId, title, description, startTime, endTime, completed, refet
   
       return (
         <View style={styles.deleteTaskContainer}>
+          <View style={{backgroundColor: 'green', width: '50%'}}>
+            <Icon
+                as={AntDesign}
+                name="checkcircle"
+                color="white"
+                size={"8"}
+              />
+          </View>
           {!deleteConfirmation ? (
-          <Pressable style={{display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center'}} onPress={() => {
+          <Pressable style={{display: 'flex', width: '50%', flexDirection: 'row', alignItems: 'center', justifyContent: 'center'}} onPress={() => {
             toggleDeleteConfirmation(true)
           }}>
             <Text style={{color: 'white'}}>Delete </Text>
@@ -75,7 +83,7 @@ const Task = ({ taskId, title, description, startTime, endTime, completed, refet
               size={"8"}
             />
           </Pressable>) :
-          <Pressable style={{display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center'}}onPress={() => {
+          <Pressable style={{display: 'flex', width: '50%', flexDirection: 'row', alignItems: 'center', justifyContent: 'center'}}onPress={() => {
             handleDeleteTask(item.id)
             rowMap[item.key].closeRow()
             toggleDeleteConfirmation(false)
@@ -166,7 +174,7 @@ const Task = ({ taskId, title, description, startTime, endTime, completed, refet
       height: 90,
       width: '95%',
       zIndex: 9,
-      backgroundColor: 'red',
+      // backgroundColor: 'red',
       borderRadius: 10,
     },
     swipeRightIcon: {
@@ -175,4 +183,4 @@ const Task = ({ taskId, title, description, startTime, endTime, completed, refet
     }
   });
 
-export default Task;
+export default React.memo(Task);

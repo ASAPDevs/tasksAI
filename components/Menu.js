@@ -2,19 +2,15 @@ import {
   StyleSheet,
   View,
   TouchableOpacity,
-  FlatList,
-  Dimensions,
 } from "react-native";
 import { useState, useEffect } from "react";
 import { Slide, Text, Button, Icon, Pressable } from "native-base";
 import { MaterialCommunityIcons, Ionicons } from "@expo/vector-icons";
-import * as Font from "expo-font";
 import { useDispatch } from "react-redux";
 import { logoutUser } from "../redux/slices/storageSlice";
 
 const Menu = ({ currentView, updateCurrentView }) => {
   const [menu, openMenu] = useState(false);
-  const [fontsLoaded, updateFonts] = useState(false);
 
   const dispatch = useDispatch();
 
@@ -96,19 +92,19 @@ const Menu = ({ currentView, updateCurrentView }) => {
     );
   };
 
-    return (
-      <View style={styles.container}>
-        <TouchableOpacity
-          style={styles.menuButton}
-          onPress={() => openMenu(!menu)}
-        >
-          <Icon as={Ionicons} size={8} name="ios-menu" color="black" />
-        </TouchableOpacity>
-        <Slide duration={150} in={menu} out={menu} placement="left">
-          <MenuComponent />
-        </Slide>
-      </View>
-    );
+  return (
+    <View style={styles.container}>
+      <TouchableOpacity
+        style={styles.menuButton}
+        onPress={() => openMenu(!menu)}
+      >
+        <Icon as={Ionicons} size={8} name="ios-menu" color="black" />
+      </TouchableOpacity>
+      <Slide duration={150} in={menu} out={menu} placement="left">
+        <MenuComponent />
+      </Slide>
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({

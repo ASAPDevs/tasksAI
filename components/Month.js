@@ -7,20 +7,11 @@ function Calendar(props) {
     const days = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
     const date = new Date(...props.date.split('-'));
     const today = new Date();
-    const [activeDay, setActiveDay] = useState(`${today.getFullYear()}-${today.getMonth()}-${today.getDate()}`);
     const firstMonthDate = new Date(date.getFullYear(), date.getMonth(), 1);
     const lastMonthDate = new Date(date.getFullYear(), date.getMonth() + 1, 0);
     const firstMonthDay = firstMonthDate.getDay(); // 0 based
     const lastMonthDay = lastMonthDate.getDay(); // 0 based
-    changeMonth = props.changeMonth;
-
-    // This useEffect changes the default highlighted day to today
-    // if the month on the calendar matches the current month
-    useEffect(() => {
-        if (date.getFullYear() === today.getFullYear() && date.getMonth() == today.getMonth()) {
-            setActiveDay(`${today.getFullYear()}-${today.getMonth()}-${today.getDate()}`);
-        }
-    }, [props.date]);
+    const { activeDay, setActiveDay, changeMonth } = props;
 
     // This function creates empty dates at the beginning of the month starting Sunday
     const addEmptyDays = (option) => {
@@ -30,8 +21,8 @@ function Calendar(props) {
         const end = option === 'start' ? lastMonthLastDate.getDate() : 6 - lastMonthDay;
         for (let i = start; i <= end; i++) {
             listOfDays.push(
-                <TouchableOpacity style={styles.day}>
-                    <Text style={{color: 'grey'}}>{i}</Text>
+                <TouchableOpacity key={`${start}-${i}`} style={styles.day}>
+                    <Text style={{ color: 'grey' }}>{i}</Text>
                 </TouchableOpacity>
             );
         }
@@ -44,12 +35,14 @@ function Calendar(props) {
         for (let i = 1; i <= lastMonthDate.getDate(); i++) {
             const day = [date.getFullYear(), date.getMonth(), i];
             listOfDays.push(
-                <TouchableOpacity
-                    style={(activeDay === day.join('-')) ? styles.activeDay : styles.day}
+                <TouchableOpacity key={`${day}-${i}`}
+                    style={[(activeDay === day.join('-')) ? styles.activeDay : styles.day,
+                    (`${today.getFullYear()}-${today.getMonth()}-${today.getDate()}` === day.join('-')) ? styles.today : styles.day]}
                     onPress={() => {
                         setActiveDay(day.join('-'));
-                        console.log('active day', activeDay)
-                        console.log('day', day)
+                        console.log('inside month.js on press: ', activeDay)
+                        // const newDate = new Date(day[0], day[1], day[2]);
+                        // setDate(newDate);
                     }}
                 >
                     <Text>{i}</Text>
@@ -69,9 +62,8 @@ function Calendar(props) {
                     onPress={() => { changeMonth('prev') }}>
                     <Text style={styles.monthControl.text}>&#8249;</Text>
                 </TouchableOpacity>
-                <View>
-                    <Text style={styles.centerText}>{months[date.getMonth()]}</Text>
-                    <Text style={styles.centerText}>{date.getFullYear()}</Text>
+                <View style={styles.monthYear}>
+                    <Text style={styles.centerText}>{months[date.getMonth()]}  {date.getFullYear()}</Text>
                 </View>
                 <TouchableOpacity
                     style={styles.monthControl}
@@ -84,7 +76,7 @@ function Calendar(props) {
             <View style={styles.weekdays}>
                 {days.map((day, index) => {
                     return (
-                        <View key={`${props.date}-${index}`} style={{ ...styles.day, borderWidth: 0 }}>
+                        <View key={`${props.date}-${index}`} style={styles.daysTitle}>
                             <Text>{day}</Text>
                         </View>
                     )
@@ -106,14 +98,7 @@ function Calendar(props) {
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
-        borderWidth: 4,
-        borderRadius: 5,
-        backgroundColor: "#fff",
-        position: 'absolute',
-        top: 120,
-        width: '100%',
-        height: '100%',
+        width: 375,
         flexDirection: 'column',
         alignItems: "center",
         justifyContent: "flex-start",
@@ -122,44 +107,18 @@ const styles = StyleSheet.create({
         display: 'flex',
         flexDirection: 'row',
         justifyContent: 'space-between',
-        backgroundColor: 'green',
-        borderWidth: 3,
-        borderColor: 'orange',
+        backgroundColor: "#F0F0F0",
+        borderColor: "#ADB7B8",
+        borderTopLeftRadius: '5%',
+        borderTopRightRadius: '5%',
+        borderBottomWidth: 1,
         width: '100%',
-        padding: 10
+        paddingTop: 18,
+        paddingBottom: 18
     },
-    weekdays: {
-        borderWidth: 2,
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        width: '100%',
-        paddingTop: 5,
-        paddingBottom: 5
-    },
-    days: {
-        borderWidth: 2,
-        width: '100%',
-        flexDirection: 'row',
-        flexWrap: 'wrap'
-    },
-    day: {
-        backgroundColor: 'azure',
-        borderWidth: 1,
-        height: 25,
-        width: '14.28%',
-        alignItems: 'center'
-    },
-    activeDay: {
-        backgroundColor: 'green',
-        borderWidth: 1,
-        height: 25,
-        width: '14.28%',
-        alignItems: 'center'
-    },
-    centerText: {
-        fontWeight: 'bold',
-        textAlign: 'center',
-        justifyContent: 'center'
+    monthYear: {
+        display: 'flex',
+        flexDirection: 'row'
     },
     monthControl: {
         paddingLeft: 10,
@@ -167,8 +126,58 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         justifyContent: 'center',
         text: {
-            fontSize: 22
+            fontSize: 24
         }
+    },
+    centerText: {
+        fontWeight: 'bold',
+        textAlign: 'center',
+        justifyContent: 'center',
+        fontSize: 16
+    },
+    daysTitle: {
+        backgroundColor: "#F0F0F0",
+        height: 25,
+        width: '14.28%',
+        alignItems: 'center'
+    },
+    weekdays: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        width: '100%',
+        paddingTop: 5,
+        paddingBottom: 5
+    },
+    days: {
+        width: '100%',
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        paddingBottom: 8
+    },
+    day: {
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        height: 30,
+        width: '14.28%',
+        alignItems: 'center'
+    },
+    activeDay: {
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: 'orange',
+        borderWidth: 1,
+        borderRadius: 5,
+        borderColor: 'orange',
+        height: 30,
+        width: '14.28%',
+        alignItems: 'center'
+    },
+    today: {
+        borderWidth: 1,
+        borderColor: 'black',
+        borderRadius: 5,
     }
 });
 
