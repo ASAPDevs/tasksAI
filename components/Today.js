@@ -1,16 +1,21 @@
 import React, { useEffect, useState } from "react";
 import { useQuery, useMutation } from "@apollo/client";
-import { View, Text, Progress, Box } from "native-base";
+import { View, Text, Progress, Box, Pressable } from "native-base";
 import { ImageBackground, StyleSheet } from "react-native";
 import { useSelector, useDispatch } from "react-redux";
 import { updateDailyTasks } from "../redux/slices/storageSlice";
 import { GET_TODAYS_TASKS } from "./helpers/queries";
 import { CREATE_TASKS, DELETE_TASK } from "./helpers/mutations";
+import { FontAwesome } from "@expo/vector-icons";
 import TaskListContainer from "./TaskListContainer";
+import Calendar from "./Calendar";
+import CalendarModal from "./CalendarModal";
 
 const Today = () => {
+  // calendar state to toggle calendar popup
+  const [showCalendar, setShowCalendar] = useState(false);
   // Figure out where we pull date or refetch date
-  const [date, setDate] = useState(new Date().toDateString());
+  const [date, setDate] = useState(new Date());
   // Need alg to read and determine (completed tasks) / (total tasks)
   const [progress, setProgress] = useState(0);
   const [newTask, openNewTask] = useState(false);
@@ -21,14 +26,14 @@ const Today = () => {
   const dispatch = useDispatch();
 
   //YYYY - MM - DD
-  const today = new Date().toISOString().split("T")[0];
+  const today = new Date().toISOString().split("T")[0]; // turn this into usestate
   // const todayInMs = new Date(today).getTime();
   // console.log("USER ID: ", userID, typeof userID)
 
   const { data, error, loading, refetch } = useQuery(GET_TODAYS_TASKS, {
     notifyOnNetworkStatusChange: true,
     onCompleted: (data) => {
-      dispatch(updateDailyTasks(data.getTasksByDay));
+      dispatch(updateDailyTasks(data.getTasksByDay)); // update redux toolkit state
     },
     onError: (error) => {
       console.log("Error in loading tasks: ", error);
@@ -68,6 +73,19 @@ const Today = () => {
   //   },
   // });
 
+  // this function converts the date state to mm/dd/yy format
+  const convertDateTitle = () => {
+    const yy = date.getFullYear();
+    const mm = date.getMonth() + 1;
+    const dd = date.getDate();
+    console.log(yy, mm, dd)
+    return `${mm}/${dd}/${yy % 100}`;
+  }
+
+  const handleCalendar = () => {
+
+  }
+
   const handleDeleteTask = (taskId) => {
     deleteTask({
       variables: { taskId: taskId },
@@ -105,13 +123,16 @@ const Today = () => {
   }, [tasks]);
 
 
-
   return (
     <View style={styles.mainContainer}>
       <ImageBackground style={styles.topContainer} resizeMode="cover">
         <View>
-          <Text style={styles.topContainerText}>Today:</Text>
-          <Text>{date}</Text>
+          <Text style={styles.topContainerText}>{convertDateTitle()}</Text>
+          <View style={styles.calendarRow}>
+            <Pressable onPress={() => console.log(showCalendar)} style={styles.calendarIcon}>
+              <FontAwesome name="calendar" size={24} color="white" />
+            </Pressable>
+          </View>
         </View>
         <Box w="50%" p="3" _text={{ textAlign: "center" }}>
           <Progress size="lg" value={progress} />
@@ -159,6 +180,22 @@ const styles = StyleSheet.create({
     fontFamily: "FamiljenGrotesk",
     // color: "white",
   },
+  calendarRow: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 8,
+    borderWidth: 1,
+    borderRadius: 8,
+    borderColor: 'orange',
+    backgroundColor: 'orange'
+  },
+  calendarIcon: {
+    // display: 'flex',
+    // justifyContent: 'center',
+    // alignItems: 'center'
+  }
 });
 
 export default Today;
