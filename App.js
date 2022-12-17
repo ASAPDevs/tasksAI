@@ -65,9 +65,6 @@ export default function App() {
           <Provider store={store}>
             <NavigationContainer>
               <LandingPage />
-              <Suspense>
-                <Text>Loading</Text>
-              </Suspense>
             </NavigationContainer>
           </Provider>
         </NativeBaseProvider>
