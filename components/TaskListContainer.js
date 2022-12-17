@@ -1,13 +1,12 @@
-import React, { useEffect, useState } from "react";
-import { View, Text, Divider, Heading, Circle, Pressable } from "native-base";
+import React, { useState } from "react";
+import { View, Divider, Heading } from "native-base";
 import { StyleSheet, ActivityIndicator } from "react-native";
 import Task, { DeleteButton } from "./Task";
 import NewTaskModal from "./NewTaskModal";
 import { SwipeListView } from "react-native-swipe-list-view";
 import TaskListTabGroup from "./TaskListTabGroup";
 import CreateTaskCircle from "./CreateTaskCircle";
-import Blockloadingsvg from '../assets/blocksloading.svg'
-import { Svg } from 'react-native-svg';
+
 
 const TaskListContainer = ({
   addTask,
@@ -48,6 +47,7 @@ const TaskListContainer = ({
       key: index,
     }));
 
+    
   //THIS FUNCTION CONDITIONALLY RENDERS THE SELECTED TAB
   const tabRender = () => {
     switch (currentTab) {
@@ -160,7 +160,7 @@ const TaskListContainer = ({
         <View
           style={{
             borderColor: 'black',
-            borderWidth: 3,
+            borderWidth: 0,
             minHeight: "85%",
             maxHeight: "85%",
             display: "flex",
@@ -200,7 +200,6 @@ const styles = StyleSheet.create({
     width: "120%",
     minHeight: "77.5%",
     maxHeight: "77.5%",
-    
   },
   bottomContainerHeading: {
     fontFamily: "FamiljenGrotesk",
@@ -225,15 +224,9 @@ const styles = StyleSheet.create({
   },
   taskListContainer: {
     borderColor: "#E8EEF7",
-    shadowColor: '#000',
-  shadowOffset: { width: 0, height: 2 },
-  shadowOpacity: 0.5,
-  shadowRadius: 2,
-  elevation: 2,
     minHeight: "85%",
     maxHeight: "85%",
     borderWidth: 1,
-    elevation: 5,
   },
   createTaskButtonContainer: {
     position: "absolute",
