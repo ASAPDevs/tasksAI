@@ -80,7 +80,7 @@ const TaskListContainer = ({
               );
             }}
             rightOpenValue={-190}
-            shouldItemUpdate={false}
+            
           />
         );
       case "completed":
@@ -150,7 +150,7 @@ const TaskListContainer = ({
 
   return (
     <View style={styles.bottomContainer}>
-      <View style={{ minHeight: "4%", borderColor: 'black', borderTopWidth: 1, borderBottomWidth: 2 }}>
+      <View style={{ minHeight: "4%", borderColor: 'black'}}>
         <Heading style={styles.bottomContainerHeading}>Task List</Heading>
         <TaskListTabGroup currentTab={currentTab} switchTab={switchTab} />
         <Divider bgColor="black" thickness={1} orientation="horizontal" />
@@ -217,8 +217,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     borderColor: "black",
-    
-    // alignItems: "center",
     borderWidth: 0,
     padding: 10,
     height: 70,

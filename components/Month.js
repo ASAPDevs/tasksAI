@@ -21,7 +21,7 @@ function Calendar(props) {
         const end = option === 'start' ? lastMonthLastDate.getDate() : 6 - lastMonthDay;
         for (let i = start; i <= end; i++) {
             listOfDays.push(
-                <TouchableOpacity style={styles.day}>
+                <TouchableOpacity key={`${start}-${i}`} style={styles.day}>
                     <Text style={{ color: 'grey' }}>{i}</Text>
                 </TouchableOpacity>
             );
@@ -35,7 +35,7 @@ function Calendar(props) {
         for (let i = 1; i <= lastMonthDate.getDate(); i++) {
             const day = [date.getFullYear(), date.getMonth(), i];
             listOfDays.push(
-                <TouchableOpacity
+                <TouchableOpacity key={`${day}-${i}`}
                     style={[(activeDay === day.join('-')) ? styles.activeDay : styles.day,
                     (`${today.getFullYear()}-${today.getMonth()}-${today.getDate()}` === day.join('-')) ? styles.today : styles.day]}
                     onPress={() => {

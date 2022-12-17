@@ -1,5 +1,5 @@
-import { Text, View } from 'native-base';
-import { StyleSheet, TouchableOpacity } from 'react-native';
+import { View } from 'native-base';
+import { StyleSheet } from 'react-native';
 import { Modal } from "native-base";
 import React, { useState } from 'react';
 import Month from './Month';
@@ -16,7 +16,7 @@ function Calendar({ calendarModal, openCalendarModal, setDate, date }) {
       setMonthToShow(lastMonth);
     } else if (change === 'next') {
       const nextMonth = monthToShow.slice();
-      nextMonth[1] += 1;
+      nextMonth[1] += 1;  
       setMonthToShow(nextMonth);
     }
   }

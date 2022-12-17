@@ -161,11 +161,9 @@ const styles = StyleSheet.create({
     zIndex: -1,
   },
   topContainer: {
-    // position: "relative",
-    
     width: "110%",
     borderBottomColor: "black",
-    borderWidth: 2,
+    borderWidth: 1,
     maxHeight: 120,
     paddingHorizontal: 40,
     flex: 1,
