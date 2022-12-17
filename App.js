@@ -36,7 +36,7 @@ export default function App() {
     else if (currentView === "dashboard") return <LazyLoadDashboard />;
     else if (currentView === "calendar") return <LazyLoadCalendar />;
     else if (currentView === "today") return <LazyLoadToday />;
-    else if (currentView === "settings") return <LazyLoadSettings updateCurrentView={updateCurrentView}/>;
+    else if (currentView === "settings") return <LazyLoadSettings updateCurrentView={updateCurrentView} />;
     else if (currentView === 'change-password') return <LazyChangePasswordForm />
   }
 
@@ -48,7 +48,7 @@ export default function App() {
     });
     updateFontsLoaded(true)
   }
-  
+
   //load fonts
   useEffect(() => {
     loadFonts()

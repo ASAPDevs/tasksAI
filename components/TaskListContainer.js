@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, Divider, Heading, Circle,  Pressable } from "native-base";
+import { View, Text, Divider, Heading, Circle, Pressable } from "native-base";
 import { StyleSheet, ActivityIndicator } from "react-native";
 import Task, { DeleteButton } from "./Task";
 import NewTaskModal from "./NewTaskModal";
@@ -164,14 +164,14 @@ const TaskListContainer = ({
         >
           {/* <ActivityIndicator size="large" /> */}
           <Svg width={24} height={24} viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
- <Blockloadingsvg />
-</Svg>
+            <Blockloadingsvg />
+          </Svg>
         </View>
       )}
       {/* Tasks List */}
       {!loading && tabRender()}
-     
-        {/* <Pressable
+
+      {/* <Pressable
           onPress={() => openNewTask(true)}
            style={{ ...styles.createTaskButtonContainer } }
         >
@@ -189,14 +189,14 @@ const TaskListContainer = ({
           </Text>
           </Circle>
         </Pressable> */}
-        <CreateTaskCircle
-      radius={50}
-      borderWidth={2}
-      color="#00FF00"
-      text="Hello"
-      icon="clock"
-      onPress={() => openNewTask(true)}
-    />
+      <CreateTaskCircle
+        radius={50}
+        borderWidth={2}
+        color="#00FF00"
+        text="Hello"
+        icon="clock"
+        onPress={() => openNewTask(true)}
+      />
       {/* {newTask ? (
         <NewTaskModal
           addTask={addTask}
@@ -206,11 +206,11 @@ const TaskListContainer = ({
       ) : (
         ""
       )} */}
-       <NewTaskModal
-          addTask={addTask}
-          newTask={newTask}
-          openNewTask={openNewTask}
-        />
+      <NewTaskModal
+        addTask={addTask}
+        newTask={newTask}
+        openNewTask={openNewTask}
+      />
     </View>
   );
 };
@@ -255,7 +255,7 @@ const styles = StyleSheet.create({
   },
   createTaskButtonContainer: {
     position: "absolute",
-    width:  150,
+    width: 150,
     height: 150,
   },
   createTaskButton: {
