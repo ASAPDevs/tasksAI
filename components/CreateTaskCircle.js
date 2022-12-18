@@ -1,5 +1,5 @@
 import React, { useState} from 'react';
-import { Icon } from 'native-base';
+import { Icon, View } from 'native-base';
 import { TouchableOpacity, Animated } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons'; 
 
@@ -27,7 +27,8 @@ const CreateTaskCircle = ({ radius, onPress }) => {
 
 
   return (
-    <TouchableOpacity activeOpacity={0.8} onPress={() => {
+   <View style={{display: 'flex', justifyContent: 'center', flex: 1, alignItems: 'center', position: 'absolute', borderColor: 'blue', bottom: 0, right: 0, width: '100%'}}>
+     <TouchableOpacity activeOpacity={0.8} onPress={() => {
       onPress()
     }}
     onPressIn={onPressIn}
@@ -42,16 +43,14 @@ const CreateTaskCircle = ({ radius, onPress }) => {
          borderWidth: 1,
          borderColor: "#E8EEF7",
          backgroundColor: "#FAA946",
-         bottom: 30,
-         left: 190,
          alignItems: 'center',
          justifyContent: 'center',
-         position: 'relative',
          transform: [{ scale: animatedValue }]
       }}>
         <Icon as={MaterialIcons} color="white" marginLeft={0} name="library-add" size={8} />
       </Animated.View>
     </TouchableOpacity>
+   </View>
   );
 };
 

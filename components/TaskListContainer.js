@@ -47,7 +47,7 @@ const TaskListContainer = ({
 
   return (
     <View style={styles.bottomContainer}>
-      <View style={{ minHeight: "4%", borderColor: "black" }}>
+      <View style={{ minHeight: "7.25%", maxHeight: '7.25%', borderColor: "black" }}>
         <Heading style={styles.bottomContainerHeading}>Task List</Heading>
         <TaskListTabGroup currentTab={currentTab} switchTab={switchTab} />
         <Divider bgColor="black" thickness={1} orientation="horizontal" />
@@ -60,6 +60,7 @@ const TaskListContainer = ({
             borderWidth: 0,
             minHeight: "85%",
             maxHeight: "85%",
+            height: "85%",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
@@ -124,6 +125,7 @@ const TaskListContainer = ({
         icon="clock"
         onPress={() => openNewTask(true)}
       />
+      
     </View>
   );
 };
@@ -147,21 +149,10 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     textAlign: "center",
   },
-  taskContainer: {
-    display: "flex",
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    borderColor: "black",
-    borderWidth: 0,
-    padding: 10,
-    height: 70,
-    margin: 10,
-    borderRadius: 10,
-  },
   taskListContainer: {
     borderColor: "#E8EEF7",
     minHeight: "85%",
+    height: "85%",
     maxHeight: "85%",
     borderWidth: 1,
   },
