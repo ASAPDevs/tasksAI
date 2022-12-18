@@ -134,7 +134,7 @@ const Today = () => {
           </Pressable>
         </View>
         <Box w="50%" p="3" _text={{ textAlign: "center" }}>
-          <Progress size="xl" value={progress} />
+          <Progress color="#FAA946" _filledTrack={{bg: "#FAA946"}} size="xl" value={progress} />
           <Text style={styles.progressText}>
             {" "}
             Daily Progress: {progress !== NaN ? progress : "0.00"}%
@@ -152,6 +152,7 @@ const Today = () => {
         loading={loading}
         newTask={newTask}
         tasks={tasks}
+        refetch={refetch}
         openNewTask={openNewTask}
         handleDeleteTask={handleDeleteTask}
       />

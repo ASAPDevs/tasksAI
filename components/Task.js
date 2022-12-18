@@ -25,6 +25,8 @@ const Task = ({ taskId, title, description, startTime, endTime, completed, refet
       }
     })
 
+    
+
 
   
   
@@ -58,21 +60,22 @@ const Task = ({ taskId, title, description, startTime, endTime, completed, refet
     );
   };
 
-  export const DeleteButton = ({item, rowMap, handleDeleteTask}) => {
+  export const UnderTaskButton = ({item, rowMap, handleDeleteTask}) => {
     const [deleteConfirmation, toggleDeleteConfirmation] = useState(false);
   
+
       return (
         <View style={styles.deleteTaskContainer}>
-          <View style={{backgroundColor: 'green', width: '50%'}}>
+          <View style={{backgroundColor: 'green', height: '100%', minWidth: '55%', maxWidth:'55%'}}>
             <Icon
                 as={AntDesign}
                 name="checkcircle"
                 color="white"
-                size={"8"}
+                size={8}
               />
           </View>
           {!deleteConfirmation ? (
-          <Pressable style={{display: 'flex', width: '50%', flexDirection: 'row', alignItems: 'center', justifyContent: 'center'}} onPress={() => {
+          <Pressable style={{display: 'flex', flex: '1', minWidth: '50%', maxWidth:'50%', height:'100%', backgroundColor: 'red', width: '50%', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end' }} onPress={() => {
             toggleDeleteConfirmation(true)
           }}>
             <Text style={{color: 'white'}}>Delete </Text>
@@ -81,9 +84,10 @@ const Task = ({ taskId, title, description, startTime, endTime, completed, refet
               name="delete"
               color="white"
               size={"8"}
+              marginRight={12}
             />
           </Pressable>) :
-          <Pressable style={{display: 'flex', width: '50%', flexDirection: 'row', alignItems: 'center', justifyContent: 'center'}}onPress={() => {
+          <Pressable style={{display: 'flex', minWidth: '50%', maxWidth:'50%', height:'100%', backgroundColor: 'red', width: '50%', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end'}}onPress={() => {
             handleDeleteTask(item.id)
             rowMap[item.key].closeRow()
             toggleDeleteConfirmation(false)
@@ -94,6 +98,7 @@ const Task = ({ taskId, title, description, startTime, endTime, completed, refet
               name="circle-with-cross"
               color="white"
               size={"8"}
+              marginRight={10}
             />
           </Pressable>
             }
@@ -165,17 +170,12 @@ const Task = ({ taskId, title, description, startTime, endTime, completed, refet
       display: "flex",
       flexDirection: "row",
       alignItems: "center",
-      justifyContent: "flex-end",
-      borderColor: "black",
-      borderBottomWidth: 1,
-      topBorderWidth: 1,
-      padding: 10,
-      paddingRight: 30,
+      alignSelf: 'center',
+      justifyContent: "center",
       height: 90,
       width: '95%',
       zIndex: 9,
       // backgroundColor: 'red',
-      borderRadius: 10,
     },
     swipeRightIcon: {
       position: "absolute",
