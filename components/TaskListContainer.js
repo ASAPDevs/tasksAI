@@ -1,11 +1,13 @@
 import React, { useMemo, useState } from "react";
 import { View, Divider, Heading } from "native-base";
 import { StyleSheet, ActivityIndicator } from "react-native";
-import Task, { DeleteButton } from "./Task";
+import Task, { UnderTaskButton } from "./Task";
 import NewTaskModal from "./NewTaskModal";
 import { SwipeListView } from "react-native-swipe-list-view";
 import TaskListTabGroup from "./TaskListTabGroup";
 import CreateTaskCircle from "./CreateTaskCircle";
+import { useMutation } from "@apollo/client";
+import { COMPLETE_TASK } from "./helpers/mutations";
 
 const TaskListContainer = ({
   addTask,
@@ -21,16 +23,27 @@ const TaskListContainer = ({
   const [currentTab, switchTab] = useState("inprogress");
 
   const filterTasks = useMemo(() => {
-    return tasks.filter((task) => {
-      if (currentTab === "inprogress") {
-        return !task.completed;
-      } else if (currentTab === "completed") {
-        return task.completed;
-      } else {
-        return true;
-      }
-    });
+    return tasks
+      .filter((task) => {
+        if (currentTab === "inprogress") {
+          return !task.completed;
+        } else if (currentTab === "completed") {
+          return task.completed;
+        } else {
+          return true;
+        }
+      })
+      .map((task) => ({ ...task, key: task.id })); // add the key property to each task object
   }, [tasks, currentTab]);
+
+  const [completeTask] = useMutation(COMPLETE_TASK, {
+    onCompleted: () => {
+      refetch();
+    },
+    onError: (err) => {
+      console.log("Error Completing Task: ", err);
+    },
+  });
 
   return (
     <View style={styles.bottomContainer}>
@@ -76,15 +89,25 @@ const TaskListContainer = ({
           }}
           renderHiddenItem={({ item }, rowMap) => {
             return (
-              <DeleteButton
+              <UnderTaskButton
                 item={item}
+                key={item.id}
                 rowMap={rowMap}
                 handleDeleteTask={handleDeleteTask}
               />
             );
           }}
           rightOpenValue={-190}
-          leftOpenValue={20}
+          leftOpenValue={100}
+          leftActivationValue={80}
+          // onLeftAction={(data, rowMap) => console.log("Left: ", rowMap.item)}
+          onLeftAction={(rowData, rowKey) => {
+            completeTask({ variables: { taskId: rowData } });
+            console.log("rowData:", typeof rowData);
+            // console.log(rowKey);
+          }}
+          // onSwipeValueChange={() => console.log("SwipeLEFT")}
+          // leftActionValue={() => console.log("Left")}
         />
       )}
 
