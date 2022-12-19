@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useMemo, useState } from "react";
 import { useQuery, useMutation } from "@apollo/client";
 import { View, Text, Progress, Box, Pressable } from "native-base";
 import { ImageBackground, StyleSheet } from "react-native";
@@ -9,6 +9,7 @@ import { CREATE_TASKS, DELETE_TASK } from "./helpers/mutations";
 import { FontAwesome } from "@expo/vector-icons";
 import TaskListContainer from "./TaskListContainer";
 import Calendar from "./Calendar";
+import ProgressBar from "./ProgressBar";
 
 const Today = () => {
   // Figure out where we pull date or refetch date
@@ -21,6 +22,9 @@ const Today = () => {
 
   const tasks = useSelector((state) => state.storage.tasks.daily);
   const userID = useSelector((state) => state.storage.user_id);
+  const completed = useMemo(() => {
+    return tasks.filter((task) => task.completed === true);
+  }, [tasks])  
 
   const dispatch = useDispatch();
 
@@ -28,6 +32,8 @@ const Today = () => {
   // const today = new Date().toISOString().split("T")[0];
   // const todayInMs = new Date(today).getTime();
   // console.log("USER ID: ", userID, typeof userID)
+
+  
 
   const { data, error, loading, refetch } = useQuery(GET_TODAYS_TASKS, {
     notifyOnNetworkStatusChange: true,
@@ -58,20 +64,6 @@ const Today = () => {
     },
   });
 
-  // const [updateCompletedTask] = useMutation(COMPLETED_TASK, {
-  //   onCompleted: () => {
-  //     dispatch(
-  //       updateDailyTasks({
-  //         /* payload should be tasks from response back from mutation spread with completed switched to false */
-  //       })
-  //     );
-  //     refetch();
-  //   },
-  //   onError: (err) => {
-  //     console.log("Error Updating Completed Task: ", err);
-  //   },
-  // });
-
   // this function converts the date state to mm/dd/yy format
 
   const convertDateTitle = () => {
@@ -90,6 +82,7 @@ const Today = () => {
     });
   };
 
+
   //this handler creates a new task using the current state inputs and sends it to the useMutation function
   //then closes the modal
   const addTask = (taskTitle, taskDescription, startTime, endTime) => {
@@ -106,19 +99,12 @@ const Today = () => {
     openNewTask(false);
   };
 
-  // Call this handler when you complete a task
-  const completedTask = () => {
-    // useMutation hook call
-    updateCompletedTask({
-      /* taskInputs with completed switched to true */
-    });
-  };
+
 
   // useEffect to update and render progress bar
   useEffect(() => {
-    console.log(date);
-    const completed = tasks.filter((task) => task.completed === true);
     setProgress(((completed.length / tasks.length) * 100).toFixed(2));
+    console.log("Progress: ", Number(progress))
   }, [tasks]);
 
   return (
@@ -134,13 +120,15 @@ const Today = () => {
           </Pressable>
         </View>
         <Box w="50%" p="3" _text={{ textAlign: "center" }}>
-          <Progress color="#FAA946" _filledTrack={{bg: "#FAA946"}} size="xl" value={progress} />
+          {/* <Progress color="#FAA946" _filledTrack={{bg: "#FAA946"}} size="xl" value={progress} /> */}
+          <ProgressBar progress={Number(progress)} />
           <Text style={styles.progressText}>
             {" "}
             Daily Progress: {progress !== NaN ? progress : "0.00"}%
           </Text>
         </Box>
       </ImageBackground>
+      
       <Calendar
         calendarModal={calendarModal}
         openCalendarModal={openCalendarModal}
@@ -154,6 +142,7 @@ const Today = () => {
         tasks={tasks}
         refetch={refetch}
         openNewTask={openNewTask}
+        setProgress={setProgress}
         handleDeleteTask={handleDeleteTask}
       />
     </View>

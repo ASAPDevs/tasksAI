@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
     View,
     Text,
@@ -37,6 +37,8 @@ const TaskModal = ({ updateTask, openTask, toggleOpenTask, taskTitle, taskDescri
       toggleOpenTask(false);
       toggleEditMode(false);
     };
+
+    useEffect(() => {}, [startTime, endTime, title, description])
   
     return (
       <Modal isOpen={openTask} onClose={() => toggleOpenTask(false)}>

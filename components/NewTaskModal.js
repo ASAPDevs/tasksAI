@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   Text,
   Button,
@@ -19,12 +19,29 @@ const NewTaskModal = ({ newTask, openNewTask, setTasks, addTask }) => {
   const [taskDescription, updateTaskDescription] = useState("");
   const [invalidSubmission, toggleInvalidSubmission] = useState(false);
 
+  //useCallback is more efficient here, since we can cache this function in between re-renders. 
+  //Dependency is an empty array because we don't need these values or functions to recalculate.
+  const clearInputs = useCallback(() => {
+    updateTaskTitle("");
+    updateTaskDescription("");
+    updateStartTime("");
+    updateEndTime("")
+  }, [])
+
   //handles main functionality of onPress
+  //useCallback is efficient here as well.
   const onPress = () => {
     if (taskTitle == "") toggleInvalidSubmission(true);
-    else addTask(taskTitle, taskDescription, startTime, endTime);
-  };
+    else {
+      addTask(taskTitle, taskDescription, startTime, endTime);
+      clearInputs();
+    } 
+  }
 
+ 
+
+  //Memoize this functional component so we don't need to re-render again. 
+  //More Effieicny
   const CreateButton = ({ onPress }) => {
     const [animatedValue, setAnimatedValue] = useState(new Animated.Value(1));
 
@@ -83,7 +100,7 @@ const NewTaskModal = ({ newTask, openNewTask, setTasks, addTask }) => {
         </Animated.View>
       </Pressable>
     );
-  };
+  }
 
   useEffect(() => {
     if (invalidSubmission)

@@ -71,3 +71,9 @@ export const COMPLETE_TASK = gql`
     completeTask(id: $taskId)
   }
 `;
+
+export const PUSH_TASK = gql`
+  mutation PushTask($id: ID!, $newStartTime: String!, $newEndTime: String!) {
+    pushTask(id: $id, newStartTime: $newStartTime, newEndTime: $newEndTime)
+  }
+`

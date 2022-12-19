@@ -1,13 +1,15 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
     View,
     Text,
     Heading,
     Pressable,
-    Icon
-  } from "native-base";
-import { StyleSheet } from "react-native";
-import { UPDATE_TASK } from "./helpers/mutations";
+    Icon,
+    Button,
+    Select,
+    Modal  } from "native-base";
+import { StyleSheet, TouchableOpacity } from "react-native";
+import { UPDATE_TASK, PUSH_TASK } from "./helpers/mutations";
 import { useMutation } from "@apollo/client";
 import { MaterialCommunityIcons, Entypo, AntDesign } from '@expo/vector-icons'; 
 import TaskModal from "./TaskModal";
@@ -15,7 +17,8 @@ import TaskModal from "./TaskModal";
 
 const Task = ({ taskId, title, description, startTime, endTime, completed, refetch }) => {
     const [openTask, toggleOpenTask] = useState(false);
-
+    const [pushTaskModal, openPushTaskModal] = useState(false);
+    
     const [updateTask] = useMutation(UPDATE_TASK, {
       onCompleted: () => {
         refetch()
@@ -23,12 +26,30 @@ const Task = ({ taskId, title, description, startTime, endTime, completed, refet
       onError: (err) => {
         console.log("Error Updating Task: ", err)
       }
-    })
+    });
 
     
+    const [pushTask] = useMutation(PUSH_TASK, {
+      onCompleted: () => {
+        refetch()
+      },
+      onError: (err) => {
+        console.log("Error Pushing Task: ", err)
+      }
+    });
 
+    const pushTaskHandler = (selectedValue) => {
+      let timeToAdd = selectedValue * 3600000
+      let newStartTime = Number(startTime) + timeToAdd
+      let newEndTime = Number(endTime) + timeToAdd
+      
+      let newId = Number(taskId)
+      let newTime = newStartTime.toString()
+      let newTime2 = newEndTime.toString()
+      console.log("checking vars in handler: ", taskId, timeToAdd, newStartTime, newEndTime, typeof newId, typeof newTime)
+      pushTask({variables: {id: newId, newStartTime: newTime, newEndTime: newTime2}})
+    }
 
-  
   
     return (
       <Pressable 
@@ -37,6 +58,10 @@ const Task = ({ taskId, title, description, startTime, endTime, completed, refet
         <View style={styles.taskContainer} key={title}>
           <View style={styles.taskContainerInnerWrapper}>
             <Heading style={styles.taskHeading}>{title}</Heading>
+            <Pressable onPress={() => openPushTaskModal(true)}>
+              <Icon as={AntDesign} name="rightcircle" size={6} color="black" style={{position: 'relative', left: 100}} />
+            </Pressable>
+            <PushComponent pushTaskHandler={pushTaskHandler} pushTaskModal={pushTaskModal} openPushTaskModal={openPushTaskModal} />
             <View style={styles.taskContainerTimeContainer}>
               <Text style={{...styles.timeContainerText, ...styles.timeText}}>{new Date(Number(startTime)).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</Text>
               <Text style={styles.timeContainerText}>to</Text>
@@ -106,13 +131,41 @@ const Task = ({ taskId, title, description, startTime, endTime, completed, refet
       );
   }
 
+  export const PushComponent = ({ pushTaskHandler, pushTaskModal, openPushTaskModal }) => {
+    const [selectedValue, updateSelectedValue] = useState(0);
+    
+    // useEffect(() => {
+    //   console.log("checking selected: ", selectedValue);
+    // }, [selectedValue])
+
+    return (
+      <Modal isOpen={pushTaskModal} onClose={() => openPushTaskModal(false)} >
+        <Modal.Content>
+          <Modal.CloseButton />
+          <Modal.Header alignSelf="center" >Push Task</Modal.Header>
+          <Modal.Body display="flex" flexDirection="row" justifyContent="space-between">
+            <View width="100%" display="flex" alignItems="center" >
+              <Text>New Time</Text>
+              <Select width="50%" onValueChange={(itemValue) => updateSelectedValue(itemValue)} >
+                <Select.Item label="1 hr" value={1} />
+                <Select.Item label="2 hr" value={2} />
+                <Select.Item label="3 hr" value={3} />
+              </Select>
+              <Button onPress={() => pushTaskHandler(selectedValue)} >Push {selectedValue} hours</Button>
+            </View>
+          </Modal.Body>
+        </Modal.Content>
+      </Modal>
+    )
+  }
+
   const styles = StyleSheet.create({
     taskContainer: {
       display: "flex",
       flexDirection: "row",
       alignItems: "center",
       justifyContent: "center",
-      borderColor: "black",
+      borderColor: "#ceddf5",
       borderBottomWidth: 1,
       topBorderWidth: 1,
       padding: 10,

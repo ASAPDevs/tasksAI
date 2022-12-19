@@ -16,7 +16,9 @@ const typeDefs = gql`
     updateTask(task: UpdateTaskInput): Task
     deleteTask(id: ID!): Boolean
     completeTask(id: ID!): Boolean
+    pushTask(id: ID!, newStartTime: String!, newEndTime: String!): Boolean
   }
+
 
   input ChangePassWordInput {
     username: String!
@@ -259,6 +261,13 @@ const resolvers = {
       );
       return completedTask.rowCount < 1 ? false : true;
     },
+    pushTask: async (_, args) => {
+      const { id, newStartTime, newEndTime } = args;
+      console.log("Check args in pushTask: ", args)
+      const updatedTask = await db.query("UPDATE tasks SET time_start = $1, time_finished = $2 WHERE id = $3 RETURNING *;", [newStartTime, newEndTime, id])
+      console.log("Pushed this task x hours: ", updatedTask)
+      return updatedTask.rowCount < 1 ? false : true;
+    }
   },
 };
 

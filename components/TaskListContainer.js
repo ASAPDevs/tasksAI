@@ -1,5 +1,5 @@
-import React, { useMemo, useState } from "react";
-import { View, Divider, Heading } from "native-base";
+import React, { useEffect, useMemo, useState } from "react";
+import { View, Text, Divider, Heading } from "native-base";
 import { StyleSheet, ActivityIndicator } from "react-native";
 import Task, { UnderTaskButton } from "./Task";
 import NewTaskModal from "./NewTaskModal";
@@ -9,7 +9,8 @@ import CreateTaskCircle from "./CreateTaskCircle";
 import { useMutation } from "@apollo/client";
 import { COMPLETE_TASK } from "./helpers/mutations";
 
-const TaskListContainer = ({
+//Props are passed down from Today component
+const TaskListContainer = React.memo(({
   addTask,
   tasks,
   refetch,
@@ -21,6 +22,7 @@ const TaskListContainer = ({
   //Selected Tab/View for the container
   //Default is "inprogress", other two are "completed" and "all"
   const [currentTab, switchTab] = useState("inprogress");
+
 
   const filterTasks = useMemo(() => {
     return tasks
@@ -36,6 +38,7 @@ const TaskListContainer = ({
       .map((task) => ({ ...task, key: task.id })); // add the key property to each task object
   }, [tasks, currentTab]);
 
+
   const [completeTask] = useMutation(COMPLETE_TASK, {
     onCompleted: () => {
       refetch();
@@ -44,6 +47,10 @@ const TaskListContainer = ({
       console.log("Error Completing Task: ", err);
     },
   });
+
+  useEffect(() => {
+
+  }, [])
 
   return (
     <View style={styles.bottomContainer}>
@@ -69,6 +76,23 @@ const TaskListContainer = ({
           <ActivityIndicator size="large" />
         </View>
       )}
+      {/* Fallback for empty tasks */}
+      {!loading && filterTasks.length < 1 &&
+        <View
+        style={{
+          borderColor: "black",
+          borderWidth: 0,
+          minHeight: "85%",
+          maxHeight: "85%",
+          height: "85%",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <Text>No Tasks To Be Shown!</Text>
+      </View>
+     }
       {/* Tasks List */}
       {!loading && (
         <SwipeListView
@@ -111,7 +135,7 @@ const TaskListContainer = ({
           // leftActionValue={() => console.log("Left")}
         />
       )}
-
+      
       <NewTaskModal
         addTask={addTask}
         newTask={newTask}
@@ -128,7 +152,7 @@ const TaskListContainer = ({
       
     </View>
   );
-};
+});
 
 const styles = StyleSheet.create({
   bottomContainer: {
@@ -150,11 +174,11 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   taskListContainer: {
-    borderColor: "#E8EEF7",
+    borderBottomColor: 'black',
     minHeight: "85%",
     height: "85%",
     maxHeight: "85%",
-    borderWidth: 1,
+    borderBottomWidth: 1,
   },
   createTaskButtonContainer: {
     position: "absolute",
