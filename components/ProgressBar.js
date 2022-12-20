@@ -6,6 +6,8 @@ import Constants from 'expo-constants';
 const ProgressBar = ({progress}) => {
   const [animatedValue, setAnimatedValue] = useState(new Animated.Value(1)) 
 
+  
+
   //function to animate, increment the progress on the progress bar.
   const load = (progress) => {
     Animated.timing(animatedValue, {
