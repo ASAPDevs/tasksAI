@@ -252,7 +252,7 @@ const convertDate = (selectedDate, selectedTime) => {
 }
 
 const displayTime = (milisec) => {
-  const time = new Date(milisec);
+  const time = new Date(Number(milisec));
   let hours = time.getHours();
   let minutes = time.getMinutes();
   if (minutes < 10) {
@@ -283,7 +283,7 @@ export const StartTimeInput = ({ startTime, endTime, updateStartTime, updateEndT
 
     updateStartTime(convertedTime);
     // convert end time to start time if it's falsy or before start time
-    if (endTime.length !== 0 && endTime < convertedTime) {
+    if (endTime?.length !== 0 && endTime < convertedTime) {
       updateEndTime(convertedTime);
     }
     setDatePickerVisibility(false);
@@ -299,16 +299,7 @@ export const StartTimeInput = ({ startTime, endTime, updateStartTime, updateEndT
           isReadOnly
           borderColor="black"
           style={styles.timeInput}
-          value={
-            typeof startTime == "number"
-              ?
-              displayTime(startTime)
-              // new Date(startTime).toLocaleTimeString([], {
-              //   hour: "2-digit",
-              //   minute: "2-digit",
-              // })
-              : "None"
-          }
+          value={Number(startTime) ? displayTime(startTime) : "None"}
           InputRightElement={
             <Button
               height="100%"
@@ -349,7 +340,7 @@ export const EndTimeInput = ({ startTime, endTime, updateStartTime, updateEndTim
 
     updateEndTime(convertedTime);
     // convert start time to end time if it's falsy or before start time
-    if (startTime.length !== 0 && convertedTime < startTime) {
+    if (startTime?.length !== 0 && convertedTime < startTime) {
       updateStartTime(convertedTime);
     }
     setDatePickerVisibility(false);
@@ -365,16 +356,7 @@ export const EndTimeInput = ({ startTime, endTime, updateStartTime, updateEndTim
           isReadOnly
           borderColor="black"
           style={styles.timeInput}
-          value={
-            typeof endTime == "number"
-              ?
-              // new Date(endTime).toLocaleTimeString([], {
-              //   hour: "2-digit",
-              //   minute: "2-digit",
-              // })
-              displayTime(endTime)
-              : "None"
-          }
+          value={Number(startTime) ? displayTime(endTime) : "None"}
           InputRightElement={
             <Button
               height="100%"

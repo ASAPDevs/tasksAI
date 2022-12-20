@@ -103,7 +103,7 @@ const Today = () => {
 
   // useEffect to update and render progress bar
   useEffect(() => {
-    tasks.length > 0 ? setProgress(((completed.length / tasks.length) * 100).toFixed(2)) : null;
+    setProgress(((completed.length / tasks.length) * 100).toFixed(2));
   }, [tasks]);
 
   return (

@@ -20,10 +20,13 @@ const TaskListContainer = React.memo(({
   handleDeleteTask,
   loading,
 }) => {
-  //Selected Tab/View for the container
-  //Default is "inprogress", other two are "completed" and "all"
+  // Selected Tab/View for the container
+  // Default is "inprogress", other two are "completed" and "all"
   const [currentTab, switchTab] = useState("inprogress");
-
+  // prevDay will determine if the user is looking at pass days,
+  // if true, nothing should be editable
+  const today = new Date();
+  const [prevDay, changePrevDay] = useState(today.getTime() > date.getTime());
 
   const filterTasks = useMemo(() => {
     return tasks
@@ -50,8 +53,8 @@ const TaskListContainer = React.memo(({
   });
 
   useEffect(() => {
-
-  }, [])
+    changePrevDay(today.getTime() > date.getTime());
+  }, [date])
 
   return (
     <View style={styles.bottomContainer}>
@@ -102,6 +105,7 @@ const TaskListContainer = React.memo(({
           renderItem={({ item }, rowMap) => {
             return (
               <Task
+                date={date}
                 description={item.task_description}
                 title={item.task_name}
                 startTime={item.time_start}
@@ -110,6 +114,7 @@ const TaskListContainer = React.memo(({
                 taskId={item.id}
                 key={item.id}
                 refetch={refetch}
+                prevDay={prevDay}
               />
             );
           }}
@@ -143,14 +148,14 @@ const TaskListContainer = React.memo(({
         newTask={newTask}
         openNewTask={openNewTask}
       />
-      <CreateTaskCircle
+      {!prevDay && <CreateTaskCircle
         radius={45}
         borderWidth={2}
         color="#00FF00"
         text="Hello"
         icon="clock"
         onPress={() => openNewTask(true)}
-      />
+      />}
 
     </View>
   );
