@@ -11,6 +11,7 @@ import {
 import { StyleSheet, Animated, View } from "react-native";
 import { FontAwesome, Octicons } from "@expo/vector-icons";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
+import { min } from "react-native-reanimated";
 
 const NewTaskModal = ({ date, newTask, openNewTask, setTasks, addTask }) => {
   const [startTime, updateStartTime] = useState("");
@@ -37,7 +38,10 @@ const NewTaskModal = ({ date, newTask, openNewTask, setTasks, addTask }) => {
       const startOfDay = new Date(date).getTime();
       const endOfDay = startOfDay + 86400000 - 60000;
       const start = (typeof startTime === 'number') ? startTime : startOfDay;
-      const end = (typeof endTime === 'number') ? endTime : endOfDay;
+      let end = (typeof endTime === 'number') ? endTime : endOfDay;
+      // if (start > end) {
+      //   end = start;
+      // }
       addTask(taskTitle, taskDescription, start, end);
       clearInputs();
     }
@@ -199,9 +203,18 @@ const NewTaskModal = ({ date, newTask, openNewTask, setTasks, addTask }) => {
           <View style={styles.timeInputsContainer}>
             <StartTimeInput
               startTime={startTime}
+              endTime={endTime}
               updateStartTime={updateStartTime}
+              updateEndTime={updateEndTime}
+              date={date}
             />
-            <EndTimeInput endTime={endTime} updateEndTime={updateEndTime} />
+            <EndTimeInput
+              startTime={startTime}
+              endTime={endTime}
+              updateStartTime={updateStartTime}
+              updateEndTime={updateEndTime}
+              date={date}
+            />
           </View>
           <CreateButton onPress={onPress} />
         </Modal.Body>
@@ -210,17 +223,69 @@ const NewTaskModal = ({ date, newTask, openNewTask, setTasks, addTask }) => {
   );
 };
 
-export const StartTimeInput = ({ startTime, updateStartTime }) => {
+// this function takes a user selected date and time,
+// then it returns the correct time in miliseconds
+const convertDate = (selectedDate, selectedTime) => {
+  const tempDate = new Date(selectedDate);
+  const year = tempDate.getFullYear();
+  const month = tempDate.getMonth();
+  const day = tempDate.getDate();
+  const hourAndMinutes = selectedTime.slice(0, selectedTime.indexOf(' ')).split(':');
+  const minutes = Number(hourAndMinutes[1]);
+  let hour = Number(hourAndMinutes[0]);
+
+  if (selectedTime.includes('PM')) {
+    if (hour === 12) {
+      hour = 12;
+    } else {
+      hour += 12;
+    }
+    const convertedTime = new Date(year, month, day, hour, minutes).getTime();
+    return convertedTime;
+  } else {
+    if (hour === 12) {
+      hour = 0;
+    }
+    const convertedTime = new Date(year, month, day, hour, minutes).getTime();
+    return convertedTime;
+  }
+}
+
+const displayTime = (milisec) => {
+  const time = new Date(milisec);
+  let hours = time.getHours();
+  let minutes = time.getMinutes();
+  if (minutes < 10) {
+    minutes = `0${minutes}`;
+  }
+  if (hours === 12) {
+    return `${12}:${minutes} PM`;
+  } else if (hours === 0) {
+    return `${12}:${minutes} AM`;
+  } else if (hours > 12) {
+    return `${hours % 12}:${minutes} PM`;
+  } else {
+    return `${hours}:${minutes} AM`;
+  }
+}
+
+export const StartTimeInput = ({ startTime, endTime, updateStartTime, updateEndTime, date }) => {
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
 
   const handleSetStartTime = (time) => {
-    console.log('time', time)
-    const newDate = new Date(startTime).toLocaleTimeString([], {
-      hour: "2-digit",
-      minute: "2-digit",
+    const tempDate = new Date(time);
+    const hourAndMinutes = tempDate.toLocaleTimeString([], {
+      hour: '2-digit',
+      minute: "2-digit"
     });
-    console.log('newDate', newDate)
-    updateStartTime(time.getTime());
+    const timeZoneOffset = tempDate.getTimezoneOffset();
+    const convertedTime = convertDate(date, hourAndMinutes, timeZoneOffset);
+
+    updateStartTime(convertedTime);
+    // convert end time to start time if it's falsy or before start time
+    if (endTime.length !== 0 && endTime < convertedTime) {
+      updateEndTime(convertedTime);
+    }
     setDatePickerVisibility(false);
   };
 
@@ -236,10 +301,12 @@ export const StartTimeInput = ({ startTime, updateStartTime }) => {
           style={styles.timeInput}
           value={
             typeof startTime == "number"
-              ? new Date(startTime).toLocaleTimeString([], {
-                hour: "2-digit",
-                minute: "2-digit",
-              })
+              ?
+              displayTime(startTime)
+              // new Date(startTime).toLocaleTimeString([], {
+              //   hour: "2-digit",
+              //   minute: "2-digit",
+              // })
               : "None"
           }
           InputRightElement={
@@ -268,11 +335,23 @@ export const StartTimeInput = ({ startTime, updateStartTime }) => {
   );
 };
 
-export const EndTimeInput = ({ endTime, updateEndTime }) => {
+export const EndTimeInput = ({ startTime, endTime, updateStartTime, updateEndTime, date }) => {
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
 
-  const handleSetEndTime = (date) => {
-    updateEndTime(date.getTime());
+  const handleSetEndTime = (time) => {
+    const tempDate = new Date(time);
+    const hourAndMinutes = tempDate.toLocaleTimeString([], {
+      hour: '2-digit',
+      minute: "2-digit"
+    });
+    const timeZoneOffset = tempDate.getTimezoneOffset();
+    const convertedTime = convertDate(date, hourAndMinutes, timeZoneOffset);
+
+    updateEndTime(convertedTime);
+    // convert start time to end time if it's falsy or before start time
+    if (startTime.length !== 0 && convertedTime < startTime) {
+      updateStartTime(convertedTime);
+    }
     setDatePickerVisibility(false);
   };
 
@@ -288,10 +367,12 @@ export const EndTimeInput = ({ endTime, updateEndTime }) => {
           style={styles.timeInput}
           value={
             typeof endTime == "number"
-              ? new Date(endTime).toLocaleTimeString([], {
-                hour: "2-digit",
-                minute: "2-digit",
-              })
+              ?
+              // new Date(endTime).toLocaleTimeString([], {
+              //   hour: "2-digit",
+              //   minute: "2-digit",
+              // })
+              displayTime(endTime)
               : "None"
           }
           InputRightElement={
