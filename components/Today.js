@@ -24,7 +24,7 @@ const Today = () => {
   const userID = useSelector((state) => state.storage.user_id);
   const completed = useMemo(() => {
     return tasks.filter((task) => task.completed === true);
-  }, [tasks])  
+  }, [tasks])
 
   const dispatch = useDispatch();
 
@@ -33,7 +33,7 @@ const Today = () => {
   // const todayInMs = new Date(today).getTime();
   // console.log("USER ID: ", userID, typeof userID)
 
-  
+
 
   const { data, error, loading, refetch } = useQuery(GET_TODAYS_TASKS, {
     notifyOnNetworkStatusChange: true,
@@ -127,7 +127,7 @@ const Today = () => {
           </Text>
         </Box>
       </ImageBackground>
-      
+
       <Calendar
         calendarModal={calendarModal}
         openCalendarModal={openCalendarModal}
@@ -135,6 +135,7 @@ const Today = () => {
         date={date}
       />
       <TaskListContainer
+        date={date}
         addTask={addTask}
         loading={loading}
         newTask={newTask}

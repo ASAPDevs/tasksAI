@@ -12,7 +12,7 @@ import { StyleSheet, Animated, View } from "react-native";
 import { FontAwesome, Octicons } from "@expo/vector-icons";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 
-const NewTaskModal = ({ newTask, openNewTask, setTasks, addTask }) => {
+const NewTaskModal = ({ date, newTask, openNewTask, setTasks, addTask }) => {
   const [startTime, updateStartTime] = useState("");
   const [endTime, updateEndTime] = useState("");
   const [taskTitle, updateTaskTitle] = useState("");
@@ -31,14 +31,19 @@ const NewTaskModal = ({ newTask, openNewTask, setTasks, addTask }) => {
   //handles main functionality of onPress
   //useCallback is efficient here as well.
   const onPress = () => {
-    if (taskTitle == "") toggleInvalidSubmission(true);
-    else {
-      addTask(taskTitle, taskDescription, startTime, endTime);
+    if (taskTitle == "") {
+      toggleInvalidSubmission(true);
+    } else {
+      const startOfDay = new Date(date).getTime();
+      const endOfDay = startOfDay + 86400000 - 60000;
+      const start = (typeof startTime === 'number') ? startTime : startOfDay;
+      const end = (typeof endTime === 'number') ? endTime : endOfDay;
+      addTask(taskTitle, taskDescription, start, end);
       clearInputs();
-    } 
+    }
   }
 
- 
+
 
   //Memoize this functional component so we don't need to re-render again. 
   //More Effieicny
@@ -208,8 +213,14 @@ const NewTaskModal = ({ newTask, openNewTask, setTasks, addTask }) => {
 export const StartTimeInput = ({ startTime, updateStartTime }) => {
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
 
-  const handleSetStartTime = (date) => {
-    updateStartTime(date.getTime());
+  const handleSetStartTime = (time) => {
+    console.log('time', time)
+    const newDate = new Date(startTime).toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+    console.log('newDate', newDate)
+    updateStartTime(time.getTime());
     setDatePickerVisibility(false);
   };
 
@@ -226,9 +237,9 @@ export const StartTimeInput = ({ startTime, updateStartTime }) => {
           value={
             typeof startTime == "number"
               ? new Date(startTime).toLocaleTimeString([], {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })
+                hour: "2-digit",
+                minute: "2-digit",
+              })
               : "None"
           }
           InputRightElement={
@@ -278,9 +289,9 @@ export const EndTimeInput = ({ endTime, updateEndTime }) => {
           value={
             typeof endTime == "number"
               ? new Date(endTime).toLocaleTimeString([], {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })
+                hour: "2-digit",
+                minute: "2-digit",
+              })
               : "None"
           }
           InputRightElement={

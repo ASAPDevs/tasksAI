@@ -11,6 +11,7 @@ import { COMPLETE_TASK } from "./helpers/mutations";
 
 //Props are passed down from Today component
 const TaskListContainer = React.memo(({
+  date,
   addTask,
   tasks,
   refetch,
@@ -79,20 +80,20 @@ const TaskListContainer = React.memo(({
       {/* Fallback for empty tasks */}
       {!loading && filterTasks.length < 1 &&
         <View
-        style={{
-          borderColor: "black",
-          borderWidth: 0,
-          minHeight: "85%",
-          maxHeight: "85%",
-          height: "85%",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        <Text>No Tasks To Be Shown!</Text>
-      </View>
-     }
+          style={{
+            borderColor: "black",
+            borderWidth: 0,
+            minHeight: "85%",
+            maxHeight: "85%",
+            height: "85%",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <Text>No Tasks To Be Shown!</Text>
+        </View>
+      }
       {/* Tasks List */}
       {!loading && (
         <SwipeListView
@@ -131,12 +132,13 @@ const TaskListContainer = React.memo(({
             console.log("rowData:", typeof rowData);
             // console.log(rowKey);
           }}
-          // onSwipeValueChange={() => console.log("SwipeLEFT")}
-          // leftActionValue={() => console.log("Left")}
+        // onSwipeValueChange={() => console.log("SwipeLEFT")}
+        // leftActionValue={() => console.log("Left")}
         />
       )}
-      
+
       <NewTaskModal
+        date={date}
         addTask={addTask}
         newTask={newTask}
         openNewTask={openNewTask}
@@ -149,7 +151,7 @@ const TaskListContainer = React.memo(({
         icon="clock"
         onPress={() => openNewTask(true)}
       />
-      
+
     </View>
   );
 });
