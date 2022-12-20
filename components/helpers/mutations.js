@@ -21,7 +21,7 @@ export const SIGNUP_MUTATION = gql`
 `;
 
 export const CHANGE_PASSWORD = gql`
-  mutation ChangePassword($userInput: ChangePassWordInput!) {
+  mutation ChangePassword($userInput: ChangePasswordInput!) {
     changePassword(userInput: $userInput) {
       id
       username

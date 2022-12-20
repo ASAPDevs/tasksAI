@@ -1,21 +1,12 @@
-import { StyleSheet, Text, View } from "react-native";
-import React, { useState, useEffect, Suspense } from "react";
+import React, { useState, useEffect } from "react";
 import Menu from "./components/Menu";
 import { Provider } from "react-redux";
-import { createDrawerNavigator } from '@react-navigation/drawer';
 import { NavigationContainer } from '@react-navigation/native';
 import * as Font from "expo-font";
 import LandingPage from "./components/Landing";
 import store from "./redux/store";
 import { ApolloClient, InMemoryCache, ApolloProvider, gql } from '@apollo/client';
-import { NativeBaseProvider, Box } from "native-base";
-import { useSelector } from "react-redux";
-const LazyLoadLanding = React.lazy(() => import("./components/Landing"));
-const LazyLoadDashboard = React.lazy(() => import("./components/Dashboard"));
-const LazyLoadCalendar = React.lazy(() => import("./components/Calendar"));
-const LazyLoadToday = React.lazy(() => import("./components/Today"));
-const LazyLoadSettings = React.lazy(() => import("./components/Settings"));
-const LazyChangePasswordForm = React.lazy(() => import("./components/ChangePasswordForm"));
+import { NativeBaseProvider } from "native-base";
 
 const client = new ApolloClient({
   uri: 'http://localhost:3000/graphql',
