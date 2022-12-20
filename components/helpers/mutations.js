@@ -70,12 +70,18 @@ export const DELETE_TASK = gql`
 
 export const COMPLETE_TASK = gql`
   mutation CompleteTask($taskId: ID!) {
-    completeTask(id: $taskId)
+    completeTask(id: $taskId) {
+      id
+    }
   }
 `;
 
 export const PUSH_TASK = gql`
   mutation PushTask($id: ID!, $newStartTime: String!, $newEndTime: String!) {
-    pushTask(id: $id, newStartTime: $newStartTime, newEndTime: $newEndTime)
+    pushTask(id: $id, newStartTime: $newStartTime, newEndTime: $newEndTime) {
+      id
+      time_start
+      time_finished
+    }
   }
 `

@@ -13,7 +13,7 @@ import { Entypo, Feather } from '@expo/vector-icons';
 import { StartTimeInput, EndTimeInput } from './NewTaskModal';
 
 
-const TaskModal = ({ updateTask, openTask, toggleOpenTask, taskTitle, taskDescription, taskStartTime, taskEndTime, taskId, completed }) => {
+const TaskModal = ({ updateTaskMutation, openTask, toggleOpenTask, taskTitle, taskDescription, taskStartTime, taskEndTime, taskId, completed }) => {
     const [editMode, toggleEditMode] = useState(false);
     const [editTime, toggleEditTime] = useState(false);
     const [startTime, updateStartTime] = useState(taskStartTime);
@@ -33,17 +33,21 @@ const TaskModal = ({ updateTask, openTask, toggleOpenTask, taskTitle, taskDescri
         completed: completed,
       };
       
-      updateTask({variables: {task: updatedTask}});
+      updateTaskMutation({variables: {task: updatedTask}});
       toggleOpenTask(false);
       toggleEditMode(false);
     };
   
-    useEffect(() => {
-      updateStartTime(taskStartTime);
-      updateEndTime(taskEndTime);
-      updateTaskDescription(taskDescription);
-      updateTaskTitle(taskTitle);
-    }, [taskStartTime, taskEndTime, taskTitle, taskDescription]);
+    // useEffect(() => {
+    //   updateStartTime(taskStartTime);
+    //   updateEndTime(taskEndTime);
+    //   updateTaskDescription(taskDescription);
+    //   updateTaskTitle(taskTitle);
+    //   console.log("Updated details prop: ", taskDescription)
+    //   console.log("Updated details state: ", description)
+    //   console.log("Updated details prop: ", typeof taskDescription)
+    //   console.log("Updated details state: ", typeof description)
+    // }, [taskStartTime, taskEndTime, taskTitle, taskDescription]);
   
     return (
       <Modal isOpen={openTask} onClose={() => toggleOpenTask(false)}>

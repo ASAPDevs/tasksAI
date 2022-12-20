@@ -7,11 +7,11 @@ import { SwipeListView } from "react-native-swipe-list-view";
 import TaskListTabGroup from "./TaskListTabGroup";
 import { useMutation } from "@apollo/client";
 import { COMPLETE_TASK } from "./helpers/mutations";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { completeTask } from "../redux/slices/storageSlice";
 
 //Props are passed down from Today component
 const TaskListContainer = ({
-  refetch,
   handleDeleteTask,
   loading,
 }) => {
@@ -19,10 +19,9 @@ const TaskListContainer = ({
   //Default is "inprogress", other two are "completed" and "all"
   const [currentTab, switchTab] = useState("inprogress");
   const tasks = useSelector((state) => state.storage.tasks.all);
-  console.log('tasklistcontainer')
+  const dispatch = useDispatch()
 
   const filterTasks = useCallback(() => {
-    console.log('filter task')
     switch (currentTab) {
       case "inprogress":
         return tasks.filter(task => !task.completed);
@@ -37,10 +36,10 @@ const TaskListContainer = ({
 
   const DATA = useMemo(() => filterTasks(), [currentTab, tasks])
 
-
-  const [completeTask] = useMutation(COMPLETE_TASK, {
-    onCompleted: () => {
-      refetch();
+  const [completeTaskMutation] = useMutation(COMPLETE_TASK, {
+    onCompleted: (data) => {
+      console.log("Data in frontend Complete Task: ", data.completeTask)
+      dispatch(completeTask(data.completeTask.id))
     },
     onError: (err) => {
       console.log("Error Completing Task: ", err);
@@ -105,7 +104,6 @@ const TaskListContainer = ({
                 endTime={item.time_finished}
                 taskId={item.id}
                 key={item.id}
-                refetch={refetch}
               />
             );
           }}
@@ -124,8 +122,9 @@ const TaskListContainer = ({
           leftActivationValue={80}
           // onLeftAction={(data, rowMap) => console.log("Left: ", rowMap.item)}
           onLeftAction={(rowData, rowKey) => {
-            completeTask({ variables: { taskId: rowData } });
-            console.log("rowData:", typeof rowData);
+            console.log("rowData:", rowData);
+            console.log("rowKey:", Object.keys(rowKey)[0]);
+            completeTaskMutation({ variables: { taskId: rowData } });
             // console.log(rowKey);
           }}
           

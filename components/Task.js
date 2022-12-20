@@ -1,41 +1,38 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
     View,
     Text,
     Heading,
     Pressable,
     Icon,
-    Button,
-    Select,
-    Modal  } from "native-base";
+   } from "native-base";
 import { StyleSheet, TouchableOpacity } from "react-native";
 import { UPDATE_TASK, PUSH_TASK } from "./helpers/mutations";
 import { useMutation } from "@apollo/client";
-import { MaterialCommunityIcons, Entypo, AntDesign } from '@expo/vector-icons'; 
-import TaskModal from "./TaskModal";
+import { Entypo, AntDesign } from '@expo/vector-icons'; 
+import { useDispatch } from "react-redux";
+import { pushTask, updateTask } from "../redux/slices/storageSlice";
 const LazyLoadModal = React.lazy(() => import('./TaskModal'))
 const LazyLoadPushModal = React.lazy(() => import('./PushComponent'))
-// import PushComponent from "./PushComponent";
 
-
-const Task = ({ taskId, title, description, startTime, endTime, completed, refetch }) => {
+const Task = ({ taskId, title, description, startTime, endTime, completed }) => {
     const [openTask, toggleOpenTask] = useState(false);
     const [pushTaskModal, openPushTaskModal] = useState(false);
+    const dispatch = useDispatch()
     
-    console.log("toggling pushTaskModal: ", pushTaskModal)
-    // const [updateTask] = useMutation(UPDATE_TASK, {
-    //   onCompleted: () => {
-    //     refetch()
-    //   },
-    //   onError: (err) => {
-    //     console.log("Error Updating Task: ", err)
-    //   }
-    // });
+    const [updateTaskMutation] = useMutation(UPDATE_TASK, {
+      onCompleted: (data) => {
+        dispatch(updateTask(data.updateTask))
+      },
+      onError: (err) => {
+        console.log("Error Updating Task: ", err)
+      }
+    });
 
     
-    const [pushTask] = useMutation(PUSH_TASK, {
-      onCompleted: () => {
-        refetch()
+    const [pushTaskMutation] = useMutation(PUSH_TASK, {
+      onCompleted: (data) => {
+        dispatch(pushTask(data.pushTask))
       },
       onError: (err) => {
         console.log("Error Pushing Task: ", err)
@@ -46,10 +43,13 @@ const Task = ({ taskId, title, description, startTime, endTime, completed, refet
       let timeToAdd = selectedValue * 3600000
       let newStartTime = Number(startTime) + timeToAdd
       let newEndTime = Number(endTime) + timeToAdd
-      pushTask({variables: {id: Number(taskId), newStartTime: newStartTime.toString(), newEndTime: newEndTime.toString()}})
+
+      pushTaskMutation({variables: {id: Number(taskId), newStartTime: newStartTime.toString(), newEndTime: newEndTime.toString()}})
+
+      openPushTaskModal(false)
     }
 
-  
+
     return (
       <Pressable 
         onPress={() => toggleOpenTask(true)}
@@ -76,8 +76,9 @@ const Task = ({ taskId, title, description, startTime, endTime, completed, refet
               <Icon as={Entypo} name="chevron-small-right" size={5} />
             </View>
           </View>
-          {openTask ?? 
-         <LazyLoadModal />}
+          {openTask && 
+          <LazyLoadModal updateTaskMutation={updateTaskMutation} openTask={openTask} toggleOpenTask={toggleOpenTask} taskTitle={title} taskDescription={description} taskStartTime={startTime} taskEndTime={endTime} taskId={taskId} completed={completed} />
+         }
         </View>
       </Pressable>
     );

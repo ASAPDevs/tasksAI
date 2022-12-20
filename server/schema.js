@@ -15,8 +15,8 @@ const typeDefs = gql`
     createTask(task: TaskInput): Task!
     updateTask(task: UpdateTaskInput): Task
     deleteTask(id: ID!): Task
-    completeTask(id: ID!): Boolean
-    pushTask(id: ID!, newStartTime: String!, newEndTime: String!): Boolean
+    completeTask(id: ID!): Task
+    pushTask(id: ID!, newStartTime: String!, newEndTime: String!): Task
   }
 
 
@@ -260,14 +260,12 @@ const resolvers = {
         "UPDATE tasks SET completed = true WHERE id = $1 RETURNING *;",
         [id]
       );
-      return completedTask.rowCount < 1 ? false : true;
+      return completedTask.rows[0]
     },
     pushTask: async (_, args) => {
       const { id, newStartTime, newEndTime } = args;
-      console.log("Check args in pushTask: ", args)
       const updatedTask = await db.query("UPDATE tasks SET time_start = $1, time_finished = $2 WHERE id = $3 RETURNING *;", [newStartTime, newEndTime, id])
-      console.log("Pushed this task x hours: ", updatedTask)
-      return updatedTask.rowCount < 1 ? false : true;
+      return updatedTask.rows[0]
     }
   },
 };

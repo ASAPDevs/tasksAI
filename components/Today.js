@@ -1,9 +1,9 @@
-import React, { useCallback, useEffect, useRef, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useQuery, useMutation } from "@apollo/client";
 import { View, Text, Box, Pressable } from "native-base";
 import { ImageBackground, StyleSheet } from "react-native";
 import { useSelector, useDispatch } from "react-redux";
-import { loadTasks, updateTasks } from "../redux/slices/storageSlice";
+import { loadTasks, deleteTask, addTask } from "../redux/slices/storageSlice";
 import { GET_TODAYS_TASKS } from "./helpers/queries";
 import { CREATE_TASKS, DELETE_TASK } from "./helpers/mutations";
 import { FontAwesome } from "@expo/vector-icons";
@@ -20,8 +20,6 @@ const Today = () => {
   const [progress, setProgress] = useState(0);
   const [newTask, openNewTask] = useState(false);
   const [calendarModal, openCalendarModal] = useState(false);
-
-  console.log('today')
 
   //maps to redux storage Slice.
   const tasks = useSelector((state) => state.storage.tasks.all);
@@ -50,18 +48,18 @@ const Today = () => {
     variables: { date: date.toISOString().split("T")[0], user_id: userID },
   });
 
-  const [createTask] = useMutation(CREATE_TASKS, {
+  const [createTaskMutation] = useMutation(CREATE_TASKS, {
     onCompleted: (data) => {
-      refetch();
+      dispatch(addTask(data.createTask))
     },
     onError: (err) => {
       console.log("Error Creating Task: ", err);
     },
   });
 
-  const [deleteTask] = useMutation(DELETE_TASK, {
+  const [deleteTaskMutation] = useMutation(DELETE_TASK, {
     onCompleted: (data) => {
-      dispatch(updateTasks(data.deleteTask.id))
+      dispatch(deleteTask(data.deleteTask.id))
     },
     onError: (err) => {
       console.log("Error Deleting Task: ", err);
@@ -80,7 +78,7 @@ const Today = () => {
   };
 
   const handleDeleteTask = (taskId) => {
-    deleteTask({
+    deleteTaskMutation({
       variables: { taskId: taskId },
     });
   };
@@ -88,7 +86,7 @@ const Today = () => {
 
   //this handler creates a new task using the current state inputs and sends it to the useMutation function
   //then closes the modal
-  const addTask = (taskTitle, taskDescription, startTime, endTime) => {
+  const addTaskHandler = (taskTitle, taskDescription, startTime, endTime) => {
     const newTask = {
       task_name: taskTitle,
       task_description: taskDescription,
@@ -98,7 +96,7 @@ const Today = () => {
       completed: false,
       user_id: Number(userID),
     };
-    createTask({ variables: { task: newTask } });
+    createTaskMutation({ variables: { task: newTask } });
     openNewTask(false);
   };
 
@@ -106,7 +104,6 @@ const Today = () => {
 
   // useEffect to update and render progress bar
   useEffect(() => {
-    console.log('inside effect')
     tasks ? setProgress(((completedTasks.length / tasks.length) * 100).toFixed(2)) : null;
   }, [tasks]);
 
@@ -139,11 +136,10 @@ const Today = () => {
       />
       <TaskListContainer
         loading={loading}
-        refetch={refetch}
         handleDeleteTask={handleDeleteTask}
       />
       <NewTaskModal
-        addTask={addTask}
+        addTaskHandler={addTaskHandler}
         newTask={newTask}
         openNewTask={openNewTask}
       />

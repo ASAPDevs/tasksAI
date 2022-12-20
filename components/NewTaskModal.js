@@ -12,7 +12,7 @@ import { StyleSheet, Animated, View } from "react-native";
 import { FontAwesome, Octicons } from "@expo/vector-icons";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 
-const NewTaskModal = ({ newTask, openNewTask, setTasks, addTask }) => {
+const NewTaskModal = ({ newTask, openNewTask, setTasks, addTaskHandler }) => {
   const [startTime, updateStartTime] = useState("");
   const [endTime, updateEndTime] = useState("");
   const [taskTitle, updateTaskTitle] = useState("");
@@ -33,13 +33,11 @@ const NewTaskModal = ({ newTask, openNewTask, setTasks, addTask }) => {
   const onPress = () => {
     if (taskTitle == "") toggleInvalidSubmission(true);
     else {
-      addTask(taskTitle, taskDescription, startTime, endTime);
+      addTaskHandler(taskTitle, taskDescription, startTime, endTime);
       clearInputs();
     } 
   }
-
- 
-
+  
   //Memoize this functional component so we don't need to re-render again. 
   //More Effieicny
   const CreateButton = ({ onPress }) => {
