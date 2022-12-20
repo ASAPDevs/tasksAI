@@ -2,20 +2,15 @@ import React, { useEffect, useCallback, useMemo, useState } from "react";
 import { View, Text, Divider, Heading } from "native-base";
 import { StyleSheet, ActivityIndicator } from "react-native";
 import Task, { UnderTaskButton } from "./Task";
-import NewTaskModal from "./NewTaskModal";
 import { SwipeListView } from "react-native-swipe-list-view";
 import TaskListTabGroup from "./TaskListTabGroup";
-import CreateTaskCircle from "./CreateTaskCircle";
 import { useMutation } from "@apollo/client";
 import { COMPLETE_TASK } from "./helpers/mutations";
 import { useSelector } from "react-redux";
 
 //Props are passed down from Today component
 const TaskListContainer = ({
-  addTask,
   refetch,
-  openNewTask,
-  newTask,
   handleDeleteTask,
   loading,
 }) => {
@@ -40,6 +35,7 @@ const TaskListContainer = ({
   //     })
   //     .map((task) => ({ ...task, key: task.id })); // add the key property to each task object
   // }, [tasks, currentTab]);
+
   let DATA;
   if (currentTab === 'inprogress') {
     DATA = inProgressTasks 
@@ -159,21 +155,6 @@ const TaskListContainer = ({
           // leftActionValue={() => console.log("Left")}
         />
       )}
-      
-      <NewTaskModal
-        addTask={addTask}
-        newTask={newTask}
-        openNewTask={openNewTask}
-      />
-      <CreateTaskCircle
-        radius={45}
-        borderWidth={2}
-        color="#00FF00"
-        text="Hello"
-        icon="clock"
-        onPress={() => openNewTask(true)}
-      />
-      
     </View>
   );
 };

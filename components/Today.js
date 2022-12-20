@@ -10,6 +10,8 @@ import { FontAwesome } from "@expo/vector-icons";
 import TaskListContainer from "./TaskListContainer";
 import Calendar from "./Calendar";
 import ProgressBar from "./ProgressBar";
+import NewTaskModal from "./NewTaskModal";
+import CreateTaskCircle from "./CreateTaskCircle";
 
 const Today = () => {
   // Figure out where we pull date or refetch date
@@ -23,7 +25,9 @@ const Today = () => {
 
   //maps to redux storage Slice.
   const tasks = useSelector((state) => state.storage.tasks.all);
-  const inProgressTasks = useSelector((state) => state.storage.tasks.progress);
+  console.log('task', tasks)
+  // const completedTasks = tasks.filter(task => task.completed)
+  // const inProgressTasks = useSelector((state) => state.storage.tasks.progress);
   const completedTasks = useSelector((state) => state.storage.tasks.completed);
   const userID = useSelector((state) => state.storage.user_id);
   // const completed = useMemo(() => {
@@ -108,6 +112,7 @@ const Today = () => {
 
   // useEffect to update and render progress bar
   useEffect(() => {
+    console.log('inside effect')
     tasks ? setProgress(((completedTasks.length / tasks.length) * 100).toFixed(2)) : null;
   }, [tasks]);
 
@@ -140,15 +145,22 @@ const Today = () => {
         date={date}
       />
       <TaskListContainer
-        addTask={addTask}
         loading={loading}
-        newTask={newTask}
         refetch={refetch}
-        // completedTasks={completedTasks}
-        // inProgressTasks={inProgressTasks}
-        openNewTask={openNewTask}
-        setProgress={setProgress}
         handleDeleteTask={handleDeleteTask}
+      />
+      <NewTaskModal
+        addTask={addTask}
+        newTask={newTask}
+        openNewTask={openNewTask}
+      />
+      <CreateTaskCircle
+        radius={45}
+        borderWidth={2}
+        color="#00FF00"
+        text="Hello"
+        icon="clock"
+        onPress={() => openNewTask(true)}
       />
     </View>
   );
