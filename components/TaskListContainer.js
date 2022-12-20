@@ -1,43 +1,49 @@
 import React, { useEffect, useCallback, useMemo, useState } from "react";
 import { View, Text, Divider, Heading } from "native-base";
 import { StyleSheet, ActivityIndicator } from "react-native";
-import Task, { UnderTaskButton } from "./Task";
+import Task from "./Task";
+import UnderTaskButton from "./UnderTaskButton";
 import { SwipeListView } from "react-native-swipe-list-view";
 import TaskListTabGroup from "./TaskListTabGroup";
 import { useMutation } from "@apollo/client";
 import { COMPLETE_TASK } from "./helpers/mutations";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { completeTask } from "../redux/slices/storageSlice";
 
 //Props are passed down from Today component
 const TaskListContainer = ({
+  prevDay,
+  today,
   date,
-  refetch,
+  changePrevDay,
   handleDeleteTask,
   loading,
 }) => {
   // Selected Tab/View for the container
   // Default is "inprogress", other two are "completed" and "all"
   const [currentTab, switchTab] = useState("inprogress");
+  const tasks = useSelector((state) => state.storage.tasks.all);
+  const dispatch = useDispatch()
 
+  const filterTasks = useCallback(() => {
+    switch (currentTab) {
+      case "inprogress":
+        return tasks.filter(task => !task.completed);
+      case "completed":
+        return tasks.filter(task => task.completed);
+      case "all":
+        return tasks;
+      default:
+          return tasks;
+    } 
+  }, [currentTab, tasks])
 
-  // const filterTasks = useCallback(() => {
-  //   console.log('filter task')
-  //   switch (currentTab) {
-  //     case "inprogress":
-  //       return inProgressTasks;
-  //     case "completed":
-  //       return completedTasks;
-  //     case "all":
-  //       return tasks;
-  //     default:
-  //         return tasks;
-  //   } 
-  // }, [currentTab])
+  const DATA = useMemo(() => filterTasks(), [currentTab, tasks])
 
-
-  const [completeTask] = useMutation(COMPLETE_TASK, {
-    onCompleted: () => {
-      refetch();
+  const [completeTaskMutation] = useMutation(COMPLETE_TASK, {
+    onCompleted: (data) => {
+      console.log("Data in frontend Complete Task: ", data.completeTask)
+      dispatch(completeTask(data.completeTask.id))
     },
     onError: (err) => {
       console.log("Error Completing Task: ", err);
@@ -73,22 +79,22 @@ const TaskListContainer = ({
         </View>
       )}
       {/* Fallback for empty tasks */}
-      {/* {!loading && tasks.length < 1 &&
+      {!loading && DATA.length < 1 &&
         <View
-          style={{
-            borderColor: "black",
-            borderWidth: 0,
-            minHeight: "85%",
-            maxHeight: "85%",
-            height: "85%",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <Text>No Tasks To Be Shown!</Text>
-        </View>
-      }
+        style={{
+          borderColor: "black",
+          borderWidth: 0,
+          minHeight: "85%",
+          maxHeight: "85%",
+          height: "85%",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <Text>No Tasks To Be Shown!</Text>
+      </View>
+     }
       {/* Tasks List */}
       {!loading && (
         <SwipeListView
@@ -98,6 +104,7 @@ const TaskListContainer = ({
           renderItem={({ item }, rowMap) => {
             return (
               <Task
+                prevDay={prevDay}
                 date={date}
                 description={item.task_description}
                 title={item.task_name}
@@ -106,8 +113,6 @@ const TaskListContainer = ({
                 endTime={item.time_finished}
                 taskId={item.id}
                 key={item.id}
-                refetch={refetch}
-                prevDay={prevDay}
               />
             );
           }}
@@ -126,12 +131,14 @@ const TaskListContainer = ({
           leftActivationValue={80}
           // onLeftAction={(data, rowMap) => console.log("Left: ", rowMap.item)}
           onLeftAction={(rowData, rowKey) => {
-            completeTask({ variables: { taskId: rowData } });
-            console.log("rowData:", typeof rowData);
+            console.log("rowData:", rowData);
+            console.log("rowKey:", Object.keys(rowKey)[0]);
+            completeTaskMutation({ variables: { taskId: rowData } });
             // console.log(rowKey);
           }}
-        // onSwipeValueChange={() => console.log("SwipeLEFT")}
-        // leftActionValue={() => console.log("Left")}
+          
+          // onSwipeValueChange={() => console.log("SwipeLEFT")}
+          // leftActionValue={() => console.log("Left")}
         />
       )}
     </View>

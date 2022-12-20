@@ -13,7 +13,7 @@ import { FontAwesome, Octicons } from "@expo/vector-icons";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { min } from "react-native-reanimated";
 
-const NewTaskModal = ({ date, newTask, openNewTask, setTasks, addTask }) => {
+const NewTaskModal = ({ date, newTask, openNewTask, setTasks, addTaskHandler }) => {
   const [startTime, updateStartTime] = useState("");
   const [endTime, updateEndTime] = useState("");
   const [taskTitle, updateTaskTitle] = useState("");
@@ -42,12 +42,10 @@ const NewTaskModal = ({ date, newTask, openNewTask, setTasks, addTask }) => {
       // if (start > end) {
       //   end = start;
       // }
-      addTask(taskTitle, taskDescription, start, end);
+      addTaskHandler(taskTitle, taskDescription, startTime, endTime);
       clearInputs();
     }
   }
-
-
 
   //Memoize this functional component so we don't need to re-render again. 
   //More Effieicny

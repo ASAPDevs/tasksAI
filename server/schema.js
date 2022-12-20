@@ -14,9 +14,9 @@ const typeDefs = gql`
     changePassword(userInput: ChangePasswordInput!): User!
     createTask(task: TaskInput): Task!
     updateTask(task: UpdateTaskInput): Task
-    deleteTask(id: ID!): Boolean
-    completeTask(id: ID!): Boolean
-    pushTask(id: ID!, newStartTime: String!, newEndTime: String!): Boolean
+    deleteTask(id: ID!): Task
+    completeTask(id: ID!): Task
+    pushTask(id: ID!, newStartTime: String!, newEndTime: String!): Task
   }
 
 
@@ -92,7 +92,7 @@ const resolvers = {
       // console.log('startOfDay', startOfDay - 1)
       // console.log('endOfDay', endOfDay)
       const task = await db.query(
-        "SELECT * FROM tasks WHERE date > $1 AND date < $2 AND user_id = ($3);",
+        "SELECT * FROM tasks WHERE date > $1 AND date < $2 AND user_id = ($3) ORDER BY time_start ASC;",
         params
       );
       console.log("Checking Task in getTaskByday: " + task.rows);
@@ -247,11 +247,12 @@ const resolvers = {
     },
     deleteTask: async (_, args) => {
       const { id } = args;
-      const task = await db.query(
+      const results = await db.query(
         "DELETE FROM tasks WHERE id = $1 RETURNING *;",
         [id]
       );
-      return task.rowCount < 1 ? false : true;
+      const deletedTask = results.rows[0]
+      return deletedTask;
     },
     completeTask: async (_, args) => {
       const { id } = args;
@@ -259,14 +260,12 @@ const resolvers = {
         "UPDATE tasks SET completed = true WHERE id = $1 RETURNING *;",
         [id]
       );
-      return completedTask.rowCount < 1 ? false : true;
+      return completedTask.rows[0]
     },
     pushTask: async (_, args) => {
       const { id, newStartTime, newEndTime } = args;
-      console.log("Check args in pushTask: ", args)
       const updatedTask = await db.query("UPDATE tasks SET time_start = $1, time_finished = $2 WHERE id = $3 RETURNING *;", [newStartTime, newEndTime, id])
-      console.log("Pushed this task x hours: ", updatedTask)
-      return updatedTask.rowCount < 1 ? false : true;
+      return updatedTask.rows[0]
     }
   },
 };

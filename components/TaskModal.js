@@ -13,36 +13,30 @@ import { Entypo, Feather } from '@expo/vector-icons';
 import { StartTimeInput, EndTimeInput } from './NewTaskModal';
 
 
-const TaskModal = ({ date, updateTask, openTask, toggleOpenTask, taskTitle, taskDescription, taskStartTime, taskEndTime, taskId, completed, prevDay }) => {
-  const [editMode, toggleEditMode] = useState(false);
-  const [editTime, toggleEditTime] = useState(false);
-  const [startTime, updateStartTime] = useState(taskStartTime);
-  const [endTime, updateEndTime] = useState(taskEndTime);
-  const [title, updateTaskTitle] = useState(taskTitle);
-  const [description, updateTaskDescription] = useState(taskDescription);
+const TaskModal = ({ prevDay, date, updateTaskMutation, openTask, toggleOpenTask, taskTitle, taskDescription, taskStartTime, taskEndTime, taskId, completed }) => {
+    const [editMode, toggleEditMode] = useState(false);
+    const [editTime, toggleEditTime] = useState(false);
+    const [startTime, updateStartTime] = useState(taskStartTime);
+    const [endTime, updateEndTime] = useState(taskEndTime);
+    const [title, updateTaskTitle] = useState(taskTitle);
+    const [description, updateTaskDescription] = useState(taskDescription);
+  
 
-  const updateTaskHandler = () => {
-    const updatedTask = {
-      id: Number(taskId),
-      task_name: title,
-      task_description: description,
-      date: date.getTime().toString(),
-      time_start: startTime.toString(),
-      time_finished: endTime.toString(),
-      completed: completed,
+    const updateTaskHandler = () => {
+      const updatedTask = {
+        id: Number(taskId),
+        task_name: title,
+        task_description: description,
+        date: date.getTime().toString(),
+        time_start: startTime.toString(),
+        time_finished: endTime.toString(),
+        completed: completed,
+      };
+      
+      updateTaskMutation({variables: {task: updatedTask}});
+      toggleOpenTask(false);
+      toggleEditMode(false);
     };
-
-    updateTask({ variables: { task: updatedTask } });
-    toggleOpenTask(false);
-    toggleEditMode(false);
-  };
-
-  useEffect(() => {
-    updateStartTime(taskStartTime);
-    updateEndTime(taskEndTime);
-    updateTaskDescription(taskDescription);
-    updateTaskTitle(taskTitle);
-  }, [taskStartTime, taskEndTime, taskTitle, taskDescription]);
 
   return (
     <Modal isOpen={openTask} onClose={() => toggleOpenTask(false)}>

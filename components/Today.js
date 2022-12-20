@@ -1,9 +1,9 @@
-import React, { useCallback, useEffect, useRef, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useQuery, useMutation } from "@apollo/client";
-import { View, Text, Progress, Box, Pressable } from "native-base";
+import { View, Text, Box, Pressable } from "native-base";
 import { ImageBackground, StyleSheet } from "react-native";
 import { useSelector, useDispatch } from "react-redux";
-import { updateDailyTasks } from "../redux/slices/storageSlice";
+import { loadTasks, deleteTask, addTask } from "../redux/slices/storageSlice";
 import { GET_TODAYS_TASKS } from "./helpers/queries";
 import { CREATE_TASKS, DELETE_TASK } from "./helpers/mutations";
 import { FontAwesome } from "@expo/vector-icons";
@@ -29,14 +29,9 @@ const Today = () => {
 
   //maps to redux storage Slice.
   const tasks = useSelector((state) => state.storage.tasks.all);
-  console.log('task', tasks)
-  // const completedTasks = tasks.filter(task => task.completed)
-  // const inProgressTasks = useSelector((state) => state.storage.tasks.progress);
+  // console.log('tasks length in Today', tasks.length)
   const completedTasks = useSelector((state) => state.storage.tasks.completed);
   const userID = useSelector((state) => state.storage.user_id);
-  // const completed = useMemo(() => {
-  //   return tasks.filter((task) => task.completed === true);
-  // }, [tasks])  
 
   const dispatch = useDispatch();
 
@@ -49,9 +44,9 @@ const Today = () => {
 
   const { data, error, loading, refetch } = useQuery(GET_TODAYS_TASKS, {
     notifyOnNetworkStatusChange: true,
-    fetchPolicy: 'cache-and-network',
+    fetchPolicy: 'cache-first',
     onCompleted: (data) => {
-      dispatch(updateDailyTasks(data.getTasksByDay)); // update redux toolkit state
+      dispatch(loadTasks(data.getTasksByDay)); // update redux toolkit state
     },
     onError: (error) => {
       console.log("Error in loading tasks: ", error);
@@ -59,18 +54,18 @@ const Today = () => {
     variables: { date: date.toISOString().split("T")[0], user_id: userID },
   });
 
-  const [createTask] = useMutation(CREATE_TASKS, {
+  const [createTaskMutation] = useMutation(CREATE_TASKS, {
     onCompleted: (data) => {
-      refetch();
+      dispatch(addTask(data.createTask))
     },
     onError: (err) => {
       console.log("Error Creating Task: ", err);
     },
   });
 
-  const [deleteTask] = useMutation(DELETE_TASK, {
-    onCompleted: () => {
-      refetch();
+  const [deleteTaskMutation] = useMutation(DELETE_TASK, {
+    onCompleted: (data) => {
+      dispatch(deleteTask(data.deleteTask.id))
     },
     onError: (err) => {
       console.log("Error Deleting Task: ", err);
@@ -78,7 +73,6 @@ const Today = () => {
   });
 
   // this function converts the date state to mm/dd/yy format
-
   const convertDateTitle = () => {
     const yy = date.getFullYear();
     const mm =
@@ -90,7 +84,7 @@ const Today = () => {
   };
 
   const handleDeleteTask = (taskId) => {
-    deleteTask({
+    deleteTaskMutation({
       variables: { taskId: taskId },
     });
   };
@@ -98,7 +92,7 @@ const Today = () => {
 
   //this handler creates a new task using the current state inputs and sends it to the useMutation function
   //then closes the modal
-  const addTask = (taskTitle, taskDescription, startTime, endTime) => {
+  const addTaskHandler = (taskTitle, taskDescription, startTime, endTime) => {
     const newTask = {
       task_name: taskTitle,
       task_description: taskDescription,
@@ -108,7 +102,7 @@ const Today = () => {
       completed: false,
       user_id: Number(userID),
     };
-    createTask({ variables: { task: newTask } });
+    createTaskMutation({ variables: { task: newTask } });
     openNewTask(false);
   };
 
@@ -116,7 +110,7 @@ const Today = () => {
 
   // useEffect to update and render progress bar
   useEffect(() => {
-    setProgress(((completed.length / tasks.length) * 100).toFixed(2));
+    tasks ? setProgress(((completedTasks.length / tasks.length) * 100).toFixed(2)) : null;
   }, [tasks]);
 
   return (
@@ -132,7 +126,6 @@ const Today = () => {
           </Pressable>
         </View>
         <Box w="50%" p="3" _text={{ textAlign: "center" }}>
-          {/* <Progress color="#FAA946" _filledTrack={{bg: "#FAA946"}} size="xl" value={progress} /> */}
           <ProgressBar progress={Number(progress)} />
           <Text style={styles.progressText}>
             {" "}
@@ -149,14 +142,16 @@ const Today = () => {
       />
       <TaskListContainer
         date={date}
+        today={today}
+        prevDay={prevDay}
         addTask={addTask}
         loading={loading}
-        refetch={refetch}
         handleDeleteTask={handleDeleteTask}
+        changePrevDay={changePrevDay}
       />
       <NewTaskModal
         date={date}
-        addTask={addTask}
+        addTaskHandler={addTaskHandler}
         newTask={newTask}
         openNewTask={openNewTask}
       />
