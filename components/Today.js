@@ -1,9 +1,9 @@
 import React, { useCallback, useEffect, useRef, useMemo, useState } from "react";
 import { useQuery, useMutation } from "@apollo/client";
-import { View, Text, Progress, Box, Pressable } from "native-base";
+import { View, Text, Box, Pressable } from "native-base";
 import { ImageBackground, StyleSheet } from "react-native";
 import { useSelector, useDispatch } from "react-redux";
-import { updateDailyTasks } from "../redux/slices/storageSlice";
+import { loadTasks, updateTasks } from "../redux/slices/storageSlice";
 import { GET_TODAYS_TASKS } from "./helpers/queries";
 import { CREATE_TASKS, DELETE_TASK } from "./helpers/mutations";
 import { FontAwesome } from "@expo/vector-icons";
@@ -20,19 +20,14 @@ const Today = () => {
   const [progress, setProgress] = useState(0);
   const [newTask, openNewTask] = useState(false);
   const [calendarModal, openCalendarModal] = useState(false);
-  // const [tasks, setTasks] = useState(useSelector((state) => state.storage.tasks.daily));
+
   console.log('today')
 
   //maps to redux storage Slice.
   const tasks = useSelector((state) => state.storage.tasks.all);
-  console.log('task', tasks)
-  // const completedTasks = tasks.filter(task => task.completed)
-  // const inProgressTasks = useSelector((state) => state.storage.tasks.progress);
+  // console.log('tasks length in Today', tasks.length)
   const completedTasks = useSelector((state) => state.storage.tasks.completed);
   const userID = useSelector((state) => state.storage.user_id);
-  // const completed = useMemo(() => {
-  //   return tasks.filter((task) => task.completed === true);
-  // }, [tasks])  
 
   const dispatch = useDispatch();
 
@@ -47,7 +42,7 @@ const Today = () => {
     notifyOnNetworkStatusChange: true,
     fetchPolicy: 'cache-and-network',
     onCompleted: (data) => {
-      dispatch(updateDailyTasks(data.getTasksByDay)); // update redux toolkit state
+      dispatch(loadTasks(data.getTasksByDay)); // update redux toolkit state
     },
     onError: (error) => {
       console.log("Error in loading tasks: ", error);
@@ -65,8 +60,8 @@ const Today = () => {
   });
 
   const [deleteTask] = useMutation(DELETE_TASK, {
-    onCompleted: () => {
-      refetch();
+    onCompleted: (data) => {
+      dispatch(updateTasks(data.deleteTask.id))
     },
     onError: (err) => {
       console.log("Error Deleting Task: ", err);
@@ -74,7 +69,6 @@ const Today = () => {
   });
 
   // this function converts the date state to mm/dd/yy format
-
   const convertDateTitle = () => {
     const yy = date.getFullYear();
     const mm =
@@ -129,7 +123,6 @@ const Today = () => {
           </Pressable>
         </View>
         <Box w="50%" p="3" _text={{ textAlign: "center" }}>
-          {/* <Progress color="#FAA946" _filledTrack={{bg: "#FAA946"}} size="xl" value={progress} /> */}
           <ProgressBar progress={Number(progress)} />
           <Text style={styles.progressText}>
             {" "}

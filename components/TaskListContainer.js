@@ -1,7 +1,8 @@
 import React, { useEffect, useCallback, useMemo, useState } from "react";
 import { View, Text, Divider, Heading } from "native-base";
 import { StyleSheet, ActivityIndicator } from "react-native";
-import Task, { UnderTaskButton } from "./Task";
+import Task from "./Task";
+import UnderTaskButton from "./UnderTaskButton";
 import { SwipeListView } from "react-native-swipe-list-view";
 import TaskListTabGroup from "./TaskListTabGroup";
 import { useMutation } from "@apollo/client";
@@ -18,47 +19,23 @@ const TaskListContainer = ({
   //Default is "inprogress", other two are "completed" and "all"
   const [currentTab, switchTab] = useState("inprogress");
   const tasks = useSelector((state) => state.storage.tasks.all);
-  const inProgressTasks = useSelector((state) => state.storage.tasks.progress);
-  const completedTasks = useSelector((state) => state.storage.tasks.completed);
   console.log('tasklistcontainer')
 
-  // const filterTasks = useMemo(() => {
-  //   return tasks
-  //     .filter((task) => {
-  //       if (currentTab === "inprogress") {
-  //         return !task.completed;
-  //       } else if (currentTab === "completed") {
-  //         return task.completed;
-  //       } else {
-  //         return true;
-  //       }
-  //     })
-  //     .map((task) => ({ ...task, key: task.id })); // add the key property to each task object
-  // }, [tasks, currentTab]);
+  const filterTasks = useCallback(() => {
+    console.log('filter task')
+    switch (currentTab) {
+      case "inprogress":
+        return tasks.filter(task => !task.completed);
+      case "completed":
+        return tasks.filter(task => task.completed);
+      case "all":
+        return tasks;
+      default:
+          return tasks;
+    } 
+  }, [currentTab, tasks])
 
-  let DATA;
-  if (currentTab === 'inprogress') {
-    DATA = inProgressTasks 
-  } else if (currentTab === 'completed') {
-    DATA = completedTasks
-  } else {
-    DATA = tasks
-  }
-
-
-  // const filterTasks = useCallback(() => {
-  //   console.log('filter task')
-  //   switch (currentTab) {
-  //     case "inprogress":
-  //       return inProgressTasks;
-  //     case "completed":
-  //       return completedTasks;
-  //     case "all":
-  //       return tasks;
-  //     default:
-  //         return tasks;
-  //   } 
-  // }, [currentTab])
+  const DATA = useMemo(() => filterTasks(), [currentTab, tasks])
 
 
   const [completeTask] = useMutation(COMPLETE_TASK, {
@@ -96,7 +73,7 @@ const TaskListContainer = ({
         </View>
       )}
       {/* Fallback for empty tasks */}
-      {/* {!loading && tasks.length < 1 &&
+      {!loading && DATA.length < 1 &&
         <View
         style={{
           borderColor: "black",
@@ -111,7 +88,7 @@ const TaskListContainer = ({
       >
         <Text>No Tasks To Be Shown!</Text>
       </View>
-     } */}
+     }
       {/* Tasks List */}
       {!loading && (
         <SwipeListView
@@ -151,6 +128,7 @@ const TaskListContainer = ({
             console.log("rowData:", typeof rowData);
             // console.log(rowKey);
           }}
+          
           // onSwipeValueChange={() => console.log("SwipeLEFT")}
           // leftActionValue={() => console.log("Left")}
         />

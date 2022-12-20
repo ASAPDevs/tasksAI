@@ -14,7 +14,7 @@ const typeDefs = gql`
     changePassword(userInput: ChangePasswordInput!): User!
     createTask(task: TaskInput): Task!
     updateTask(task: UpdateTaskInput): Task
-    deleteTask(id: ID!): Boolean
+    deleteTask(id: ID!): Task
     completeTask(id: ID!): Boolean
     pushTask(id: ID!, newStartTime: String!, newEndTime: String!): Boolean
   }
@@ -92,7 +92,7 @@ const resolvers = {
       // console.log('startOfDay', startOfDay - 1)
       // console.log('endOfDay', endOfDay)
       const task = await db.query(
-        "SELECT * FROM tasks WHERE date > $1 AND date < $2 AND user_id = ($3);",
+        "SELECT * FROM tasks WHERE date > $1 AND date < $2 AND user_id = ($3) ORDER BY time_start ASC;",
         params
       );
       console.log("Checking Task in getTaskByday: " + task.rows);
@@ -247,11 +247,12 @@ const resolvers = {
     },
     deleteTask: async (_, args) => {
       const { id } = args;
-      const task = await db.query(
+      const results = await db.query(
         "DELETE FROM tasks WHERE id = $1 RETURNING *;",
         [id]
       );
-      return task.rowCount < 1 ? false : true;
+      const deletedTask = results.rows[0]
+      return deletedTask;
     },
     completeTask: async (_, args) => {
       const { id } = args;
