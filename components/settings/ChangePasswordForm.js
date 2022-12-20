@@ -1,29 +1,36 @@
 import { useMutation } from '@apollo/client';
-import { Heading } from 'native-base';
-import React, { useState } from 'react';
+import { Heading, Icon, Pressable } from 'native-base';
+import React, { useEffect, useState } from 'react';
 import { SafeAreaView, StyleSheet, View, Text, TextInput, TouchableOpacity } from 'react-native';
-import { CHANGE_PASSWORD } from './helpers/mutations';
+import { CHANGE_PASSWORD } from '../helpers/mutations';
+import { useSelector } from 'react-redux';
+import { Ionicons } from '@expo/vector-icons';
 
 const initialUser = {
-  username: "",
   oldPassword: "",
   newPassword: "",
   confirmNewPassword: ""
 }
 
-const ChangePasswordForm = () => {
+const ChangePasswordForm = ({updateCurrentAccountView}) => {
   const [focus, setFocus] = useState("");
   const [user, setUser] = useState(initialUser);
   const [wrongCredentials, toggleWrongCredentials] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
+  const username = useSelector((state) => state.storage.username)
   
+  
+
+
+
   const handleSubmit = () => {
     const userInput = {
-      username: user.username,
+      username: username,
       oldPassword: user.oldPassword,
       newPassword: user.newPassword
     }
     changePassword({ variables: { userInput } })
+    
   }
 
   const [changePassword] = useMutation(CHANGE_PASSWORD, {
@@ -39,20 +46,15 @@ const ChangePasswordForm = () => {
     }
   })
 
+
   return (
     <SafeAreaView style={styles.mainContainer}>
       <View style={styles.innerContainer}>
+        {/* Back Button */}
+        <Pressable onPress={() => updateCurrentAccountView('main')}>
+          <Icon as={Ionicons} name="arrow-back" color="black" size={6} marginLeft={1} />
+        </Pressable>
         <Heading style={styles.heading}>Change Password</Heading>
-        <TextInput 
-            autoFocus={true}
-            autoCapitalize="none"
-            style={focus === "username" ? styles.inputFocus : styles.input}
-            placeholder="Username"
-            id="username"
-            value={user.username}
-            onChangeText={text => setUser({ ...user, username: text })}
-            onFocus={() => setFocus("username")}
-        />
         <TextInput
           autoCapitalize="none"
           style={focus === "old-password" ? styles.inputFocus : styles.input}
@@ -87,7 +89,7 @@ const ChangePasswordForm = () => {
         {focus == 'confirm-password' && user.confirmNewPassword.length > 0 && user.newPassword !== user.confirmNewPassword ? <Text style={{color: 'red', marginLeft: 7.5}}>Passwords don't match!</Text> : null}
 
         <TouchableOpacity 
-          disabled={!user.username || !user.oldPassword || !user.newPassword || !user.confirmNewPassword ? true : false} 
+          disabled={!user.oldPassword || !user.newPassword || !user.confirmNewPassword ? true : false} 
           style={{...styles.submitButton, backgroundColor: `${!user.username || !user.oldPassword || !user.newPassword || !user.confirmNewPassword ? 'grey' : '#007bff'}`}}
           onPress={handleSubmit} 
         >
@@ -102,7 +104,7 @@ const ChangePasswordForm = () => {
           </Text> : null
         }
         {successMessage ? 
-          <Text style={{color: 'red', left: 10 }}>
+          <Text style={{color: 'green', left: 10 }}>
             {successMessage}
           </Text> : null
         }
@@ -114,23 +116,24 @@ const ChangePasswordForm = () => {
 const styles = StyleSheet.create({
   mainContainer: {
     display: "flex",
-    position: "absolute",
     width: "100%",
     height: "100%",
     zIndex: -1
   },
   innerContainer: {
-    paddingTop: 80,
+    paddingTop: 30,
     paddingLeft: 20,
   },
   heading: {
     alignItems: "center",
-    margin: 8
+    margin: 8,
+    fontFamily: 'FamiljenGrotesk',
   },
   input: {
     height: 40,
     width: "90%",
     margin: 8,
+    fontFamily: 'FamiljenGrotesk',
     borderWidth: 1,
     borderRadius: 7,
     padding: 10
@@ -139,6 +142,7 @@ const styles = StyleSheet.create({
     height: 40,
     width: "90%",
     margin: 8,
+    fontFamily: 'FamiljenGrotesk',
     borderWidth: 1,
     borderRadius: 7,
     padding: 10,
@@ -152,9 +156,11 @@ const styles = StyleSheet.create({
     margin: 8,
     marginTop: 15,
     borderWidth: 1,
+    fontFamily: 'FamiljenGrotesk',
     borderRadius: 7,
   },
   buttonText: {
+    fontFamily: 'FamiljenGrotesk',
     color: "#fff",
     fontWeight: "bold",
     fontSize: 17

@@ -1,18 +1,46 @@
-import React from 'react'
+import React, {useState} from 'react'
 import { SafeAreaView, StyleSheet, View, Text } from 'react-native'
+import Account from './settings/AccountSettings'
+const LazyLoadAccountSettings = React.lazy(() => import('./settings/AccountSettings'))
 
-const Settings = ({ updateCurrentView }) => {
-  
+
+
+const Settings = () => {
+  const [currentView, updateCurrentView] = useState('main')
+
+
+  const conditionalRender = () => {
+    switch (currentView) {
+      case 'main':
+        return (
+          <View style={styles.innerContainer}>
+            <Text 
+              style={styles.text}
+              onPress={() => updateCurrentView('account')}
+            >
+              Account
+            </Text>
+            <Text 
+              style={styles.text}
+              
+            >
+              Privacy (Unavailable Currently)
+            </Text>
+            <Text 
+              style={styles.text}
+              
+            >
+              Notifications (Unavailable Currently)
+            </Text>
+        </View>
+        )
+     case 'account':
+      return <LazyLoadAccountSettings updateCurrentView={updateCurrentView} />
+  }}
+
   return (
     <SafeAreaView style={styles.mainContainer}>
-        <View style={styles.innerContainer}>
-          <Text 
-            style={styles.text}
-            onPress={() => updateCurrentView('change-password')}
-          >
-            Change Password
-          </Text>
-        </View>
+        {conditionalRender()}
     </SafeAreaView>
   )
 }
@@ -20,18 +48,17 @@ const Settings = ({ updateCurrentView }) => {
 const styles = StyleSheet.create({
   mainContainer: {
     display: "flex",
-    position: "absolute",
     width: "100%",
     height: "100%",
-    zIndex: -1
   },
   innerContainer: {
-    paddingTop: 80,
-    paddingLeft: 20,
+    paddingTop: 30,
+    paddingLeft: 20
   },
   text: {
-    fontSize: 20,
-    margin: 10
+    fontSize: 22,
+    margin: 10,
+    fontFamily: 'FamiljenGrotesk'
   }
 })
 

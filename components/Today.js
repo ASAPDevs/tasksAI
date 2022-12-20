@@ -10,6 +10,8 @@ import { FontAwesome } from "@expo/vector-icons";
 import TaskListContainer from "./TaskListContainer";
 import Calendar from "./Calendar";
 import ProgressBar from "./ProgressBar";
+import NewTaskModal from "./NewTaskModal";
+import CreateTaskCircle from "./CreateTaskCircle";
 
 const Today = () => {
   // Figure out where we pull date or refetch date
@@ -19,12 +21,22 @@ const Today = () => {
   const [newTask, openNewTask] = useState(false);
   const [calendarModal, openCalendarModal] = useState(false);
   // const [tasks, setTasks] = useState(useSelector((state) => state.storage.tasks.daily));
+  // prevDay will determine if the user is looking at pass days,
+  // if true, nothing should be editable
+  const today = new Date();
+  const [prevDay, changePrevDay] = useState(today.getTime() > date.getTime());
+  console.log('today')
 
-  const tasks = useSelector((state) => state.storage.tasks.daily);
+  //maps to redux storage Slice.
+  const tasks = useSelector((state) => state.storage.tasks.all);
+  console.log('task', tasks)
+  // const completedTasks = tasks.filter(task => task.completed)
+  // const inProgressTasks = useSelector((state) => state.storage.tasks.progress);
+  const completedTasks = useSelector((state) => state.storage.tasks.completed);
   const userID = useSelector((state) => state.storage.user_id);
-  const completed = useMemo(() => {
-    return tasks.filter((task) => task.completed === true);
-  }, [tasks])
+  // const completed = useMemo(() => {
+  //   return tasks.filter((task) => task.completed === true);
+  // }, [tasks])  
 
   const dispatch = useDispatch();
 
@@ -37,6 +49,7 @@ const Today = () => {
 
   const { data, error, loading, refetch } = useQuery(GET_TODAYS_TASKS, {
     notifyOnNetworkStatusChange: true,
+    fetchPolicy: 'cache-and-network',
     onCompleted: (data) => {
       dispatch(updateDailyTasks(data.getTasksByDay)); // update redux toolkit state
     },
@@ -138,13 +151,23 @@ const Today = () => {
         date={date}
         addTask={addTask}
         loading={loading}
-        newTask={newTask}
-        tasks={tasks}
         refetch={refetch}
-        openNewTask={openNewTask}
-        setProgress={setProgress}
         handleDeleteTask={handleDeleteTask}
       />
+      <NewTaskModal
+        date={date}
+        addTask={addTask}
+        newTask={newTask}
+        openNewTask={openNewTask}
+      />
+      {!prevDay && <CreateTaskCircle
+        radius={45}
+        borderWidth={2}
+        color="#00FF00"
+        text="Hello"
+        icon="clock"
+        onPress={() => openNewTask(true)}
+      />}
     </View>
   );
 };

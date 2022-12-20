@@ -8,13 +8,15 @@ const TaskListTabGroup = ({ currentTab, switchTab }) => {
   return (
     <Button.Group
       colorScheme="grey"
-      variant="ghost"
+      variant="link"
       isAttached
+      borderless
       size="sm"
       style={{ top: 4, position: "absolute", right: 50 }}
     >
       <IconButton
         onPress={() => switchTab("inprogress")}
+        borderless
         icon={
           <Icon
             color={currentTab === "inprogress" ? "orange.400" : "grey"}
@@ -26,6 +28,7 @@ const TaskListTabGroup = ({ currentTab, switchTab }) => {
       />
 
       <IconButton
+      borderless
         onPress={() => switchTab("completed")}
         icon={
           <Icon
@@ -37,6 +40,7 @@ const TaskListTabGroup = ({ currentTab, switchTab }) => {
         }
       />
       <Button
+        borderless
         onPress={() => switchTab("all")}
         _text={{
           color: `${currentTab == "all" ? "orange.400" : "grey"}`,

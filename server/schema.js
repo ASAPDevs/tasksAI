@@ -11,7 +11,7 @@ const typeDefs = gql`
   type Mutation {
     login(username: String!, password: String!): User!
     signup(email: String!, username: String!, password: String!): User!
-    changePassword(userInput: ChangePassWordInput): User!
+    changePassword(userInput: ChangePasswordInput!): User!
     createTask(task: TaskInput): Task!
     updateTask(task: UpdateTaskInput): Task
     deleteTask(id: ID!): Boolean
@@ -20,7 +20,7 @@ const typeDefs = gql`
   }
 
 
-  input ChangePassWordInput {
+  input ChangePasswordInput {
     username: String!
     oldPassword: String!
     newPassword: String!
