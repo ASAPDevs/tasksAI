@@ -37,8 +37,13 @@ const TaskModal = ({ updateTask, openTask, toggleOpenTask, taskTitle, taskDescri
       toggleOpenTask(false);
       toggleEditMode(false);
     };
-
-    useEffect(() => {}, [startTime, endTime, title, description])
+  
+    useEffect(() => {
+      updateStartTime(taskStartTime);
+      updateEndTime(taskEndTime);
+      updateTaskDescription(taskDescription);
+      updateTaskTitle(taskTitle);
+    }, [taskStartTime, taskEndTime, taskTitle, taskDescription]);
   
     return (
       <Modal isOpen={openTask} onClose={() => toggleOpenTask(false)}>

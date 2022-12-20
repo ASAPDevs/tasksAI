@@ -42,12 +42,7 @@ const Task = ({ taskId, title, description, startTime, endTime, completed, refet
       let timeToAdd = selectedValue * 3600000
       let newStartTime = Number(startTime) + timeToAdd
       let newEndTime = Number(endTime) + timeToAdd
-      
-      let newId = Number(taskId)
-      let newTime = newStartTime.toString()
-      let newTime2 = newEndTime.toString()
-      console.log("checking vars in handler: ", taskId, timeToAdd, newStartTime, newEndTime, typeof newId, typeof newTime)
-      pushTask({variables: {id: newId, newStartTime: newTime, newEndTime: newTime2}})
+      pushTask({variables: {id: Number(taskId), newStartTime: newStartTime.toString(), newEndTime: newEndTime.toString()}})
     }
 
   
@@ -58,8 +53,9 @@ const Task = ({ taskId, title, description, startTime, endTime, completed, refet
         <View style={styles.taskContainer} key={title}>
           <View style={styles.taskContainerInnerWrapper}>
             <Heading style={styles.taskHeading}>{title}</Heading>
-            <Pressable onPress={() => openPushTaskModal(true)}>
-              <Icon as={AntDesign} name="rightcircle" size={6} color="black" style={{position: 'relative', left: 100}} />
+            {/* Push Task Button */}
+            <Pressable onPress={() => openPushTaskModal(true)} style={{borderColor: "black", borderWidth: 2, position: 'absolute', right: 115}}>
+              <Icon as={AntDesign} name="rightcircle" size={6} color="amber.500" style={{position: 'relative'}} />
             </Pressable>
             <PushComponent pushTaskHandler={pushTaskHandler} pushTaskModal={pushTaskModal} openPushTaskModal={openPushTaskModal} />
             <View style={styles.taskContainerTimeContainer}>
@@ -67,6 +63,7 @@ const Task = ({ taskId, title, description, startTime, endTime, completed, refet
               <Text style={styles.timeContainerText}>to</Text>
               <Text style={{...styles.timeContainerText, ...styles.timeText}}>{new Date(Number(endTime)).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</Text>
             </View>
+            {/* Right Icon At The End Of The Component */}
             <View style={styles.swipeRightIcon}>
               <Icon as={Entypo} name="chevron-small-right" size={5} />
             </View>

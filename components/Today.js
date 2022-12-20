@@ -103,8 +103,7 @@ const Today = () => {
 
   // useEffect to update and render progress bar
   useEffect(() => {
-    setProgress(((completed.length / tasks.length) * 100).toFixed(2));
-    console.log("Progress: ", Number(progress))
+    tasks.length > 0 ? setProgress(((completed.length / tasks.length) * 100).toFixed(2)) : null;
   }, [tasks]);
 
   return (
@@ -124,7 +123,7 @@ const Today = () => {
           <ProgressBar progress={Number(progress)} />
           <Text style={styles.progressText}>
             {" "}
-            Daily Progress: {progress !== NaN ? progress : "0.00"}%
+            Daily Progress: {!isNaN(progress) ? progress : "0.00"}%
           </Text>
         </Box>
       </ImageBackground>
