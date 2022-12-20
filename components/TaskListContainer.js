@@ -12,11 +12,15 @@ import { completeTask } from "../redux/slices/storageSlice";
 
 //Props are passed down from Today component
 const TaskListContainer = ({
+  prevDay,
+  today,
+  date,
+  changePrevDay,
   handleDeleteTask,
   loading,
 }) => {
-  //Selected Tab/View for the container
-  //Default is "inprogress", other two are "completed" and "all"
+  // Selected Tab/View for the container
+  // Default is "inprogress", other two are "completed" and "all"
   const [currentTab, switchTab] = useState("inprogress");
   const tasks = useSelector((state) => state.storage.tasks.all);
   const dispatch = useDispatch()
@@ -46,6 +50,9 @@ const TaskListContainer = ({
     },
   });
 
+  useEffect(() => {
+    changePrevDay(today.getTime() > date.getTime());
+  }, [date])
 
   return (
     <View style={styles.bottomContainer}>
@@ -97,6 +104,8 @@ const TaskListContainer = ({
           renderItem={({ item }, rowMap) => {
             return (
               <Task
+                prevDay={prevDay}
+                date={date}
                 description={item.task_description}
                 title={item.task_name}
                 startTime={item.time_start}

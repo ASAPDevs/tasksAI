@@ -20,6 +20,12 @@ const Today = () => {
   const [progress, setProgress] = useState(0);
   const [newTask, openNewTask] = useState(false);
   const [calendarModal, openCalendarModal] = useState(false);
+  // const [tasks, setTasks] = useState(useSelector((state) => state.storage.tasks.daily));
+  // prevDay will determine if the user is looking at pass days,
+  // if true, nothing should be editable
+  const today = new Date();
+  const [prevDay, changePrevDay] = useState(today.getTime() > date.getTime());
+  console.log('today')
 
   //maps to redux storage Slice.
   const tasks = useSelector((state) => state.storage.tasks.all);
@@ -34,11 +40,11 @@ const Today = () => {
   // const todayInMs = new Date(today).getTime();
   // console.log("USER ID: ", userID, typeof userID)
 
-  
+
 
   const { data, error, loading, refetch } = useQuery(GET_TODAYS_TASKS, {
     notifyOnNetworkStatusChange: true,
-    fetchPolicy: 'cache-and-network',
+    fetchPolicy: 'cache-first',
     onCompleted: (data) => {
       dispatch(loadTasks(data.getTasksByDay)); // update redux toolkit state
     },
@@ -127,7 +133,7 @@ const Today = () => {
           </Text>
         </Box>
       </ImageBackground>
-      
+
       <Calendar
         calendarModal={calendarModal}
         openCalendarModal={openCalendarModal}
@@ -135,22 +141,28 @@ const Today = () => {
         date={date}
       />
       <TaskListContainer
+        date={date}
+        today={today}
+        prevDay={prevDay}
+        addTask={addTask}
         loading={loading}
         handleDeleteTask={handleDeleteTask}
+        changePrevDay={changePrevDay}
       />
       <NewTaskModal
+        date={date}
         addTaskHandler={addTaskHandler}
         newTask={newTask}
         openNewTask={openNewTask}
       />
-      <CreateTaskCircle
+      {!prevDay && <CreateTaskCircle
         radius={45}
         borderWidth={2}
         color="#00FF00"
         text="Hello"
         icon="clock"
         onPress={() => openNewTask(true)}
-      />
+      />}
     </View>
   );
 };

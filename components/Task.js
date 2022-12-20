@@ -15,7 +15,7 @@ import { pushTask, updateTask } from "../redux/slices/storageSlice";
 const LazyLoadModal = React.lazy(() => import('./TaskModal'))
 const LazyLoadPushModal = React.lazy(() => import('./PushComponent'))
 
-const Task = ({ taskId, title, description, startTime, endTime, completed }) => {
+const Task = ({ prevDay, date, taskId, title, description, startTime, endTime, completed }) => {
     const [openTask, toggleOpenTask] = useState(false);
     const [pushTaskModal, openPushTaskModal] = useState(false);
     const dispatch = useDispatch()
@@ -77,88 +77,88 @@ const Task = ({ taskId, title, description, startTime, endTime, completed }) => 
             </View>
           </View>
           {openTask && 
-          <LazyLoadModal updateTaskMutation={updateTaskMutation} openTask={openTask} toggleOpenTask={toggleOpenTask} taskTitle={title} taskDescription={description} taskStartTime={startTime} taskEndTime={endTime} taskId={taskId} completed={completed} />
+          <LazyLoadModal prevDay={prevDay} date={date} updateTaskMutation={updateTaskMutation} openTask={openTask} toggleOpenTask={toggleOpenTask} taskTitle={title} taskDescription={description} taskStartTime={startTime} taskEndTime={endTime} taskId={taskId} completed={completed} />
          }
         </View>
       </Pressable>
     );
   };
 
-  const styles = StyleSheet.create({
-    taskContainer: {
-      display: "flex",
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "center",
-      borderColor: "#ceddf5",
-      borderBottomWidth: 1,
-      topBorderWidth: 1,
-      padding: 10,
-      height: 90,
-      
-      width: '100%',
-      backgroundColor: "white",
-      zIndex: 10,
-    },
-    taskContainerInnerWrapper: {
-      display: 'flex',
-      width: '80%',
-      borderColor: 'red',
-      borderWidth: 0,
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      padding: 5,
-    },
-    taskContainerTimeContainer: {
-      display: "flex",
-      flexDirection: "column",
-      fontSize: 17,
-      marginTop: 2,
-      gap: 20,
-      height: '110%',
-      width: '25%',
-      alignItems: "center",
-      justifyItems: 'center',
-      justifyContent: "space-around",
-      borderColor: "black",
-      borderWidth: 0,
-      marginRight: 5
-    },
-    timeContainerText: {
-      fontSize: 17,
-      textAlign: 'center',
-      fontFamily: 'FamiljenBold',
-      fontWeight: 'bold'
-    },
-    timeText: {
-      color: '#0B486B',
-      borderColor: 'black',
-      borderWidth: 0,
-      padding: 3,
-      borderRadius: '2%',
+const styles = StyleSheet.create({
+  taskContainer: {
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    borderColor: "#ceddf5",
+    borderBottomWidth: 1,
+    topBorderWidth: 1,
+    padding: 10,
+    height: 90,
 
-    },
-    taskHeading: {
-      fontSize: 18,
-      fontFamily: "FamiljenGrotesk",
-      textDecorationLine: "underline"
-    },
-    deleteTaskContainer: {
-      display: "flex",
-      flexDirection: "row",
-      alignItems: "center",
-      alignSelf: 'center',
-      justifyContent: "center",
-      height: 90,
-      width: '95%',
-      zIndex: 9,
-      // backgroundColor: 'red',
-    },
-    swipeRightIcon: {
-      position: "absolute",
-      right: -18.5
-    }
-  });
+    width: '100%',
+    backgroundColor: "white",
+    zIndex: 10,
+  },
+  taskContainerInnerWrapper: {
+    display: 'flex',
+    width: '80%',
+    borderColor: 'red',
+    borderWidth: 0,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: 5,
+  },
+  taskContainerTimeContainer: {
+    display: "flex",
+    flexDirection: "column",
+    fontSize: 17,
+    marginTop: 2,
+    gap: 20,
+    height: '110%',
+    width: '25%',
+    alignItems: "center",
+    justifyItems: 'center',
+    justifyContent: "space-around",
+    borderColor: "black",
+    borderWidth: 0,
+    marginRight: 5
+  },
+  timeContainerText: {
+    fontSize: 17,
+    textAlign: 'center',
+    fontFamily: 'FamiljenBold',
+    fontWeight: 'bold'
+  },
+  timeText: {
+    color: '#0B486B',
+    borderColor: 'black',
+    borderWidth: 0,
+    padding: 3,
+    borderRadius: '2%',
+
+  },
+  taskHeading: {
+    fontSize: 18,
+    fontFamily: "FamiljenGrotesk",
+    textDecorationLine: "underline"
+  },
+  deleteTaskContainer: {
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+    alignSelf: 'center',
+    justifyContent: "center",
+    height: 90,
+    width: '95%',
+    zIndex: 9,
+    // backgroundColor: 'red',
+  },
+  swipeRightIcon: {
+    position: "absolute",
+    right: -18.5
+  }
+});
 
 export default React.memo(Task);
