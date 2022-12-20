@@ -13,10 +13,11 @@ const initialState = {
   loggedIn: false,
   avatar: '',
   tasks: {
-    daily: [],
-    weekly: [],
-    yearly: [],
     all: [],
+    completed: [],
+    progress: [],
+    // completedLength: completed.length,
+    // inprogressLength: progress.length
   },
   recommendations: [],
   settings: {
@@ -38,7 +39,10 @@ export const storageSlice = createSlice({
       state = initialState
     },
     updateDailyTasks: (state, action) => {
-      state.tasks.daily = action.payload
+      // state.tasks.all = action.payload
+      state.tasks.all = action.payload.map((task) => ({...task, key: task.id}))
+      state.tasks.completed = state.tasks.all.filter(task => task.completed)
+      state.tasks.progress = state.tasks.all.filter(task => !task.completed)
     }
   }
 })

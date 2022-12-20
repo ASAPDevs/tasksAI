@@ -19,12 +19,16 @@ const Today = () => {
   const [newTask, openNewTask] = useState(false);
   const [calendarModal, openCalendarModal] = useState(false);
   // const [tasks, setTasks] = useState(useSelector((state) => state.storage.tasks.daily));
+  console.log('today')
 
-  const tasks = useSelector((state) => state.storage.tasks.daily);
+  //maps to redux storage Slice.
+  const tasks = useSelector((state) => state.storage.tasks.all);
+  const inProgressTasks = useSelector((state) => state.storage.tasks.progress);
+  const completedTasks = useSelector((state) => state.storage.tasks.completed);
   const userID = useSelector((state) => state.storage.user_id);
-  const completed = useMemo(() => {
-    return tasks.filter((task) => task.completed === true);
-  }, [tasks])  
+  // const completed = useMemo(() => {
+  //   return tasks.filter((task) => task.completed === true);
+  // }, [tasks])  
 
   const dispatch = useDispatch();
 
@@ -37,6 +41,7 @@ const Today = () => {
 
   const { data, error, loading, refetch } = useQuery(GET_TODAYS_TASKS, {
     notifyOnNetworkStatusChange: true,
+    fetchPolicy: 'cache-and-network',
     onCompleted: (data) => {
       dispatch(updateDailyTasks(data.getTasksByDay)); // update redux toolkit state
     },
@@ -103,7 +108,7 @@ const Today = () => {
 
   // useEffect to update and render progress bar
   useEffect(() => {
-    tasks.length > 0 ? setProgress(((completed.length / tasks.length) * 100).toFixed(2)) : null;
+    tasks ? setProgress(((completedTasks.length / tasks.length) * 100).toFixed(2)) : null;
   }, [tasks]);
 
   return (
@@ -138,8 +143,9 @@ const Today = () => {
         addTask={addTask}
         loading={loading}
         newTask={newTask}
-        tasks={tasks}
         refetch={refetch}
+        // completedTasks={completedTasks}
+        // inProgressTasks={inProgressTasks}
         openNewTask={openNewTask}
         setProgress={setProgress}
         handleDeleteTask={handleDeleteTask}

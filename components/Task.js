@@ -13,6 +13,7 @@ import { UPDATE_TASK, PUSH_TASK } from "./helpers/mutations";
 import { useMutation } from "@apollo/client";
 import { MaterialCommunityIcons, Entypo, AntDesign } from '@expo/vector-icons'; 
 import TaskModal from "./TaskModal";
+const LazyLoadModal = React.lazy(() => import('./TaskModal'))
 
 
 const Task = ({ taskId, title, description, startTime, endTime, completed, refetch }) => {
@@ -68,15 +69,8 @@ const Task = ({ taskId, title, description, startTime, endTime, completed, refet
               <Icon as={Entypo} name="chevron-small-right" size={5} />
             </View>
           </View>
-          <TaskModal 
-            updateTask={updateTask} openTask={openTask} 
-            toggleOpenTask={toggleOpenTask} taskTitle={title} 
-            taskDescription={description} 
-            taskStartTime={startTime} 
-            taskEndTime={endTime} 
-            taskId={taskId}
-            completed={completed}
-          />
+          {openTask ?? 
+         <LazyLoadModal />}
         </View>
       </Pressable>
     );

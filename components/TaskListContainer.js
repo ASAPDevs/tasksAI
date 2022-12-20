@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useCallback, useMemo, useState } from "react";
 import { View, Text, Divider, Heading } from "native-base";
 import { StyleSheet, ActivityIndicator } from "react-native";
 import Task, { UnderTaskButton } from "./Task";
@@ -8,11 +8,11 @@ import TaskListTabGroup from "./TaskListTabGroup";
 import CreateTaskCircle from "./CreateTaskCircle";
 import { useMutation } from "@apollo/client";
 import { COMPLETE_TASK } from "./helpers/mutations";
+import { useSelector } from "react-redux";
 
 //Props are passed down from Today component
-const TaskListContainer = React.memo(({
+const TaskListContainer = ({
   addTask,
-  tasks,
   refetch,
   openNewTask,
   newTask,
@@ -22,21 +22,47 @@ const TaskListContainer = React.memo(({
   //Selected Tab/View for the container
   //Default is "inprogress", other two are "completed" and "all"
   const [currentTab, switchTab] = useState("inprogress");
+  const tasks = useSelector((state) => state.storage.tasks.all);
+  const inProgressTasks = useSelector((state) => state.storage.tasks.progress);
+  const completedTasks = useSelector((state) => state.storage.tasks.completed);
+  console.log('tasklistcontainer')
+
+  // const filterTasks = useMemo(() => {
+  //   return tasks
+  //     .filter((task) => {
+  //       if (currentTab === "inprogress") {
+  //         return !task.completed;
+  //       } else if (currentTab === "completed") {
+  //         return task.completed;
+  //       } else {
+  //         return true;
+  //       }
+  //     })
+  //     .map((task) => ({ ...task, key: task.id })); // add the key property to each task object
+  // }, [tasks, currentTab]);
+  let DATA;
+  if (currentTab === 'inprogress') {
+    DATA = inProgressTasks 
+  } else if (currentTab === 'completed') {
+    DATA = completedTasks
+  } else {
+    DATA = tasks
+  }
 
 
-  const filterTasks = useMemo(() => {
-    return tasks
-      .filter((task) => {
-        if (currentTab === "inprogress") {
-          return !task.completed;
-        } else if (currentTab === "completed") {
-          return task.completed;
-        } else {
-          return true;
-        }
-      })
-      .map((task) => ({ ...task, key: task.id })); // add the key property to each task object
-  }, [tasks, currentTab]);
+  // const filterTasks = useCallback(() => {
+  //   console.log('filter task')
+  //   switch (currentTab) {
+  //     case "inprogress":
+  //       return inProgressTasks;
+  //     case "completed":
+  //       return completedTasks;
+  //     case "all":
+  //       return tasks;
+  //     default:
+  //         return tasks;
+  //   } 
+  // }, [currentTab])
 
 
   const [completeTask] = useMutation(COMPLETE_TASK, {
@@ -48,9 +74,6 @@ const TaskListContainer = React.memo(({
     },
   });
 
-  useEffect(() => {
-
-  }, [])
 
   return (
     <View style={styles.bottomContainer}>
@@ -77,7 +100,7 @@ const TaskListContainer = React.memo(({
         </View>
       )}
       {/* Fallback for empty tasks */}
-      {!loading && filterTasks.length < 1 &&
+      {/* {!loading && tasks.length < 1 &&
         <View
         style={{
           borderColor: "black",
@@ -92,12 +115,13 @@ const TaskListContainer = React.memo(({
       >
         <Text>No Tasks To Be Shown!</Text>
       </View>
-     }
+     } */}
       {/* Tasks List */}
       {!loading && (
         <SwipeListView
           style={styles.taskListContainer}
-          data={filterTasks}
+          data={DATA}
+          windowSize={5}
           renderItem={({ item }, rowMap) => {
             return (
               <Task
@@ -152,7 +176,7 @@ const TaskListContainer = React.memo(({
       
     </View>
   );
-});
+};
 
 const styles = StyleSheet.create({
   bottomContainer: {
@@ -200,5 +224,5 @@ const styles = StyleSheet.create({
     alignContent: "center",
     justifyContent: "center",
   },
-});
+})
 export default TaskListContainer;
