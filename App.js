@@ -9,6 +9,7 @@ import { ApolloClient, InMemoryCache, ApolloProvider, gql } from '@apollo/client
 import { NativeBaseProvider } from "native-base";
 
 const client = new ApolloClient({
+  // uri: 'https://ai-todo-server-production.up.railway.app/graphql',
   uri: 'http://localhost:3000/graphql',
   cache: new InMemoryCache(),
   onError: ({ networkError, graphQLErrors }) => {
