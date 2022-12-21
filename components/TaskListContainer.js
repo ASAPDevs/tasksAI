@@ -34,8 +34,8 @@ const TaskListContainer = ({
       case "all":
         return tasks;
       default:
-          return tasks;
-    } 
+        return tasks;
+    }
   }, [currentTab, tasks])
 
   const DATA = useMemo(() => filterTasks(), [currentTab, tasks])
@@ -50,9 +50,9 @@ const TaskListContainer = ({
     },
   });
 
-  useEffect(() => {
-    changePrevDay(today.getTime() > date.getTime());
-  }, [date])
+  // useEffect(() => {
+  //   changePrevDay(today.getTime() > date.getTime());
+  // }, [date])
 
   return (
     <View style={styles.bottomContainer}>
@@ -81,20 +81,20 @@ const TaskListContainer = ({
       {/* Fallback for empty tasks */}
       {!loading && DATA.length < 1 &&
         <View
-        style={{
-          borderColor: "black",
-          borderWidth: 0,
-          minHeight: "85%",
-          maxHeight: "85%",
-          height: "85%",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        <Text>No Tasks To Be Shown!</Text>
-      </View>
-     }
+          style={{
+            borderColor: "black",
+            borderWidth: 0,
+            minHeight: "85%",
+            maxHeight: "85%",
+            height: "85%",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <Text>No Tasks To Be Shown!</Text>
+        </View>
+      }
       {/* Tasks List */}
       {!loading && (
         <SwipeListView
@@ -136,9 +136,9 @@ const TaskListContainer = ({
             completeTaskMutation({ variables: { taskId: rowData } });
             // console.log(rowKey);
           }}
-          
-          // onSwipeValueChange={() => console.log("SwipeLEFT")}
-          // leftActionValue={() => console.log("Left")}
+
+        // onSwipeValueChange={() => console.log("SwipeLEFT")}
+        // leftActionValue={() => console.log("Left")}
         />
       )}
     </View>

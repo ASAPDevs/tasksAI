@@ -19,9 +19,6 @@ const client = new ApolloClient({
 });
 
 
-
-
-
 export default function App() {
   const [fontsLoaded, updateFontsLoaded] = useState(false);
 
