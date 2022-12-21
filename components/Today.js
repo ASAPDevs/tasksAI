@@ -14,6 +14,8 @@ import NewTaskModal from "./NewTaskModal";
 import CreateTaskCircle from "./CreateTaskCircle";
 
 const Today = () => {
+  const today = new Date();
+  const timezoneOffset = today.getTimezoneOffset();
   // Figure out where we pull date or refetch date
   const [date, setDate] = useState(new Date());
   // Need alg to read and determine (completed tasks) / (total tasks)
@@ -21,11 +23,10 @@ const Today = () => {
   const [newTask, openNewTask] = useState(false);
   const [calendarModal, openCalendarModal] = useState(false);
   // const [tasks, setTasks] = useState(useSelector((state) => state.storage.tasks.daily));
+
   // prevDay will determine if the user is looking at pass days,
   // if true, nothing should be editable
-  const today = new Date();
-  const [prevDay, changePrevDay] = useState(today.getTime() > date.getTime());
-  console.log('today')
+  const [prevDay, changePrevDay] = useState(compareDateWithToday);
 
   //maps to redux storage Slice.
   const tasks = useSelector((state) => state.storage.tasks.all);
@@ -35,12 +36,11 @@ const Today = () => {
 
   const dispatch = useDispatch();
 
-  //YYYY - MM - DD
-  // const today = new Date().toISOString().split("T")[0];
-  // const todayInMs = new Date(today).getTime();
-  // console.log("USER ID: ", userID, typeof userID)
-
-
+  const compareDateWithToday = () => {
+    const todayTime = new Date(today.getTime() - (timezoneOffset * 60000));
+    const todayFirstMoment = new Date(todayTime.getFullYear(), todayTime.getMonth(), todayTime.getDate());
+    return todayFirstMoment.getTime() - (timezoneOffset * 60000) > date.getTime();
+  }
 
   const { data, error, loading, refetch } = useQuery(GET_TODAYS_TASKS, {
     notifyOnNetworkStatusChange: true,
@@ -111,7 +111,8 @@ const Today = () => {
   // useEffect to update and render progress bar
   useEffect(() => {
     tasks ? setProgress(((completedTasks.length / tasks.length) * 100).toFixed(2)) : null;
-  }, [tasks]);
+    changePrevDay(compareDateWithToday);
+  }, [tasks, date]);
 
   return (
     <View style={styles.mainContainer}>

@@ -67,6 +67,7 @@ export const storageSlice = createSlice({
         if (task.id === action.payload.id) {
           return {
             ...task,
+            completed: action.payload.completed,
             time_start: action.payload.time_start,
             time_finished: action.payload.time_finished
           }
