@@ -17,7 +17,7 @@ const Today = () => {
   const today = new Date();
   const timezoneOffset = today.getTimezoneOffset();
   // Figure out where we pull date or refetch date
-  const [date, setDate] = useState(new Date());
+  const [date, setDate] = useState(today);
   // Need alg to read and determine (completed tasks) / (total tasks)
   const [progress, setProgress] = useState(0);
   const [newTask, openNewTask] = useState(false);
@@ -36,10 +36,16 @@ const Today = () => {
 
   const dispatch = useDispatch();
 
+  // this function offsets the passed in date with any time zone difference
+  const offsetTime = (dateObj) => {
+    const newDate = new Date(dateObj.getTime() - (timezoneOffset * 60000));
+    return newDate;
+  }
+
   const compareDateWithToday = () => {
-    const todayTime = new Date(today.getTime() - (timezoneOffset * 60000));
+    const todayTime = offsetTime(today);
     const todayFirstMoment = new Date(todayTime.getFullYear(), todayTime.getMonth(), todayTime.getDate());
-    return todayFirstMoment.getTime() - (timezoneOffset * 60000) > date.getTime();
+    return offsetTime(todayFirstMoment).getTime() > offsetTime(date).getTime();
   }
 
   const { data, error, loading, refetch } = useQuery(GET_TODAYS_TASKS, {
@@ -51,7 +57,7 @@ const Today = () => {
     onError: (error) => {
       console.log("Error in loading tasks: ", error);
     },
-    variables: { date: date.toISOString().split("T")[0], user_id: userID },
+    variables: { date: offsetTime(date).toISOString().split("T")[0], user_id: userID },
   });
 
   const [createTaskMutation] = useMutation(CREATE_TASKS, {
