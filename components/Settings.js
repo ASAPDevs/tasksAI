@@ -1,49 +1,69 @@
-import React, {useState} from 'react'
-import { SafeAreaView, StyleSheet, View, Text } from 'react-native'
-import Account from './settings/AccountSettings'
-const LazyLoadAccountSettings = React.lazy(() => import('./settings/AccountSettings'))
+import React, { useState } from "react";
+import { SafeAreaView, StyleSheet, View, Text } from "react-native";
+import Account from "./settings/AccountSettings";
+import * as SecureStore from "expo-secure-store";
+import { logoutUser } from "../redux/slices/storageSlice";
+import { useDispatch } from "react-redux";
+// import LandingPage from "./Landing";
+// const LazyLoadGateway = React.lazy(() =>
+//   import("./Gateway")
+// );
+import Gateway from "./Gateway";
+const LazyLoadAccountSettings = React.lazy(() =>
+  import("./settings/AccountSettings")
+);
 
+const Settings = ({navigation}) => {
+  const [currentView, updateCurrentView] = useState("main");
+  const dispatch = useDispatch();
 
-
-const Settings = () => {
-  const [currentView, updateCurrentView] = useState('main')
-
+  const logoutHandler = () => {
+    SecureStore.deleteItemAsync("username");
+    SecureStore.deleteItemAsync("userid");
+    dispatch(logoutUser());
+    navigation.navigate('LandingPage')
+    // updateCurrentView("gateway");
+    // return <Gateway />
+  };
 
   const conditionalRender = () => {
     switch (currentView) {
-      case 'main':
+      case "main":
         return (
           <View style={styles.innerContainer}>
-            <Text 
+            <Text
               style={styles.text}
-              onPress={() => updateCurrentView('account')}
+              onPress={() => updateCurrentView("account")}
             >
               Account
             </Text>
-            <Text 
-              style={styles.text}
-              
-            >
-              Privacy (Unavailable Currently)
-            </Text>
-            <Text 
-              style={styles.text}
-              
-            >
+            <Text style={styles.text}>Privacy (Unavailable Currently)</Text>
+            <Text style={styles.text}>
               Notifications (Unavailable Currently)
             </Text>
-        </View>
-        )
-     case 'account':
-      return <LazyLoadAccountSettings updateCurrentView={updateCurrentView} />
-  }}
+            <Text style={styles.text} onPress={() => logoutHandler()}>
+              Logout
+            </Text>
+          </View>
+        );
+      case "account":
+        return (
+          <LazyLoadAccountSettings updateCurrentView={updateCurrentView} />
+        );
+      //   case "gateway":
+      //     return (
+      //       <LazyLoadGateway />
+      //     )
+      // }
+    }
+  };
 
   return (
     <SafeAreaView style={styles.mainContainer}>
-        {conditionalRender()}
+      {conditionalRender()}
     </SafeAreaView>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
   mainContainer: {
@@ -53,13 +73,13 @@ const styles = StyleSheet.create({
   },
   innerContainer: {
     paddingTop: 30,
-    paddingLeft: 20
+    paddingLeft: 20,
   },
   text: {
     fontSize: 22,
     margin: 10,
-    fontFamily: 'FamiljenGrotesk'
-  }
-})
+    fontFamily: "FamiljenGrotesk",
+  },
+});
 
-export default Settings
+export default Settings;

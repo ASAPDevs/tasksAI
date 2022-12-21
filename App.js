@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Menu from "./components/Menu";
 import { Provider } from "react-redux";
-import { NavigationContainer } from "@react-navigation/native";
 import * as Font from "expo-font";
 import LandingPage from "./components/Landing";
 import store from "./redux/store";
@@ -12,10 +11,12 @@ import {
   gql,
 } from "@apollo/client";
 import { NativeBaseProvider } from "native-base";
+import Gateway from "./components/Gateway";
+import Navigation from "./components/Navigation";
 
 const client = new ApolloClient({
-  // uri: 'https://ai-todo-server-production.up.railway.app/graphql',
-  uri: "http://localhost:3000/graphql",
+  uri: "https://ai-todo-server-production.up.railway.app/graphql",
+  // uri: "http://localhost:3000/graphql",
   cache: new InMemoryCache(),
   onError: ({ networkError, graphQLErrors }) => {
     console.log("graphQLErrors", graphQLErrors);
@@ -46,9 +47,9 @@ export default function App() {
       <ApolloProvider client={client}>
         <NativeBaseProvider>
           <Provider store={store}>
-            <NavigationContainer>
-              <LandingPage />
-            </NavigationContainer>
+            {/* <LandingPage /> */}
+            {/* <Gateway /> */}
+            <Navigation />
           </Provider>
         </NativeBaseProvider>
       </ApolloProvider>
