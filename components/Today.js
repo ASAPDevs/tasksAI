@@ -23,10 +23,10 @@ const Today = () => {
   const [newTask, openNewTask] = useState(false);
   const [calendarModal, openCalendarModal] = useState(false);
   // const [tasks, setTasks] = useState(useSelector((state) => state.storage.tasks.daily));
+
   // prevDay will determine if the user is looking at pass days,
   // if true, nothing should be editable
   const [prevDay, changePrevDay] = useState(compareDateWithToday);
-  console.log('today', today, 'date', date)
 
   //maps to redux storage Slice.
   const tasks = useSelector((state) => state.storage.tasks.all);
@@ -37,8 +37,9 @@ const Today = () => {
   const dispatch = useDispatch();
 
   const compareDateWithToday = () => {
-    const todayTime = today.getTime() - (timezoneOffset * 60000);
-    return todayTime > date.getTime();
+    const todayTime = new Date(today.getTime() - (timezoneOffset * 60000));
+    const todayFirstMoment = new Date(todayTime.getFullYear(), todayTime.getMonth(), todayTime.getDate());
+    return todayFirstMoment.getTime() - (timezoneOffset * 60000) > date.getTime();
   }
 
   const { data, error, loading, refetch } = useQuery(GET_TODAYS_TASKS, {
