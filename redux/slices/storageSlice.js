@@ -28,6 +28,7 @@ export const storageSlice = createSlice({
     },
     logoutUser: (state) => {
       state = initialState
+      console.log("Logged out: ", state)
     },
     loadTasks: (state, action) => {
       state.tasks.all = action.payload.map((task) => ({...task, key: task.id}))

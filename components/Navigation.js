@@ -1,6 +1,8 @@
 import Dashboard from "./Dashboard";
 import Today from "./Today";
 import Calendar from "./Calendar";
+import { Text } from "native-base";
+import React, {useState, useEffect} from 'react';
 import Settings from "./Settings";
 import LandingPage from "./Landing";
 import { useSelector, useDispatch } from "react-redux";
@@ -10,6 +12,8 @@ import {
   NavigationContainer,
 } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
+import * as SecureStore from 'expo-secure-store';
+import { loginUser } from "../redux/slices/storageSlice";
 
 const DrawerNavigatorConfig = {
   intialRouteName: "Dashboard",
@@ -50,10 +54,17 @@ const useBeforeRender = (callback, deps) => {
 const Drawer = createDrawerNavigator();
 const Stack = createStackNavigator();
 
-export const navigationRef = createNavigationContainerRef();
+// export const navigationRef = createNavigationContainerRef();
+// export function navigate(name, params) {
+//   if (navigationRef.isReady()) {
+//     navigationRef.navigate(name, params);
+//   }
+// }
 
 function Navigation() {
   const isLoggedIn = useSelector((state) => state.storage.loggedIn);
+  console.log("Logged in status in navigation: ", isLoggedIn)
+  const dispatch = useDispatch();
 
   // const sessionHandler = async () => {
   //   let username = await SecureStore.getItemAsync("username");
@@ -69,58 +80,73 @@ function Navigation() {
   //   }
   // };
 
+  // useBeforeRender(() => sessionHandler(), [])
   
-  const dispatch = useDispatch();
+  function Root() {
+    return (
+      <Drawer.Navigator
+     
+      // ref={navigationRef}
+      // independent={true}
+      // initialRouteName="Dashboard"
+      screenOptions={{
+        headerTintColor: "#FAA946",
+        headerTitleStyle: {
+          color: "black",
+        },
+        drawerActiveTintColor: "#FAA946",
+        drawerInactiveTintColor: "black",
+      }}
+    >
+      <Drawer.Screen name="Dashboard" component={Dashboard} />
+      <Drawer.Screen name="Today" component={Today} />
+      {/* <Drawer.Screen name="Calendar" component={Calendar} /> */}
+      <Drawer.Screen name="Settings" component={Settings} />
+      {/* <Drawer.Item label="Logout" onPress={() => console.log('logout')} /> */}
+      
+    </Drawer.Navigator>
+    )
+  }
 
-  const sessionHandler = async () => {
-    let username = await SecureStore.getItemAsync("username");
-    let user_id = await SecureStore.getItemAsync("userid");
-    console.log("loggedin state:", username, user_id);
-    if (username && user_id) {
-      dispatch(
-        loginUser({
-          username: username,
-          user_id: Number(user_id),
-        })
-      );
-    }
-  };
-
-  sessionHandler()
-
-  session
+  
+  
+  // useEffect(() => {
+  // }, [isLoggedIn])
 
   return (
-    <NavigationContainer>
-      {isLoggedIn ? (
-        <Drawer.Navigator
-          initialRouteName="Dashboard"
-          screenOptions={{
-            headerTintColor: "#FAA946",
-            headerTitleStyle: {
-              color: "black",
-            },
-            drawerActiveTintColor: "#FAA946",
-            drawerInactiveTintColor: "black",
-          }}
-        >
-          <Drawer.Screen name="Dashboard" component={Dashboard} />
-          <Drawer.Screen name="Today" component={Today} />
-          {/* <Drawer.Screen name="Calendar" component={Calendar} /> */}
-          <Drawer.Screen name="Settings" component={Settings} />
-          {/* <Drawer.Item label="Logout" onPress={() => console.log('logout')} /> */}
-        </Drawer.Navigator>
-      ) : (
-        <Stack.Navigator>
-          <Stack.Screen
-            name="LandingPage"
-            component={LandingPage}
-            // initialParams={{ setLoggedIn }}
-          />
-        </Stack.Navigator>
-      )}
+    <NavigationContainer independent={true}>
+      <Stack.Navigator >
+        {isLoggedIn ? 
+          <Stack.Screen 
+            name="Root" 
+            component={Root} />
+            :
+          <Stack.Screen 
+            name="LandingPage" 
+            component={LandingPage} />
+        }
+      </Stack.Navigator>
     </NavigationContainer>
   );
 }
+
+// function LandingNavigator() {
+//   return (
+//     <Stack.Navigator
+//     // independent={true}
+//     // initialRouteName="Dashboard"
+//     screenOptions={{
+//       headerTintColor: "#FAA946",
+//       headerTitleStyle: {
+//         color: "black",
+//       },
+//       drawerActiveTintColor: "#FAA946",
+//       drawerInactiveTintColor: "black",
+//     }}
+//   >
+//     <Stack.Screen name="Landing" component={LandingPage} />
+//   </Stack.Navigator>
+//   )
+// }
 
 export default Navigation;

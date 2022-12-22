@@ -18,7 +18,7 @@ import { useSelector } from "react-redux";
 import Navigation from "./Navigation";
 import * as SecureStore from "expo-secure-store";
 
-const LandingPage = ({ updateCurrentView }) => {
+const LandingPage = ({ updateCurrentView, navigation }) => {
   const [currentView, setCurrentView] = useState("landing");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -64,30 +64,6 @@ const LandingPage = ({ updateCurrentView }) => {
     },
   });
 
-  // const sessionHandler = async () => {
-  //   let username = await SecureStore.getItemAsync("username");
-  //   let user_id = await SecureStore.getItemAsync("userid");
-  //   console.log("loggedin state:", username, user_id);
-  //   if (username && user_id) {
-  //     dispatch(
-  //       loginUser({
-  //         username: username,
-  //         user_id: Number(user_id),
-  //       })
-  //     );
-  //   }
-  // };
-
-  // sessionHandler();
-  
-  // useLayoutEffect(() => {
-  //   // console.log("Logged in status in landing: ", loggedInStatus);
-  //   sessionHandler();
-  // }, []);
-
-  // if (loading) return <p>Loading...</p>
-  // if (error) return <p>Error! {error.message}</p>
-  // Change input style when the input is focus
 
   const loginHandler = async () => {
     try {
@@ -95,10 +71,11 @@ const LandingPage = ({ updateCurrentView }) => {
       const result = await login({
         variables: { username: username, password: password },
       });
-      console.log(result.data.login);
+      
       if (result.data) {
         await SecureStore.setItemAsync("username", result.data.login.username);
         await SecureStore.setItemAsync("userid", result.data.login.id);
+        // navigation.navigate('Root', { screen: 'Dashboard' })
       }
     } catch (err) {
       console.log("The error" + err);

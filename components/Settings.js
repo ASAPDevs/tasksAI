@@ -4,11 +4,7 @@ import Account from "./settings/AccountSettings";
 import * as SecureStore from "expo-secure-store";
 import { logoutUser } from "../redux/slices/storageSlice";
 import { useDispatch } from "react-redux";
-// import LandingPage from "./Landing";
-// const LazyLoadGateway = React.lazy(() =>
-//   import("./Gateway")
-// );
-import Gateway from "./Gateway";
+import {navigate} from './Navigation'
 const LazyLoadAccountSettings = React.lazy(() =>
   import("./settings/AccountSettings")
 );
@@ -17,11 +13,14 @@ const Settings = ({navigation}) => {
   const [currentView, updateCurrentView] = useState("main");
   const dispatch = useDispatch();
 
+
   const logoutHandler = () => {
     SecureStore.deleteItemAsync("username");
     SecureStore.deleteItemAsync("userid");
     dispatch(logoutUser());
-    navigation.navigate('LandingPage')
+    // navigation.navigate('LandingPage', {screen: 'Landing'})
+    // navigate('Landinge')
+    // navigation.navigate('landingStack', {screen: 'LandingPage'})
     // updateCurrentView("gateway");
     // return <Gateway />
   };
