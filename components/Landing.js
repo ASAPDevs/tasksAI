@@ -17,6 +17,7 @@ import { SIGNUP_MUTATION, LOGIN_MUTATION } from "./helpers/mutations";
 import { useSelector } from "react-redux";
 import Navigation from "./Navigation";
 import * as SecureStore from "expo-secure-store";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 const LandingPage = ({ updateCurrentView, navigation }) => {
   const [currentView, setCurrentView] = useState("landing");
@@ -40,7 +41,7 @@ const LandingPage = ({ updateCurrentView, navigation }) => {
           user_id: Number(data.login.id),
         })
       );
-      navigation.navigate("Root", {screen: "Dashboard"})
+      navigation.navigate("Root", { screen: "Dashboard" })
       setUsername('')
       setPassword('')
       // updateCurrentView('dashboard')
@@ -59,7 +60,7 @@ const LandingPage = ({ updateCurrentView, navigation }) => {
           user_id: Number(data.signup.id),
         })
       );
-      navigation.navigate("Root", {screen: "Dashboard"})
+      navigation.navigate("Root", { screen: "Dashboard" })
     },
     onError: (err) => {
       console.log("Error in signup mutation: ", err);
@@ -74,7 +75,7 @@ const LandingPage = ({ updateCurrentView, navigation }) => {
       const result = await login({
         variables: { username: username, password: password },
       });
-      
+
       if (result.data) {
         await SecureStore.setItemAsync("username", result.data.login.username);
         await SecureStore.setItemAsync("userid", result.data.login.id);
@@ -100,7 +101,12 @@ const LandingPage = ({ updateCurrentView, navigation }) => {
   };
 
 
-    return (
+  return (
+    <KeyboardAwareScrollView
+      style={{ backgroundColor: '#ffffff' }}
+      resetScrollToCoords={{ x: 0, y: 0 }}
+      scrollEnabled={false}
+    >
       <SafeAreaView style={styles.mainContainer}>
         <View style={styles.innerContainer}>
           <View>
@@ -155,8 +161,8 @@ const LandingPage = ({ updateCurrentView, navigation }) => {
                   onFocus={() => setFocus("confirm-password")}
                 />
                 {focus == "confirm-password" &&
-                confirmPassword.length > 0 &&
-                password !== confirmPassword ? (
+                  confirmPassword.length > 0 &&
+                  password !== confirmPassword ? (
                   <Text style={{ color: "red", marginLeft: 7.5 }}>
                     Passwords don't match!
                   </Text>
@@ -171,9 +177,8 @@ const LandingPage = ({ updateCurrentView, navigation }) => {
                 onPress={loginHandler}
                 style={{
                   ...styles.signInButton,
-                  backgroundColor: `${
-                    !username || !password ? "grey" : "#FAA946"
-                  }`,
+                  backgroundColor: `${!username || !password ? "grey" : "#FAA946"
+                    }`,
                 }}
               >
                 <Text style={styles.buttonText}>Sign In</Text>
@@ -190,11 +195,10 @@ const LandingPage = ({ updateCurrentView, navigation }) => {
                 onPress={signupHandler}
                 style={{
                   ...styles.signInButton,
-                  backgroundColor: `${
-                    !username || !password || !email || !confirmPassword
-                      ? "grey"
-                      : "#FAA946"
-                  }`,
+                  backgroundColor: `${!username || !password || !email || !confirmPassword
+                    ? "grey"
+                    : "#FAA946"
+                    }`,
                 }}
               >
                 <Text style={styles.buttonText}>Sign Up</Text>
@@ -242,7 +246,8 @@ const LandingPage = ({ updateCurrentView, navigation }) => {
           </View>
         </View>
       </SafeAreaView>
-    );
+    </KeyboardAwareScrollView>
+  );
 };
 
 const styles = StyleSheet.create({
