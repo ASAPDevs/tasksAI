@@ -5,6 +5,10 @@ import * as SecureStore from "expo-secure-store";
 import { logoutUser } from "../redux/slices/storageSlice";
 import { useDispatch } from "react-redux";
 import {navigate} from './Navigation'
+
+
+
+
 const LazyLoadAccountSettings = React.lazy(() =>
   import("./settings/AccountSettings")
 );
@@ -12,17 +16,13 @@ const LazyLoadAccountSettings = React.lazy(() =>
 const Settings = ({navigation}) => {
   const [currentView, updateCurrentView] = useState("main");
   const dispatch = useDispatch();
+  // const navigation = useNavigation();
 
-
-  const logoutHandler = () => {
-    SecureStore.deleteItemAsync("username");
-    SecureStore.deleteItemAsync("userid");
+  const logoutHandler = async () => {
+    await SecureStore.deleteItemAsync("username");
+    await SecureStore.deleteItemAsync("userid");
     dispatch(logoutUser());
-    // navigation.navigate('LandingPage', {screen: 'Landing'})
-    // navigate('Landinge')
-    // navigation.navigate('landingStack', {screen: 'LandingPage'})
-    // updateCurrentView("gateway");
-    // return <Gateway />
+    navigation.navigate('LandingPage')
   };
 
   const conditionalRender = () => {

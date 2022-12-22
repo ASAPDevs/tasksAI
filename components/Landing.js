@@ -40,6 +40,7 @@ const LandingPage = ({ updateCurrentView, navigation }) => {
           user_id: Number(data.login.id),
         })
       );
+      navigation.navigate("Root", {screen: "Dashboard"})
       // updateCurrentView('dashboard')
     },
     onError: (err) => {
@@ -56,7 +57,7 @@ const LandingPage = ({ updateCurrentView, navigation }) => {
           user_id: Number(data.signup.id),
         })
       );
-      updateCurrentView("dashboard");
+      navigation.navigate("Root", {screen: "Dashboard"})
     },
     onError: (err) => {
       console.log("Error in signup mutation: ", err);
@@ -96,8 +97,7 @@ const LandingPage = ({ updateCurrentView, navigation }) => {
     }
   };
 
-  if (loggedInStatus) return <Navigation />;
-  else
+
     return (
       <SafeAreaView style={styles.mainContainer}>
         <View style={styles.innerContainer}>

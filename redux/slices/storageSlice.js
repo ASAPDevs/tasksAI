@@ -28,6 +28,7 @@ export const storageSlice = createSlice({
     },
     logoutUser: (state) => {
       state = initialState
+      state.loggedIn = false;
       console.log("Logged out: ", state)
     },
     loadTasks: (state, action) => {
