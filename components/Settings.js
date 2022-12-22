@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { SafeAreaView, StyleSheet, View, Text } from "react-native";
 import Account from "./settings/AccountSettings";
 import * as SecureStore from "expo-secure-store";
 import { logoutUser } from "../redux/slices/storageSlice";
 import { useDispatch } from "react-redux";
 import {navigate} from './Navigation'
+import { resolveObjMapThunk } from "graphql";
 
 
 
@@ -21,9 +22,19 @@ const Settings = ({navigation}) => {
   const logoutHandler = async () => {
     await SecureStore.deleteItemAsync("username");
     await SecureStore.deleteItemAsync("userid");
-    dispatch(logoutUser());
-    navigation.navigate('LandingPage')
+    try {
+      await dispatch(logoutUser())
+      navigation.navigate('LandingPage')
+    } catch (err){
+      console.log(err)
+    }
+    // dispatch(logoutUser()).then(() => {
+    //   navigation.navigate("LandingPage");
+    // });
   };
+
+
+
 
   const conditionalRender = () => {
     switch (currentView) {

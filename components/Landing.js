@@ -41,6 +41,8 @@ const LandingPage = ({ updateCurrentView, navigation }) => {
         })
       );
       navigation.navigate("Root", {screen: "Dashboard"})
+      setUsername('')
+      setPassword('')
       // updateCurrentView('dashboard')
     },
     onError: (err) => {

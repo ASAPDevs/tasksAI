@@ -138,11 +138,11 @@ function Navigation() {
     <NavigationContainer independent={true}>
       {/* <Stack.Navigator  initialRouteName={view}> */}
       {/* <Stack.Navigator  initialRouteName={isLoading ? "Loading" : isLoggedIn ? "Root" : "LandingPage"}> */}
-      <Stack.Navigator initialRouteName={isLoggedIn ? 'Root' : 'LandingPage'}>
-        {/* Order of the stacks matters!!! */}
-        {/* <Stack.Screen name="Loading" component={Splash} options={{ headerShown: false }} /> */}
-       {!isLoggedIn &&  <Stack.Screen name="LandingPage" component={LandingPage} options={{ headerShown: false }} />}
-        <Stack.Screen name="Root" component={Root} options={{ headerShown: false }} />
+      <Stack.Navigator initialRouteName={isLoading ? "Loading" : isLoggedIn ? "Root" : "Landing"}>
+        {/* Order of the stacks matters!!! initialRouteName={isLoggedIn ? 'Root' : 'LandingPage'}*/}
+        {isLoading && <Stack.Screen name="Loading" component={Splash} options={{ headerShown: false }} />}
+        {!isLoggedIn && <Stack.Screen name="LandingPage" component={LandingPage} options={{ headerShown: false }} />}
+        {isLoggedIn && <Stack.Screen name="Root" component={Root} options={{ headerShown: false }} />} 
       </Stack.Navigator>
     </NavigationContainer>
   );
