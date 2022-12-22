@@ -43,7 +43,7 @@ const Task = ({ prevDay, date, taskId, title, description, startTime, endTime, c
       let timeToAdd = selectedValue * 3600000
       let newStartTime = Number(startTime) + timeToAdd
       let newEndTime = Number(endTime) + timeToAdd
-
+      
       pushTaskMutation({variables: {id: Number(taskId), newStartTime: newStartTime.toString(), newEndTime: newEndTime.toString()}})
 
       openPushTaskModal(false)

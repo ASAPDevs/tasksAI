@@ -71,6 +71,7 @@ const Today = () => {
 
   const [deleteTaskMutation] = useMutation(DELETE_TASK, {
     onCompleted: (data) => {
+      console.log("data.deleteTask.id: ", data.deleteTask.id, typeof data.deleteTask.id,)
       dispatch(deleteTask(data.deleteTask.id))
     },
     onError: (err) => {
@@ -90,6 +91,7 @@ const Today = () => {
   };
 
   const handleDeleteTask = (taskId) => {
+    console.log("type of task id in handleDeleteTask: ", typeof taskId)
     deleteTaskMutation({
       variables: { taskId: taskId },
     });
@@ -108,6 +110,7 @@ const Today = () => {
       completed: false,
       user_id: Number(userID),
     };
+    console.log("New Task: ", newTask)
     createTaskMutation({ variables: { task: newTask } });
     openNewTask(false);
   };

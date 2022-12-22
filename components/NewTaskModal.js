@@ -42,7 +42,7 @@ const NewTaskModal = ({ date, newTask, openNewTask, setTasks, addTaskHandler }) 
       // if (start > end) {
       //   end = start;
       // }
-      addTaskHandler(taskTitle, taskDescription, startTime, endTime);
+      addTaskHandler(taskTitle, taskDescription, start, end);
       clearInputs();
     }
   }
@@ -116,7 +116,7 @@ const NewTaskModal = ({ date, newTask, openNewTask, setTasks, addTaskHandler }) 
 
   return (
     <Modal
-      top={5}
+      top={-65}
       isOpen={newTask}
       onClose={() => openNewTask(false)}
       size="xl"
@@ -281,7 +281,7 @@ export const StartTimeInput = ({ startTime, endTime, updateStartTime, updateEndT
 
     updateStartTime(convertedTime);
     // convert end time to start time if it's falsy or before start time
-    if (endTime?.length !== 0 && endTime < convertedTime) {
+    if (endTime !== '' && endTime < convertedTime) {
       updateEndTime(convertedTime);
     }
     setDatePickerVisibility(false);
@@ -338,7 +338,7 @@ export const EndTimeInput = ({ startTime, endTime, updateStartTime, updateEndTim
 
     updateEndTime(convertedTime);
     // convert start time to end time if it's falsy or before start time
-    if (startTime?.length !== 0 && convertedTime < startTime) {
+    if (startTime !== '' && convertedTime < startTime) {
       updateStartTime(convertedTime);
     }
     setDatePickerVisibility(false);

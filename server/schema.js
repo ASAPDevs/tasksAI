@@ -247,6 +247,7 @@ const resolvers = {
     },
     deleteTask: async (_, args) => {
       const { id } = args;
+      console.log("Deleted Args: ", args)
       const results = await db.query(
         "DELETE FROM tasks WHERE id = $1 RETURNING *;",
         [id]
@@ -256,6 +257,7 @@ const resolvers = {
     },
     completeTask: async (_, args) => {
       const { id } = args;
+      console.log("Completed Args: ", args)
       const completedTask = await db.query(
         "UPDATE tasks SET completed = true WHERE id = $1 RETURNING *;",
         [id]
@@ -264,6 +266,7 @@ const resolvers = {
     },
     pushTask: async (_, args) => {
       const { id, newStartTime, newEndTime } = args;
+      console.log("Push Task Backend Args: ", args)
       const updatedTask = await db.query("UPDATE tasks SET time_start = $1, time_finished = $2 WHERE id = $3 RETURNING *;", [newStartTime, newEndTime, id])
       return updatedTask.rows[0]
     }

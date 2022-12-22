@@ -46,6 +46,7 @@ const TaskModal = ({ prevDay, date, updateTaskMutation, openTask, toggleOpenTask
         (<Modal.Content
           width="95%"
           height="500"
+          marginBottom={50}
           display="flex"
           flexDirection="column"
           borderColor="grey"
