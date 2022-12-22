@@ -1,9 +1,9 @@
-import React, {useEffect, useState} from 'react';
-import { Icon, Pressable} from 'native-base';
+import React, { useState} from 'react';
+import { Icon, View } from 'native-base';
 import { TouchableOpacity, Animated } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons'; 
 
-const CreateTaskCircle = ({ radius, borderWidth, color, text, icon, onPress }) => {
+const CreateTaskCircle = ({ radius, onPress }) => {
   const [animatedValue] = useState(new Animated.Value(1));
 
   const onPressIn = () => {
@@ -27,7 +27,8 @@ const CreateTaskCircle = ({ radius, borderWidth, color, text, icon, onPress }) =
 
 
   return (
-    <TouchableOpacity activeOpacity={0.8} onPress={() => {
+   <View style={{display: 'flex', justifyContent: 'center', flex: 1, alignItems: 'center', position: 'absolute', borderColor: 'blue', bottom: 0, right: 0, width: '100%'}}>
+     <TouchableOpacity activeOpacity={0.8} onPress={() => {
       onPress()
     }}
     onPressIn={onPressIn}
@@ -42,16 +43,14 @@ const CreateTaskCircle = ({ radius, borderWidth, color, text, icon, onPress }) =
          borderWidth: 1,
          borderColor: "#E8EEF7",
          backgroundColor: "#FAA946",
-         bottom: -50,
-         right: 55,
          alignItems: 'center',
          justifyContent: 'center',
-         position: 'absolute',
          transform: [{ scale: animatedValue }]
       }}>
         <Icon as={MaterialIcons} color="white" marginLeft={0} name="library-add" size={8} />
       </Animated.View>
     </TouchableOpacity>
+   </View>
   );
 };
 

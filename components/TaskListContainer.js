@@ -1,153 +1,62 @@
-import React, { useEffect, useState } from "react";
-import { View, Text, Divider, Heading, Circle,  Pressable } from "native-base";
+import React, { useEffect, useCallback, useMemo, useState } from "react";
+import { View, Text, Divider, Heading } from "native-base";
 import { StyleSheet, ActivityIndicator } from "react-native";
-import Task, { DeleteButton } from "./Task";
-import NewTaskModal from "./NewTaskModal";
+import Task from "./Task";
+import UnderTaskButton from "./UnderTaskButton";
 import { SwipeListView } from "react-native-swipe-list-view";
 import TaskListTabGroup from "./TaskListTabGroup";
-import CreateTaskCircle from "./CreateTaskCircle";
-import Blockloadingsvg from '../assets/blocksloading.svg'
-import { Svg } from 'react-native-svg';
+import { useMutation } from "@apollo/client";
+import { COMPLETE_TASK } from "./helpers/mutations";
+import { useSelector, useDispatch } from "react-redux";
+import { completeTask } from "../redux/slices/storageSlice";
 
+//Props are passed down from Today component
 const TaskListContainer = ({
-  addTask,
-  tasks,
-  refetch,
-  openNewTask,
-  newTask,
+  prevDay,
+  today,
+  date,
+  changePrevDay,
   handleDeleteTask,
   loading,
 }) => {
-  //Selected Tab/View for the container
-  //Default is "inprogress", other two are "completed" and "all"
+  // Selected Tab/View for the container
+  // Default is "inprogress", other two are "completed" and "all"
   const [currentTab, switchTab] = useState("inprogress");
+  const tasks = useSelector((state) => state.storage.tasks.all);
+  const dispatch = useDispatch()
 
-  // This data is needed to use for SwipeListView
-  const swipeListData = tasks.map((task, index) => ({
-    ...task,
-    key: index,
-  }));
-
-  const swipeListDataInProgress = tasks
-    .filter((task, index) => {
-      return task.completed === false;
-    })
-    .map((task, index) => ({
-      ...task,
-      key: index,
-    }));
-
-  const swipeDataCompleted = tasks
-    .filter((task, index) => {
-      return task.completed === true;
-    })
-    .map((task, index) => ({
-      ...task,
-      key: index,
-    }));
-
-  //THIS FUNCTION CONDITIONALLY RENDERS THE SELECTED TAB
-  const tabRender = () => {
+  const filterTasks = useCallback(() => {
     switch (currentTab) {
       case "inprogress":
-        return (
-          <SwipeListView
-            style={styles.taskListContainer}
-            data={swipeListDataInProgress}
-            renderItem={({ item }, rowMap) => {
-              return (
-                <Task
-                  description={item.task_description}
-                  title={item.task_name}
-                  startTime={item.time_start}
-                  completed={item.completed}
-                  endTime={item.time_finished}
-                  taskId={item.id}
-                  key={item.id}
-                  refetch={refetch}
-                />
-              );
-            }}
-            renderHiddenItem={({ item }, rowMap) => {
-              return (
-                <DeleteButton
-                  item={item}
-                  rowMap={rowMap}
-                  handleDeleteTask={handleDeleteTask}
-                />
-              );
-            }}
-            rightOpenValue={-190}
-          />
-        );
+        return tasks.filter(task => !task.completed);
       case "completed":
-        return (
-          <SwipeListView
-            style={styles.taskListContainer}
-            data={swipeDataCompleted}
-            renderItem={({ item }, rowMap) => {
-              return (
-                <Task
-                  description={item.task_description}
-                  title={item.task_name}
-                  startTime={item.time_start}
-                  completed={item.completed}
-                  endTime={item.time_finished}
-                  taskId={item.id}
-                  key={item.id}
-                  refetch={refetch}
-                />
-              );
-            }}
-            renderHiddenItem={({ item }, rowMap) => {
-              return (
-                <DeleteButton
-                  item={item}
-                  rowMap={rowMap}
-                  handleDeleteTask={handleDeleteTask}
-                />
-              );
-            }}
-            rightOpenValue={-190}
-          />
-        );
+        return tasks.filter(task => task.completed);
       case "all":
-        return (
-          <SwipeListView
-            style={styles.taskListContainer}
-            data={swipeListData}
-            renderItem={({ item }, rowMap) => {
-              return (
-                <Task
-                  description={item.task_description}
-                  title={item.task_name}
-                  startTime={item.time_start}
-                  completed={item.completed}
-                  endTime={item.time_finished}
-                  taskId={item.id}
-                  key={item.id}
-                  refetch={refetch}
-                />
-              );
-            }}
-            renderHiddenItem={({ item }, rowMap) => {
-              return (
-                <DeleteButton
-                  item={item}
-                  rowMap={rowMap}
-                  handleDeleteTask={handleDeleteTask}
-                />
-              );
-            }}
-            rightOpenValue={-190}
-          />
-        );
+        return tasks;
+      default:
+        return tasks;
     }
-  };
+  }, [currentTab, tasks])
+
+  const DATA = useMemo(() => filterTasks(), [currentTab, tasks])
+
+  const [completeTaskMutation] = useMutation(COMPLETE_TASK, {
+    onCompleted: (data) => {
+      console.log("Data in frontend Complete Task: ", data.completeTask)
+      dispatch(completeTask(data.completeTask.id))
+    },
+    onError: (err) => {
+      console.log("Error Completing Task: ", err);
+    },
+  });
+
+  // useEffect(() => {
+  //   changePrevDay(today.getTime() > date.getTime());
+  // }, [date])
 
   return (
     <View style={styles.bottomContainer}>
-      <View style={{ minHeight: "4%" }}>
+      <View style={{ minHeight: "7.25%", maxHeight: '7.25%', borderColor: "black" }}>
         <Heading style={styles.bottomContainerHeading}>Task List</Heading>
         <TaskListTabGroup currentTab={currentTab} switchTab={switchTab} />
         <Divider bgColor="black" thickness={1} orientation="horizontal" />
@@ -156,76 +65,95 @@ const TaskListContainer = ({
       {loading && (
         <View
           style={{
-            height: "55%",
+            borderColor: "black",
+            borderWidth: 0,
+            minHeight: "85%",
+            maxHeight: "85%",
+            height: "85%",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
           }}
         >
-          {/* <ActivityIndicator size="large" /> */}
-          <Svg width={24} height={24} viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
- <Blockloadingsvg />
-</Svg>
+          <ActivityIndicator size="large" />
         </View>
       )}
-      {/* Tasks List */}
-      {!loading && tabRender()}
-     
-        {/* <Pressable
-          onPress={() => openNewTask(true)}
-           style={{ ...styles.createTaskButtonContainer } }
+      {/* Fallback for empty tasks */}
+      {!loading && DATA.length < 1 &&
+        <View
+          style={{
+            borderColor: "black",
+            borderWidth: 0,
+            minHeight: "85%",
+            maxHeight: "85%",
+            height: "85%",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
         >
-           <Circle style={{ ...styles.createTaskButton }}>
-          <Text
-            style={{
-              fontFamily: "FamiljenGrotesk",
-              fontWeight: "bold",
-              textAlign: "center",
-              fontSize: 18,
-            }}
-          >
-            CREATE A{"\n"} NEW TASK
-            
-          </Text>
-          </Circle>
-        </Pressable> */}
-        <CreateTaskCircle
-      radius={50}
-      borderWidth={2}
-      color="#00FF00"
-      text="Hello"
-      icon="clock"
-      onPress={() => openNewTask(true)}
-    />
-      {/* {newTask ? (
-        <NewTaskModal
-          addTask={addTask}
-          newTask={newTask}
-          openNewTask={openNewTask}
+          <Text>No Tasks To Be Shown!</Text>
+        </View>
+      }
+      {/* Tasks List */}
+      {!loading && (
+        <SwipeListView
+          style={styles.taskListContainer}
+          data={DATA}
+          windowSize={5}
+          renderItem={({ item }, rowMap) => {
+            return (
+              <Task
+                prevDay={prevDay}
+                date={date}
+                description={item.task_description}
+                title={item.task_name}
+                startTime={item.time_start}
+                completed={item.completed}
+                endTime={item.time_finished}
+                taskId={item.id}
+                key={item.id}
+              />
+            );
+          }}
+          renderHiddenItem={({ item }, rowMap) => {
+            return (
+              <UnderTaskButton
+                item={item}
+                key={item.id}
+                rowMap={rowMap}
+                handleDeleteTask={handleDeleteTask}
+              />
+            );
+          }}
+          rightOpenValue={-190}
+          leftOpenValue={100}
+          leftActivationValue={80}
+          // onLeftAction={(data, rowMap) => console.log("Left: ", rowMap.item)}
+          onLeftAction={(rowData, rowKey) => {
+            console.log("rowData:", rowData);
+            console.log("rowKey:", Object.keys(rowKey)[0]);
+            completeTaskMutation({ variables: { taskId: rowData } });
+            // console.log(rowKey);
+          }}
+
+        // onSwipeValueChange={() => console.log("SwipeLEFT")}
+        // leftActionValue={() => console.log("Left")}
         />
-      ) : (
-        ""
-      )} */}
-       <NewTaskModal
-          addTask={addTask}
-          newTask={newTask}
-          openNewTask={openNewTask}
-        />
+      )}
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   bottomContainer: {
-    // borderColor: "cyan",
-    // borderWidth: 3,
-    position: "relative",
-    top: 120,
     paddingTop: 0,
     display: "flex",
     alignContent: "center",
     flexDirection: "column",
     width: "120%",
+    minHeight: "77.5%",
+    maxHeight: "77.5%",
   },
   bottomContainerHeading: {
     fontFamily: "FamiljenGrotesk",
@@ -236,26 +164,16 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     textAlign: "center",
   },
-  taskContainer: {
-    display: "flex",
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    borderColor: "black",
-    // alignItems: "center",
-    borderWidth: 0,
-    padding: 10,
-    height: 70,
-    margin: 10,
-    borderRadius: 10,
-  },
   taskListContainer: {
-    borderColor: "black",
-    height: "55%",
+    borderBottomColor: 'black',
+    minHeight: "85%",
+    height: "85%",
+    maxHeight: "85%",
+    borderBottomWidth: 1,
   },
   createTaskButtonContainer: {
     position: "absolute",
-    width:  150,
+    width: 150,
     height: 150,
   },
   createTaskButton: {
@@ -273,5 +191,5 @@ const styles = StyleSheet.create({
     alignContent: "center",
     justifyContent: "center",
   },
-});
+})
 export default TaskListContainer;

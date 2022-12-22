@@ -8,7 +8,7 @@ export const LOGIN_MUTATION = gql`
       email
     }
   }
-`
+`;
 
 export const SIGNUP_MUTATION = gql`
   mutation Signup($email: String!, $username: String!, $password: String!) {
@@ -18,10 +18,10 @@ export const SIGNUP_MUTATION = gql`
       email
     }
   }
-`
+`;
 
 export const CHANGE_PASSWORD = gql`
-  mutation ChangePassword($userInput: ChangePassWordInput!) {
+  mutation ChangePassword($userInput: ChangePasswordInput!) {
     changePassword(userInput: $userInput) {
       id
       username
@@ -43,7 +43,7 @@ export const CREATE_TASKS = gql`
       user_id
     }
   }
-`
+`;
 
 export const UPDATE_TASK = gql`
   mutation UpdateTask($task: UpdateTaskInput) {
@@ -58,10 +58,30 @@ export const UPDATE_TASK = gql`
       user_id
     }
   }
-`
+`;
 
 export const DELETE_TASK = gql`
   mutation DeleteTask($taskId: ID!) {
-    deleteTask(id: $taskId)
+    deleteTask(id: $taskId) {
+      id
+    }
+  }
+`;
+
+export const COMPLETE_TASK = gql`
+  mutation CompleteTask($taskId: ID!) {
+    completeTask(id: $taskId) {
+      id
+    }
+  }
+`;
+
+export const PUSH_TASK = gql`
+  mutation PushTask($id: ID!, $newStartTime: String!, $newEndTime: String!) {
+    pushTask(id: $id, newStartTime: $newStartTime, newEndTime: $newEndTime) {
+      id
+      time_start
+      time_finished
+    }
   }
 `
