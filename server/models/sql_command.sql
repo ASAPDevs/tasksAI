@@ -24,15 +24,15 @@ UPDATE tasks SET task_name = 'make portfolio', task_description = 'make a portfo
 -- new tasks TABLE
 CREATE TABLE tasks(
     id serial PRIMARY KEY,
-    task_name varchar NOT NULL,
-    task_description varchar,
-    category integer NOT NULL,
+    task_name VARCHAR NOT NULL,
+    task_description VARCHAR,
+    category integer DEFAULT 1,
     date BIGINT NOT NULL,
     time_start BIGINT NOT NULL,
     time_finished BIGINT NOT NULL,
-    time_of_day integer NOT NULL,
+    time_of_day integer DEFAULT 1,
     completed boolean NOT NULL,
-    completed_on_time integer DEFAULT 0 NOT NULL,
+    completed_on_time integer DEFAULT 0,
     user_id integer NOT NULL
 );
 
