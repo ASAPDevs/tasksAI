@@ -27,7 +27,14 @@ const CreateTaskCircle = ({ radius, onPress }) => {
 
 
   return (
-   <View style={{display: 'flex', justifyContent: 'center', flex: 1, alignItems: 'center', position: 'absolute', borderColor: 'blue', bottom: 0, right: 0, width: '100%'}}>
+   <View style={{display: 'flex', justifyContent: 'center', flex: 1, alignItems: 'center', position: 'absolute', borderColor: 'darkgrey', bottom: 20, right: 0, width: '100%', shadowColor: '#000',
+   shadowOffset: {
+     width: 0,
+     height: 1,
+   },
+   shadowOpacity: 0.35,
+   shadowRadius: 3.84,
+   elevation: 5}}>
      <TouchableOpacity activeOpacity={0.8} onPress={() => {
       onPress()
     }}

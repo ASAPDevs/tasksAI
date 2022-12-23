@@ -53,7 +53,16 @@ const styles = StyleSheet.create({
     backgroundColor: "#F0F0F0",
     borderColor: "#ADB7B8",
     borderWidth: 1,
-    borderRadius: '5%'
+    padding: 10,
+    borderRadius: '5%',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   }
 });
 

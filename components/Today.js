@@ -126,7 +126,7 @@ const Today = () => {
   return (
     <View style={styles.mainContainer}>
       <ImageBackground style={styles.topContainer} resizeMode="cover">
-        <View>
+        <View alignItems="center" >
           <Text style={styles.topContainerText}>{today.toDateString()}</Text>
           <Pressable
             onPress={() => openCalendarModal(true)}
@@ -210,9 +210,19 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: 8,
     borderWidth: 1,
+    marginTop: -5,
     borderRadius: 8,
-    borderColor: "orange",
+    borderColor: "darkgrey",
     backgroundColor: "orange",
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.175,
+    shadowRadius: 3.84,
+    elevation: 5,
+    width: 100
   },
   progressText: {
     fontSize: 13,
