@@ -15,8 +15,8 @@ import Gateway from "./components/Gateway";
 import Navigation from "./components/Navigation";
 
 const client = new ApolloClient({
-  // uri: "https://ai-todo-server-production.up.railway.app/graphql",
-  uri: "http://localhost:3000/graphql",
+  uri: "https://ai-todo-server-production.up.railway.app/graphql",
+  // uri: "http://localhost:3000/graphql",
   cache: new InMemoryCache(),
   onError: ({ networkError, graphQLErrors }) => {
     console.log("graphQLErrors", graphQLErrors);
