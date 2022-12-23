@@ -15,7 +15,7 @@ const UnderTaskButton = ({item, rowMap, handleDeleteTask}) => {
 
       return (
         <View style={styles.deleteTaskContainer}>
-          <View style={{backgroundColor: 'green', height: '100%', minWidth: '55%', maxWidth:'55%'}}>
+          <View style={{backgroundColor: '#FAA946', height: '100%', minWidth: '55%', maxWidth:'55%'}}>
             <Icon
                 as={AntDesign}
                 name="checkcircle"

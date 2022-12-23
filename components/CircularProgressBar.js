@@ -1,5 +1,6 @@
 import React, { useRef, useEffect } from 'react';
 import { View, StyleSheet, Animated, Easing } from 'react-native';
+import { Svg } from 'react-native-svg';
 
 const CircularProgressBar = ({ progress }) => {
   const circleRadius = 50;
@@ -16,20 +17,36 @@ const CircularProgressBar = ({ progress }) => {
     }).start();
   }, [progress]);
 
-  const strokeDasharray = Animated.multiply(
-    Animated.divide(progressAnimation, 100),
-    circumference
+  const strokeDasharray = Animated.add(
+    Animated.multiply(Animated.divide(progressAnimation, 100), circumference),
+    0
   );
 
   const progressStyle = {
-    strokeDasharray: `${strokeDasharray} ${circumference}`,
+    strokeDasharray: strokeDasharray,
   };
 
   return (
     <View style={styles.container}>
-      <View style={[styles.circle, styles.border]}>
-        <View style={[styles.progress, progressStyle]} />
-      </View>
+      <Svg width={100} height={100}>
+        <Svg.Circle
+          cx={50}
+          cy={50}
+          r={circleRadius}
+          stroke="#ddd"
+          strokeWidth={10}
+          fill="none"
+        />
+        <Svg.Circle
+          cx={50}
+          cy={50}
+          r={circleRadius}
+          stroke="#3498db"
+          strokeWidth={10}
+          fill="none"
+          {...{ style: progressStyle }}
+        />
+      </Svg>
     </View>
   );
 };
@@ -38,27 +55,6 @@ const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  circle: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  border: {
-    borderWidth: 10,
-    borderColor: '#ddd',
-  },
-  progress: {
-    width: '100%',
-    height: '100%',
-    borderRadius: 50,
-    position: 'absolute',
-    left: 0,
-    top: 0,
-    transform: [{ rotate: '-90deg' }],
-    backgroundColor: '#3498db',
   },
 });
 
