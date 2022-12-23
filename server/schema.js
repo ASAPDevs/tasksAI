@@ -90,7 +90,7 @@ const resolvers = {
     getTasksByDay: async (_, args) => {
       // grab day from args and use to get tasks for the day
       const { date, user_id } = args; //"1670522400000"
-
+      console.log("Inside of getTasksByDay", args)
       // date: '2022-12-11'   1day = 86.4 mil ms
       // const dateToQuery = new Date(date.split('-').map(el => Number(el)));
       const startOfDay = new Date(date).getTime();

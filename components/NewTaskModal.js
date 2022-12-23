@@ -4,6 +4,7 @@ import {
   Button,
   Pressable,
   Input,
+  Select,
   Modal,
   FormControl,
   Icon,
@@ -11,7 +12,6 @@ import {
 import { StyleSheet, Animated, View } from "react-native";
 import { FontAwesome, Octicons } from "@expo/vector-icons";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
-import { min } from "react-native-reanimated";
 
 const NewTaskModal = ({ date, newTask, openNewTask, setTasks, addTaskHandler }) => {
   const [startTime, updateStartTime] = useState("");
@@ -213,6 +213,11 @@ const NewTaskModal = ({ date, newTask, openNewTask, setTasks, addTaskHandler }) 
               updateEndTime={updateEndTime}
               date={date}
             />
+          </View>
+          <View>
+            <Select>
+
+            </Select>
           </View>
           <CreateButton onPress={onPress} />
         </Modal.Body>

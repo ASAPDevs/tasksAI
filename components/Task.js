@@ -78,7 +78,7 @@ const Task = ({ prevDay, date, taskId, title, description, startTime, endTime, c
           <Heading style={styles.taskHeading}>{title}</Heading>
 
           {/* Push Task Button */}
-          <Pressable onPress={() => openPushTaskModal(true)} style={{ borderColor: "black", borderWidth: 2, position: 'absolute', right: 115 }}>
+          <Pressable onPress={() => openPushTaskModal(true)} style={{ borderColor: "black", borderWidth: 0, position: 'absolute', right: 115 }}>
             <Icon as={AntDesign} name="rightcircle" size={6} color="amber.500" style={{ position: 'relative' }} />
           </Pressable>
 

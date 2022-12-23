@@ -56,9 +56,10 @@ const Today = () => {
     return offsetTime(todayFirstMoment).getTime() > offsetTime(date).getTime();
   }
 
+
   const { data, error, loading, refetch } = useQuery(GET_TODAYS_TASKS, {
     notifyOnNetworkStatusChange: true,
-    fetchPolicy: 'network-only',
+    fetchPolicy: 'cache-first',
     onCompleted: (data) => {
       console.log('date', date)
       dispatch(loadTasks(data.getTasksByDay)); // update redux toolkit state
@@ -155,7 +156,7 @@ const Today = () => {
     <View style={styles.mainContainer}>
       <ImageBackground style={styles.topContainer} resizeMode="cover">
         <View alignItems="center" >
-          <Text style={styles.topContainerText}>{date.toDateString()}</Text>
+          <Text style={styles.topContainerText}>{date.toLocaleDateString()}</Text>
           <Pressable
             onPress={() => openCalendarModal(true)}
             style={styles.calendarRow}

@@ -169,7 +169,7 @@ const styles = StyleSheet.create({
     minHeight: "85%",
     height: "85%",
     maxHeight: "85%",
-    borderBottomWidth: 1,
+    borderBottomWidth: 0,
   },
   createTaskButtonContainer: {
     position: "absolute",

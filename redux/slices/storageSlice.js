@@ -30,6 +30,9 @@ export const storageSlice = createSlice({
       state = initialState
       return state;
     },
+    countCompleted: (state, action) => {
+      
+    },
     loadTasks: (state, action) => {
       state.tasks.all = action.payload.map((task) => ({...task, key: task.id}))
     },

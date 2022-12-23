@@ -1,16 +1,83 @@
 import { StyleSheet } from "react-native";
 import { View, Text, Heading, Center, Switch, Divider } from "native-base";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useLayoutEffect, useCallback } from "react";
 import { updateUsername } from "../redux/slices/storageSlice";
 import { useSelector } from "react-redux";
 import Emoji from "./helpers/Emoji";
 import CircularProgress from 'react-native-circular-progress-indicator';
+import { useQuery } from "@apollo/client";
+import { GET_TODAYS_TASKS } from "./helpers/queries";
+import { useDispatch } from "react-redux";
+import { loadTasks } from "../redux/slices/storageSlice";
 
+
+
+const progressMessages = {
+  0: "Let's create some tasks for today!",
+  0.5: "Let's get some tasks done!\n You got this!",
+  1: "One task a time.\n Nice progress!",
+  2: "Halfway there!\n Let's go!",
+  3: "Nearly done!\n You got this!",
+  4: "Awesome job!\n All tasks completed!"
+}
 
 const Dashboard = () => {
   const username = useSelector((state) => state.storage.username);
+  const userID = useSelector((state) => state.storage.user_id)
+  const totalTasksLength = useSelector((state) => state.storage.tasks.all.length);
+  const completedTasksLength = useSelector((state) => state.storage.tasks.all.filter((task) => task.completed).length)
+  const [completionProgress, updateProgress] = useState(0);
   const today = new Date();
+  const dispatch = useDispatch();
   const welcomeText = "Welcome Back, \n"
+  const [currentMessage, updateMessage] = useState(progressMessages[0])
+
+
+ 
+
+
+  //Preload today's tasks / This prefetches once.
+  const { data, error, loading, refetch } = useQuery(GET_TODAYS_TASKS, {
+    notifyOnNetworkStatusChange: true,
+    fetchPolicy: 'cache-first',
+    onCompleted: (data) => {
+      dispatch(loadTasks(data.getTasksByDay));// update redux toolkit state
+    },
+    onError: (error) => {
+      console.log("Error in loading tasks: ", error);
+    },
+    variables: { date: today.toISOString().split('T')[0], user_id: userID },
+  });
+
+
+  //this function used to update the message under the progress circle.
+  const progressMessageHandler = useCallback(() => {
+    if (completionProgress === 0 && !totalTasksLength) {
+      return updateMessage(progressMessages[0])
+    } else if (completionProgress === 0 && !totalTasksLength) {
+      return updateMessage(progressMessages[0.5])
+    } else if (completionProgress > 0 && completionProgress < 50) {
+      return updateMessage(progressMessages[1])
+    } else if (completionProgress >= 50 && completionProgress < 60) {
+      return updateMessage(progressMessages[2])
+    } else if (completionProgress >= 60 && completionProgress < 100) {
+      return updateMessage(progressMessages[3])
+    } else if (completionProgress === 100) {
+      return updateMessage(progressMessages[4])
+    }
+  }, [completionProgress, totalTasksLength])
+
+
+  useLayoutEffect(() => {
+    if (!isNaN(completedTasksLength/totalTasksLength)) {
+      updateProgress((completedTasksLength/totalTasksLength) * 100)
+    }
+  }, [totalTasksLength, completedTasksLength])
+
+  useLayoutEffect(() => {
+    progressMessageHandler()
+  }, [completionProgress])
+
 
   return (
     <View style={styles.mainContainer}>
@@ -29,21 +96,24 @@ const Dashboard = () => {
         <Divider orientation="horizontal" />
         <View style={styles.todayTaskContainer} >
           <View style={styles.taskCountContainer} alignItems="center" >
-            <View style={styles.innerTaskCountContainer}><Text fontFamily="FamiljenGrotesk" >Today's Tasks:</Text><Text fontFamily="FamiljenBold" fontSize={20} color="white">10</Text></View>
-            <View style={styles.innerTaskCountContainer}><Text fontFamily="FamiljenGrotesk" >Tasks Completed:</Text><Text fontFamily="FamiljenBold" fontSize={20} color="white">5</Text></View>
+            <View style={styles.innerTaskCountContainer}><Text fontFamily="FamiljenGrotesk" >Today's Tasks:</Text><Text fontFamily="FamiljenBold" fontSize={20} color="white">{totalTasksLength}</Text></View>
+            <View style={styles.innerTaskCountContainer}><Text fontFamily="FamiljenGrotesk" >Tasks Completed:</Text><Text fontFamily="FamiljenBold" fontSize={20} color="white">{completedTasksLength}</Text></View>
             </View>
           {/* <View style={styles.taskCountContainer} alignItems="center"></View> */}
         </View>
         <CircularProgress 
-        value={50}
+        value={isNaN(completionProgress) ? 0 : completionProgress}
         maxValue={100}
         radius={40}
         title={'%'}
         titleColor={'black'}
         activeStrokeColor={'#FAA946'}
         titleStyle={{fontWeight: 'bold'}} 
-        progressValueColor={'black'}/>
-        
+        progressValueColor={'black'}
+        />
+        <View style={styles.progressMessageContainer}> 
+          <Text color="white" textAlign="center" fontFamily="FamiljenBold" fontSize={15} lineHeight={18}  >{currentMessage}</Text>
+        </View>
       </View>
     </View>
   );
@@ -104,7 +174,8 @@ const styles = StyleSheet.create({
     elevation: 5,
     borderRadius: 10,
     width: "80%",
-    height: "40%",
+    minHeight: "45.5%",
+    maxHeight: "45.5%",
     backgroundColor: '#DBE6EC'
   },  
   todayContainer: {
@@ -161,6 +232,28 @@ const styles = StyleSheet.create({
     width: '50%',
     flexDirection: 'column',
     alignItems: 'center',
+  },
+  progressMessageContainer: {
+    width: '65%',
+    backgroundColor: "darkgrey",
+    borderColor: "rgba(250, 169, 70, .15)",
+    borderWidth: 1,
+    padding: 5,
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: 65,
+    marginTop: 10.5,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+    borderRadius: 10,
   }
 });
 
