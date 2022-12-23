@@ -80,15 +80,15 @@ const Today = () => {
   });
 
   // this function converts the date state to mm/dd/yy format
-  const convertDateTitle = () => {
-    const yy = date.getFullYear();
-    const mm =
-      date.getMonth() + 1 < 10
-        ? `0${date.getMonth() + 1}`
-        : date.getMonth() + 1;
-    const dd = date.getDate() < 10 ? `0${date.getDate()}` : date.getDate();
-    return `${mm}/${dd}/${yy % 100}`;
-  };
+  // const convertDateTitle = () => {
+  //   const yy = date.getFullYear();
+  //   const mm =
+  //     date.getMonth() + 1 < 10
+  //       ? `0${date.getMonth() + 1}`
+  //       : date.getMonth() + 1;
+  //   const dd = date.getDate() < 10 ? `0${date.getDate()}` : date.getDate();
+  //   return `${mm}/${dd}/${yy % 100}`;
+  // };
 
   const handleDeleteTask = (taskId) => {
     console.log("type of task id in handleDeleteTask: ", typeof taskId)
@@ -127,7 +127,7 @@ const Today = () => {
     <View style={styles.mainContainer}>
       <ImageBackground style={styles.topContainer} resizeMode="cover">
         <View>
-          <Text style={styles.topContainerText}>{convertDateTitle()}</Text>
+          <Text style={styles.topContainerText}>{today.toDateString()}</Text>
           <Pressable
             onPress={() => openCalendarModal(true)}
             style={styles.calendarRow}
