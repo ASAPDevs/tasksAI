@@ -48,6 +48,14 @@ const styles = StyleSheet.create({
     paddingTop: Constants.statusBarHeight,
     backgroundColor: '#ecf0f1',
     padding: 8,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.35,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
   progressBar: {
     height: 20,
@@ -57,6 +65,14 @@ const styles = StyleSheet.create({
     borderColor: 'darkgrey',
     borderWidth: 1,
     borderRadius: 3,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.35,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
 });
 
