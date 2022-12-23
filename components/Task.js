@@ -1,88 +1,107 @@
 import React, { useState } from "react";
 import {
-    View,
-    Text,
-    Heading,
-    Pressable,
-    Icon,
-   } from "native-base";
+  View,
+  Text,
+  Heading,
+  Pressable,
+  Icon,
+} from "native-base";
 import { StyleSheet, TouchableOpacity } from "react-native";
 import { UPDATE_TASK, PUSH_TASK } from "./helpers/mutations";
 import { useMutation } from "@apollo/client";
-import { Entypo, AntDesign } from '@expo/vector-icons'; 
+import { Entypo, AntDesign } from '@expo/vector-icons';
 import { useDispatch } from "react-redux";
 import { pushTask, updateTask } from "../redux/slices/storageSlice";
 const LazyLoadModal = React.lazy(() => import('./TaskModal'))
 const LazyLoadPushModal = React.lazy(() => import('./PushComponent'))
 
 const Task = ({ prevDay, date, taskId, title, description, startTime, endTime, completed }) => {
-    const [openTask, toggleOpenTask] = useState(false);
-    const [pushTaskModal, openPushTaskModal] = useState(false);
-    const dispatch = useDispatch()
-    
-    const [updateTaskMutation] = useMutation(UPDATE_TASK, {
-      onCompleted: (data) => {
-        dispatch(updateTask(data.updateTask))
-      },
-      onError: (err) => {
-        console.log("Error Updating Task: ", err)
-      }
-    });
+  const [openTask, toggleOpenTask] = useState(false);
+  const [pushTaskModal, openPushTaskModal] = useState(false);
+  const dispatch = useDispatch()
 
-    
-    const [pushTaskMutation] = useMutation(PUSH_TASK, {
-      onCompleted: (data) => {
-        dispatch(pushTask(data.pushTask))
-      },
-      onError: (err) => {
-        console.log("Error Pushing Task: ", err)
-      }
-    });
-
-    const pushTaskHandler = (selectedValue) => {
-      let timeToAdd = selectedValue * 3600000
-      let newStartTime = Number(startTime) + timeToAdd
-      let newEndTime = Number(endTime) + timeToAdd
-      
-      pushTaskMutation({variables: {id: Number(taskId), newStartTime: newStartTime.toString(), newEndTime: newEndTime.toString()}})
-
-      openPushTaskModal(false)
+  const [updateTaskMutation] = useMutation(UPDATE_TASK, {
+    onCompleted: (data) => {
+      dispatch(updateTask(data.updateTask))
+    },
+    onError: (err) => {
+      console.log("Error Updating Task: ", err)
     }
+  });
 
 
-    return (
-      <Pressable 
-        onPress={() => toggleOpenTask(true)}
-      >
-        <View style={styles.taskContainer} key={title}>
-          <View style={styles.taskContainerInnerWrapper}>
-            <Heading style={styles.taskHeading}>{title}</Heading>
+  const [pushTaskMutation] = useMutation(PUSH_TASK, {
+    onCompleted: (data) => {
+      dispatch(pushTask(data.pushTask))
+    },
+    onError: (err) => {
+      console.log("Error Pushing Task: ", err)
+    }
+  });
 
-            {/* Push Task Button */}
-            <Pressable onPress={() => openPushTaskModal(true)} style={{borderColor: "black", borderWidth: 2, position: 'absolute', right: 115}}>
-              <Icon as={AntDesign} name="rightcircle" size={6} color="amber.500" style={{position: 'relative'}} />
-            </Pressable>
+  const getTimeOfDay = (startTime) => {
+    let time_of_day;
+    const timeOfDayHour = new Date(Number(startTime)).getHours();
+    if (timeOfDayHour < 7) {
+      // dawn
+      time_of_day = 1;
+    } else if (timeOfDayHour >= 7 && timeOfDayHour < 12) {
+      // morning
+      time_of_day = 2;
+    } else if (timeOfDayHour >= 12 && timeOfDayHour <= 18) {
+      // afternoon
+      time_of_day = 3;
+    } else {
+      // evening
+      time_of_day = 4;
+    }
+    return time_of_day;
+  }
 
-            {pushTaskModal && <LazyLoadPushModal pushTaskHandler={pushTaskHandler} pushTaskModal={pushTaskModal} openPushTaskModal={openPushTaskModal} />}
+  const pushTaskHandler = (selectedValue) => {
+    let timeToAdd = selectedValue * 3600000
+    let newStartTime = Number(startTime) + timeToAdd
+    let newEndTime = Number(endTime) + timeToAdd
 
-            <View style={styles.taskContainerTimeContainer}>
-              <Text style={{...styles.timeContainerText, ...styles.timeText}}>{new Date(Number(startTime)).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</Text>
-              <Text style={styles.timeContainerText}>to</Text>
-              <Text style={{...styles.timeContainerText, ...styles.timeText}}>{new Date(Number(endTime)).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</Text>
-            </View>
-            
-            {/* Right Icon At The End Of The Component */}
-            <View style={styles.swipeRightIcon}>
-              <Icon as={Entypo} name="chevron-small-right" size={5} />
-            </View>
+    pushTaskMutation({ variables: { id: Number(taskId), newStartTime: newStartTime.toString(), newEndTime: newEndTime.toString(), newTimeOfDay: getTimeOfDay(newStartTime.toString()) } })
+
+    openPushTaskModal(false)
+  }
+
+
+  return (
+    <Pressable
+      onPress={() => toggleOpenTask(true)}
+    >
+      <View style={styles.taskContainer} key={title}>
+        <View style={styles.taskContainerInnerWrapper}>
+          <Heading style={styles.taskHeading}>{title}</Heading>
+
+          {/* Push Task Button */}
+          <Pressable onPress={() => openPushTaskModal(true)} style={{ borderColor: "black", borderWidth: 2, position: 'absolute', right: 115 }}>
+            <Icon as={AntDesign} name="rightcircle" size={6} color="amber.500" style={{ position: 'relative' }} />
+          </Pressable>
+
+          {pushTaskModal && <LazyLoadPushModal pushTaskHandler={pushTaskHandler} pushTaskModal={pushTaskModal} openPushTaskModal={openPushTaskModal} />}
+
+          <View style={styles.taskContainerTimeContainer}>
+            <Text style={{ ...styles.timeContainerText, ...styles.timeText }}>{new Date(Number(startTime)).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</Text>
+            <Text style={styles.timeContainerText}>to</Text>
+            <Text style={{ ...styles.timeContainerText, ...styles.timeText }}>{new Date(Number(endTime)).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</Text>
           </View>
-          {openTask && 
-          <LazyLoadModal prevDay={prevDay} date={date} updateTaskMutation={updateTaskMutation} openTask={openTask} toggleOpenTask={toggleOpenTask} taskTitle={title} taskDescription={description} taskStartTime={startTime} taskEndTime={endTime} taskId={taskId} completed={completed} />
-         }
+
+          {/* Right Icon At The End Of The Component */}
+          <View style={styles.swipeRightIcon}>
+            <Icon as={Entypo} name="chevron-small-right" size={5} />
+          </View>
         </View>
-      </Pressable>
-    );
-  };
+        {openTask &&
+          <LazyLoadModal prevDay={prevDay} date={date} updateTaskMutation={updateTaskMutation} openTask={openTask} toggleOpenTask={toggleOpenTask} taskTitle={title} taskDescription={description} taskStartTime={startTime} taskEndTime={endTime} taskId={taskId} completed={completed} />
+        }
+      </View>
+    </Pressable>
+  );
+};
 
 const styles = StyleSheet.create({
   taskContainer: {

@@ -14,29 +14,48 @@ import { StartTimeInput, EndTimeInput } from './NewTaskModal';
 
 
 const TaskModal = ({ prevDay, date, updateTaskMutation, openTask, toggleOpenTask, taskTitle, taskDescription, taskStartTime, taskEndTime, taskId, completed }) => {
-    const [editMode, toggleEditMode] = useState(false);
-    const [editTime, toggleEditTime] = useState(false);
-    const [startTime, updateStartTime] = useState(taskStartTime);
-    const [endTime, updateEndTime] = useState(taskEndTime);
-    const [title, updateTaskTitle] = useState(taskTitle);
-    const [description, updateTaskDescription] = useState(taskDescription);
-  
+  const [editMode, toggleEditMode] = useState(false);
+  const [editTime, toggleEditTime] = useState(false);
+  const [startTime, updateStartTime] = useState(taskStartTime);
+  const [endTime, updateEndTime] = useState(taskEndTime);
+  const [title, updateTaskTitle] = useState(taskTitle);
+  const [description, updateTaskDescription] = useState(taskDescription);
 
-    const updateTaskHandler = () => {
-      const updatedTask = {
-        id: Number(taskId),
-        task_name: title,
-        task_description: description,
-        date: date.getTime().toString(),
-        time_start: startTime.toString(),
-        time_finished: endTime.toString(),
-        completed: completed,
-      };
-      
-      updateTaskMutation({variables: {task: updatedTask}});
-      toggleOpenTask(false);
-      toggleEditMode(false);
+  const getTimeOfDay = (startTime) => {
+    let time_of_day;
+    const timeOfDayHour = new Date(Number(startTime)).getHours();
+    if (timeOfDayHour < 7) {
+      // dawn
+      time_of_day = 1;
+    } else if (timeOfDayHour >= 7 && timeOfDayHour < 12) {
+      // morning
+      time_of_day = 2;
+    } else if (timeOfDayHour >= 12 && timeOfDayHour <= 18) {
+      // afternoon
+      time_of_day = 3;
+    } else {
+      // evening
+      time_of_day = 4;
+    }
+    return time_of_day
+  }
+
+  const updateTaskHandler = () => {
+    const updatedTask = {
+      id: Number(taskId),
+      task_name: title,
+      task_description: description,
+      date: date.getTime().toString(),
+      time_start: startTime.toString(),
+      time_finished: endTime.toString(),
+      time_of_day: getTimeOfDay(startTime.toString()),
+      completed: completed,
     };
+
+    updateTaskMutation({ variables: { task: updatedTask } });
+    toggleOpenTask(false);
+    toggleEditMode(false);
+  };
 
   return (
     <Modal isOpen={openTask} onClose={() => toggleOpenTask(false)}>

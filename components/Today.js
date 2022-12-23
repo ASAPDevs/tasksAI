@@ -16,6 +16,20 @@ import CreateTaskCircle from "./CreateTaskCircle";
 const Today = () => {
   const today = new Date();
   const timezoneOffset = today.getTimezoneOffset();
+  // this function offsets the passed in date with any time zone difference
+  const offsetTime = (dateObj) => {
+    const newDate = new Date(dateObj.getTime() - (timezoneOffset * 60000));
+    return newDate;
+  }
+
+  const setTodayFirstMoment = () => {
+    console.log('today', today)
+    const todayWithTimeZoneOffset = offsetTime(today);
+    console.log('today with offset', todayWithTimeZoneOffset)
+    const todayFirstMoment = new Date(todayWithTimeZoneOffset.getFullYear(), todayWithTimeZoneOffset.getMonth(), todayWithTimeZoneOffset.getDate());
+    return todayFirstMoment;
+  }
+
   // Figure out where we pull date or refetch date
   const [date, setDate] = useState(today);
   // Need alg to read and determine (completed tasks) / (total tasks)
@@ -36,12 +50,6 @@ const Today = () => {
 
   const dispatch = useDispatch();
 
-  // this function offsets the passed in date with any time zone difference
-  const offsetTime = (dateObj) => {
-    const newDate = new Date(dateObj.getTime() - (timezoneOffset * 60000));
-    return newDate;
-  }
-
   const compareDateWithToday = () => {
     const todayTime = offsetTime(today);
     const todayFirstMoment = new Date(todayTime.getFullYear(), todayTime.getMonth(), todayTime.getDate());
@@ -50,14 +58,15 @@ const Today = () => {
 
   const { data, error, loading, refetch } = useQuery(GET_TODAYS_TASKS, {
     notifyOnNetworkStatusChange: true,
-    fetchPolicy: 'cache-first',
+    fetchPolicy: 'network-only',
     onCompleted: (data) => {
+      console.log('date', date)
       dispatch(loadTasks(data.getTasksByDay)); // update redux toolkit state
     },
     onError: (error) => {
       console.log("Error in loading tasks: ", error);
     },
-    variables: { date: offsetTime(date).toISOString().split("T")[0], user_id: userID },
+    variables: { date: date.toISOString().split('T')[0], user_id: userID },
   });
 
   const [createTaskMutation] = useMutation(CREATE_TASKS, {
@@ -97,6 +106,24 @@ const Today = () => {
     });
   };
 
+  const getTimeOfDay = (startTime) => {
+    let time_of_day;
+    const timeOfDayHour = new Date(Number(startTime)).getHours();
+    if (timeOfDayHour < 7) {
+      // dawn
+      time_of_day = 1;
+    } else if (timeOfDayHour >= 7 && timeOfDayHour < 12) {
+      // morning
+      time_of_day = 2;
+    } else if (timeOfDayHour >= 12 && timeOfDayHour <= 18) {
+      // afternoon
+      time_of_day = 3;
+    } else {
+      // evening
+      time_of_day = 4;
+    }
+    return time_of_day
+  }
 
   //this handler creates a new task using the current state inputs and sends it to the useMutation function
   //then closes the modal
@@ -107,6 +134,7 @@ const Today = () => {
       time_start: startTime.toString(),
       date: date.getTime().toString(),
       time_finished: endTime.toString(),
+      time_of_day: getTimeOfDay(startTime.toString()),
       completed: false,
       user_id: Number(userID),
     };
@@ -127,7 +155,7 @@ const Today = () => {
     <View style={styles.mainContainer}>
       <ImageBackground style={styles.topContainer} resizeMode="cover">
         <View alignItems="center" >
-          <Text style={styles.topContainerText}>{today.toDateString()}</Text>
+          <Text style={styles.topContainerText}>{date.toDateString()}</Text>
           <Pressable
             onPress={() => openCalendarModal(true)}
             style={styles.calendarRow}
