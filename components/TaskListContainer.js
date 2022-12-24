@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback, useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { View, Text, Divider, Heading } from "native-base";
 import { StyleSheet, ActivityIndicator } from "react-native";
 import Task from "./Task";
@@ -49,10 +49,6 @@ const TaskListContainer = ({
       console.log("Error Completing Task: ", err);
     },
   });
-
-  // useEffect(() => {
-  //   changePrevDay(today.getTime() > date.getTime());
-  // }, [date])
 
   return (
     <View style={styles.bottomContainer}>
@@ -134,7 +130,6 @@ const TaskListContainer = ({
             console.log("rowData:", rowData);
             console.log("rowKey:", Object.keys(rowKey)[0]);
             completeTaskMutation({ variables: { taskId: rowData } });
-            // console.log(rowKey);
           }}
 
         // onSwipeValueChange={() => console.log("SwipeLEFT")}
@@ -170,26 +165,6 @@ const styles = StyleSheet.create({
     height: "85%",
     maxHeight: "85%",
     borderBottomWidth: 0,
-  },
-  createTaskButtonContainer: {
-    position: "absolute",
-    width: 150,
-    height: 150,
-  },
-  createTaskButton: {
-    borderColor: "black",
-    borderWidth: 0,
-    borderRadius: "50%",
-    borderWidth: 2,
-    borderColor: "black",
-    paddingTop: 5,
-    backgroundColor: "orange",
-    position: "relative",
-    height: "100%",
-    display: "flex",
-    flexDirection: "column",
-    alignContent: "center",
-    justifyContent: "center",
   },
 })
 export default TaskListContainer;

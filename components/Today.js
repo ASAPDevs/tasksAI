@@ -12,6 +12,7 @@ import Calendar from "./Calendar";
 import ProgressBar from "./ProgressBar";
 import NewTaskModal from "./NewTaskModal";
 import CreateTaskCircle from "./CreateTaskCircle";
+import { getTimeOfDay } from "./helpers/dateHelperFunc";
 
 const Today = () => {
   const today = new Date();
@@ -36,7 +37,6 @@ const Today = () => {
   const [progress, setProgress] = useState(0);
   const [newTask, openNewTask] = useState(false);
   const [calendarModal, openCalendarModal] = useState(false);
-  // const [tasks, setTasks] = useState(useSelector((state) => state.storage.tasks.daily));
 
   // prevDay will determine if the user is looking at pass days,
   // if true, nothing should be editable
@@ -44,7 +44,6 @@ const Today = () => {
 
   //maps to redux storage Slice.
   const tasks = useSelector((state) => state.storage.tasks.all);
-  // console.log('tasks length in Today', tasks.length)
   const completedTasks = useSelector((state) => state.storage.tasks.completed);
   const userID = useSelector((state) => state.storage.user_id);
 
@@ -61,7 +60,6 @@ const Today = () => {
     notifyOnNetworkStatusChange: true,
     fetchPolicy: 'cache-first',
     onCompleted: (data) => {
-      console.log('date', date)
       dispatch(loadTasks(data.getTasksByDay)); // update redux toolkit state
     },
     onError: (error) => {
@@ -107,25 +105,6 @@ const Today = () => {
     });
   };
 
-  const getTimeOfDay = (startTime) => {
-    let time_of_day;
-    const timeOfDayHour = new Date(Number(startTime)).getHours();
-    if (timeOfDayHour < 7) {
-      // dawn
-      time_of_day = 1;
-    } else if (timeOfDayHour >= 7 && timeOfDayHour < 12) {
-      // morning
-      time_of_day = 2;
-    } else if (timeOfDayHour >= 12 && timeOfDayHour <= 18) {
-      // afternoon
-      time_of_day = 3;
-    } else {
-      // evening
-      time_of_day = 4;
-    }
-    return time_of_day
-  }
-
   //this handler creates a new task using the current state inputs and sends it to the useMutation function
   //then closes the modal
   const addTaskHandler = (taskTitle, taskDescription, startTime, endTime) => {
@@ -139,7 +118,6 @@ const Today = () => {
       completed: false,
       user_id: Number(userID),
     };
-    console.log("New Task: ", newTask)
     createTaskMutation({ variables: { task: newTask } });
     openNewTask(false);
   };

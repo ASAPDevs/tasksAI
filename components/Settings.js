@@ -1,14 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { SafeAreaView, StyleSheet, View, Text } from "react-native";
-import Account from "./settings/AccountSettings";
 import * as SecureStore from "expo-secure-store";
 import { logoutUser } from "../redux/slices/storageSlice";
 import { useDispatch } from "react-redux";
-import {navigate} from './Navigation'
-import { resolveObjMapThunk } from "graphql";
-
-
-
 
 const LazyLoadAccountSettings = React.lazy(() =>
   import("./settings/AccountSettings")
@@ -17,7 +11,6 @@ const LazyLoadAccountSettings = React.lazy(() =>
 const Settings = ({navigation}) => {
   const [currentView, updateCurrentView] = useState("main");
   const dispatch = useDispatch();
-  // const navigation = useNavigation();
 
   const logoutHandler = async () => {
     await SecureStore.deleteItemAsync("username");
@@ -28,13 +21,7 @@ const Settings = ({navigation}) => {
     } catch (err){
       console.log(err)
     }
-    // dispatch(logoutUser()).then(() => {
-    //   navigation.navigate("LandingPage");
-    // });
   };
-
-
-
 
   const conditionalRender = () => {
     switch (currentView) {
@@ -60,11 +47,6 @@ const Settings = ({navigation}) => {
         return (
           <LazyLoadAccountSettings updateCurrentView={updateCurrentView} />
         );
-      //   case "gateway":
-      //     return (
-      //       <LazyLoadGateway />
-      //     )
-      // }
     }
   };
 

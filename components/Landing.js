@@ -1,4 +1,4 @@
-import { useEffect, useState, useLayoutEffect } from "react";
+import { useState } from "react";
 import { Heading } from "native-base";
 import {
   StyleSheet,
@@ -11,15 +11,13 @@ import {
 } from "react-native";
 import logo from "../assets/AI-TODO.png";
 import { useMutation } from "@apollo/client";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { loginUser } from "../redux/slices/storageSlice";
 import { SIGNUP_MUTATION, LOGIN_MUTATION } from "./helpers/mutations";
-import { useSelector } from "react-redux";
-import Navigation from "./Navigation";
 import * as SecureStore from "expo-secure-store";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
-const LandingPage = ({ updateCurrentView, navigation }) => {
+const LandingPage = ({ navigation }) => {
   const [currentView, setCurrentView] = useState("landing");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -28,7 +26,6 @@ const LandingPage = ({ updateCurrentView, navigation }) => {
   const [focus, setFocus] = useState("");
   const [wrongLogin, toggleWrongLogin] = useState(false);
   const [wrongSignup, toggleWrongSignup] = useState(false);
-  const loggedInStatus = useSelector((state) => state.storage.loggedIn);
 
   const dispatch = useDispatch();
 
@@ -44,7 +41,6 @@ const LandingPage = ({ updateCurrentView, navigation }) => {
       navigation.navigate("Root", { screen: "Dashboard" })
       setUsername('')
       setPassword('')
-      // updateCurrentView('dashboard')
     },
     onError: (err) => {
       console.log("Error in login mutation: ", err);
@@ -71,7 +67,6 @@ const LandingPage = ({ updateCurrentView, navigation }) => {
 
   const loginHandler = async () => {
     try {
-      // await SecureStore.setItemAsync(key, val);
       const result = await login({
         variables: { username: username, password: password },
       });
@@ -79,7 +74,6 @@ const LandingPage = ({ updateCurrentView, navigation }) => {
       if (result.data) {
         await SecureStore.setItemAsync("username", result.data.login.username);
         await SecureStore.setItemAsync("userid", result.data.login.id);
-        // navigation.navigate('Root', { screen: 'Dashboard' })
       }
     } catch (err) {
       console.log("The error" + err);

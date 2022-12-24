@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
 import {
-  Text,
   Button,
   Pressable,
   Input,
@@ -12,8 +11,10 @@ import {
 import { StyleSheet, Animated, View } from "react-native";
 import { FontAwesome, Octicons } from "@expo/vector-icons";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
+import { convertDate, displayTime } from "./helpers/dateHelperFunc";
 
-const NewTaskModal = ({ date, newTask, openNewTask, setTasks, addTaskHandler }) => {
+
+const NewTaskModal = ({ date, newTask, openNewTask, addTaskHandler }) => {
   const [startTime, updateStartTime] = useState("");
   const [endTime, updateEndTime] = useState("");
   const [taskTitle, updateTaskTitle] = useState("");
@@ -39,9 +40,7 @@ const NewTaskModal = ({ date, newTask, openNewTask, setTasks, addTaskHandler }) 
       const endOfDay = startOfDay + 86400000 - 60000;
       const start = (typeof startTime === 'number') ? startTime : startOfDay;
       let end = (typeof endTime === 'number') ? endTime : endOfDay;
-      // if (start > end) {
-      //   end = start;
-      // }
+
       addTaskHandler(taskTitle, taskDescription, start, end);
       clearInputs();
     }
@@ -226,51 +225,7 @@ const NewTaskModal = ({ date, newTask, openNewTask, setTasks, addTaskHandler }) 
   );
 };
 
-// this function takes a user selected date and time,
-// then it returns the correct time in miliseconds
-const convertDate = (selectedDate, selectedTime) => {
-  const tempDate = new Date(selectedDate);
-  const year = tempDate.getFullYear();
-  const month = tempDate.getMonth();
-  const day = tempDate.getDate();
-  const hourAndMinutes = selectedTime.slice(0, selectedTime.indexOf(' ')).split(':');
-  const minutes = Number(hourAndMinutes[1]);
-  let hour = Number(hourAndMinutes[0]);
 
-  if (selectedTime.includes('PM')) {
-    if (hour === 12) {
-      hour = 12;
-    } else {
-      hour += 12;
-    }
-    const convertedTime = new Date(year, month, day, hour, minutes).getTime();
-    return convertedTime;
-  } else {
-    if (hour === 12) {
-      hour = 0;
-    }
-    const convertedTime = new Date(year, month, day, hour, minutes).getTime();
-    return convertedTime;
-  }
-}
-
-const displayTime = (milisec) => {
-  const time = new Date(Number(milisec));
-  let hours = time.getHours();
-  let minutes = time.getMinutes();
-  if (minutes < 10) {
-    minutes = `0${minutes}`;
-  }
-  if (hours === 12) {
-    return `${12}:${minutes} PM`;
-  } else if (hours === 0) {
-    return `${12}:${minutes} AM`;
-  } else if (hours > 12) {
-    return `${hours % 12}:${minutes} PM`;
-  } else {
-    return `${hours}:${minutes} AM`;
-  }
-}
 
 export const StartTimeInput = ({ startTime, endTime, updateStartTime, updateEndTime, date }) => {
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);

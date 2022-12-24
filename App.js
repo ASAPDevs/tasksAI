@@ -1,17 +1,13 @@
 import React, { useState, useEffect } from "react";
-import Menu from "./components/Menu";
 import { Provider } from "react-redux";
 import * as Font from "expo-font";
-import LandingPage from "./components/Landing";
 import store from "./redux/store";
 import {
   ApolloClient,
   InMemoryCache,
   ApolloProvider,
-  gql,
 } from "@apollo/client";
 import { NativeBaseProvider } from "native-base";
-import Gateway from "./components/Gateway";
 import Navigation from "./components/Navigation";
 
 
@@ -50,8 +46,6 @@ export default function App() {
       <ApolloProvider client={client}>
         <NativeBaseProvider>
           <Provider store={store}>
-            {/* <LandingPage /> */}
-            {/* <Gateway /> */}
             <Navigation />
           </Provider>
         </NativeBaseProvider>

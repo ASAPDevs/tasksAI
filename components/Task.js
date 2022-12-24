@@ -6,12 +6,14 @@ import {
   Pressable,
   Icon,
 } from "native-base";
-import { StyleSheet, TouchableOpacity } from "react-native";
+import { StyleSheet } from "react-native";
 import { UPDATE_TASK, PUSH_TASK } from "./helpers/mutations";
 import { useMutation } from "@apollo/client";
 import { Entypo, AntDesign } from '@expo/vector-icons';
 import { useDispatch } from "react-redux";
 import { pushTask, updateTask } from "../redux/slices/storageSlice";
+import { getTimeOfDay } from "./helpers/dateHelperFunc";
+
 const LazyLoadModal = React.lazy(() => import('./TaskModal'))
 const LazyLoadPushModal = React.lazy(() => import('./PushComponent'))
 
@@ -38,25 +40,6 @@ const Task = ({ prevDay, date, taskId, title, description, startTime, endTime, c
       console.log("Error Pushing Task: ", err)
     }
   });
-
-  const getTimeOfDay = (startTime) => {
-    let time_of_day;
-    const timeOfDayHour = new Date(Number(startTime)).getHours();
-    if (timeOfDayHour < 7) {
-      // dawn
-      time_of_day = 1;
-    } else if (timeOfDayHour >= 7 && timeOfDayHour < 12) {
-      // morning
-      time_of_day = 2;
-    } else if (timeOfDayHour >= 12 && timeOfDayHour <= 18) {
-      // afternoon
-      time_of_day = 3;
-    } else {
-      // evening
-      time_of_day = 4;
-    }
-    return time_of_day;
-  }
 
   const pushTaskHandler = (selectedValue) => {
     let timeToAdd = selectedValue * 3600000
@@ -169,17 +152,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontFamily: "FamiljenGrotesk",
     textDecorationLine: "underline"
-  },
-  deleteTaskContainer: {
-    display: "flex",
-    flexDirection: "row",
-    alignItems: "center",
-    alignSelf: 'center',
-    justifyContent: "center",
-    height: 90,
-    width: '95%',
-    zIndex: 9,
-    // backgroundColor: 'red',
   },
   swipeRightIcon: {
     position: "absolute",

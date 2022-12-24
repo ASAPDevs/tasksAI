@@ -1,12 +1,12 @@
-import React, { useRef, useEffect, useState } from "react";
-import { Dimensions, StyleSheet, View, Animated } from "react-native";
+import React, { useEffect, useState } from "react";
+import { StyleSheet, View, Animated } from "react-native";
 import Constants from 'expo-constants';
 
 
 const ProgressBar = ({ progress }) => {
   const [animatedValue, setAnimatedValue] = useState(new Animated.Value(1))
 
-  
+
 
   //function to animate, increment the progress on the progress bar.
   const load = (progress) => {
