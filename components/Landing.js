@@ -1,77 +1,248 @@
 import { useState } from "react";
 import { Heading } from "native-base";
-import { StyleSheet, Text, View, TextInput, SafeAreaView, Image, TouchableOpacity } from "react-native";
-import logo from '../assets/todo-ai-logo.png'
+import {
+  StyleSheet,
+  Text,
+  View,
+  TextInput,
+  SafeAreaView,
+  Image,
+  TouchableOpacity,
+} from "react-native";
+import logo from "../assets/AI-TODO.png";
+import { useMutation } from "@apollo/client";
+import { useDispatch, useSelector } from "react-redux";
+import { loginUser } from "../redux/slices/storageSlice";
+import { SIGNUP_MUTATION, LOGIN_MUTATION } from "./helpers/mutations";
+import * as SecureStore from "expo-secure-store";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
-export default function LandingPage() {
+const LandingPage = ({ navigation }) => {
   const [currentView, setCurrentView] = useState("landing");
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [email, setEmail] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-
-  // Change input style when the input is focus
   const [focus, setFocus] = useState("");
+  const [wrongLogin, toggleWrongLogin] = useState(false);
+  const [wrongSignup, toggleWrongSignup] = useState(false);
+
+  const dispatch = useDispatch();
+
+  // data received from useMutation
+  const [login] = useMutation(LOGIN_MUTATION, {
+    onCompleted: (data) => {
+      dispatch(
+        loginUser({
+          username: data.login.username,
+          user_id: Number(data.login.id),
+        })
+      );
+      navigation.navigate("Root", { screen: "Dashboard" })
+      setUsername('')
+      setPassword('')
+    },
+    onError: (err) => {
+      console.log("Error in login mutation: ", err);
+      toggleWrongLogin(true);
+    },
+  });
+
+  const [signup] = useMutation(SIGNUP_MUTATION, {
+    onCompleted: (data) => {
+      dispatch(
+        loginUser({
+          username: data.signup.username,
+          user_id: Number(data.signup.id),
+        })
+      );
+      navigation.navigate("Root", { screen: "Dashboard" })
+    },
+    onError: (err) => {
+      console.log("Error in signup mutation: ", err);
+      toggleWrongSignup(true);
+    },
+  });
+
+
+  const loginHandler = async () => {
+    try {
+      const result = await login({
+        variables: { username: username, password: password },
+      });
+
+      if (result.data) {
+        await SecureStore.setItemAsync("username", result.data.login.username);
+        await SecureStore.setItemAsync("userid", result.data.login.id);
+      }
+    } catch (err) {
+      console.log("The error" + err);
+    }
+  };
+
+  const signupHandler = async () => {
+    try {
+      const result = await signup({
+        variables: { email: email, password: password, username: username },
+      });
+      if (result.data) {
+        await SecureStore.setItemAsync("username", result.data.signup.username);
+        await SecureStore.setItemAsync("userid", result.data.signup.id);
+      }
+    } catch (err) {
+      console.log("Signup error" + err);
+    }
+  };
+
 
   return (
-    <SafeAreaView style={styles.mainContainer}>
-      <View style={styles.innerContainer}>
-        <View>
-          <View style={styles.heading}>
-            <Heading size="xl" >Welcome to Todo-AI</Heading>
-            <Image style={styles.logo} source={logo} />
+    <KeyboardAwareScrollView
+      style={{ backgroundColor: '#ffffff' }}
+      resetScrollToCoords={{ x: 0, y: 0 }}
+      scrollEnabled={false}
+    >
+      <SafeAreaView style={styles.mainContainer}>
+        <View style={styles.innerContainer}>
+          <View>
+            <View style={styles.heading}>
+              <Heading size="xl"></Heading>
+              <Image style={styles.logo} source={logo} />
+            </View>
+            {currentView === "register" && (
+              <TextInput
+                autoFocus={currentView === "register" ? true : false}
+                autoCapitalize="none"
+                style={styles.input}
+                value={email}
+                placeholder="Email Address"
+                onChangeText={setEmail}
+                onFocus={() => setFocus("email")}
+              />
+            )}
+            <TextInput
+              autoFocus={currentView === "login" ? true : false}
+              autoCapitalize="none"
+              style={focus === "username" ? styles.inputFocus : styles.input}
+              value={username}
+              placeholder="Username"
+              onChangeText={setUsername}
+              onFocus={() => setFocus("username")}
+            />
+            <TextInput
+              autoCapitalize="none"
+              style={focus === "password" ? styles.inputFocus : styles.input}
+              secureTextEntry={true}
+              value={password}
+              placeholder="Password"
+              onChangeText={setPassword}
+              onFocus={() => setFocus("password")}
+            />
+
+            {/* Signup View */}
+            {currentView === "register" && (
+              <>
+                <TextInput
+                  autoCapitalize="none"
+                  style={
+                    focus === "confirm-password"
+                      ? styles.inputFocus
+                      : styles.input
+                  }
+                  value={confirmPassword}
+                  secureTextEntry={true}
+                  placeholder="Confirm password"
+                  onChangeText={setConfirmPassword}
+                  onFocus={() => setFocus("confirm-password")}
+                />
+                {focus == "confirm-password" &&
+                  confirmPassword.length > 0 &&
+                  password !== confirmPassword ? (
+                  <Text style={{ color: "red", marginLeft: 7.5 }}>
+                    Passwords don't match!
+                  </Text>
+                ) : null}
+              </>
+            )}
+
+            {/* Conditionally renders button according to signup/login state */}
+            {currentView == "landing" && (
+              <TouchableOpacity
+                disabled={!username || !password ? true : false}
+                onPress={loginHandler}
+                style={{
+                  ...styles.signInButton,
+                  backgroundColor: `${!username || !password ? "grey" : "#FAA946"
+                    }`,
+                }}
+              >
+                <Text style={styles.buttonText}>Sign In</Text>
+              </TouchableOpacity>
+            )}
+
+            {currentView == "register" && (
+              <TouchableOpacity
+                disabled={
+                  !username || !password || !email || !confirmPassword
+                    ? true
+                    : false
+                }
+                onPress={signupHandler}
+                style={{
+                  ...styles.signInButton,
+                  backgroundColor: `${!username || !password || !email || !confirmPassword
+                    ? "grey"
+                    : "#FAA946"
+                    }`,
+                }}
+              >
+                <Text style={styles.buttonText}>Sign Up</Text>
+              </TouchableOpacity>
+            )}
+
+            {wrongLogin ? (
+              <Text style={{ color: "red", textAlign: "center" }}>
+                Invalid Login Credentials.
+              </Text>
+            ) : null}
+            {wrongSignup ? (
+              <Text style={{ color: "red", textAlign: "center" }}>
+                Invalid Signup. Check All Inputs.
+              </Text>
+            ) : null}
           </View>
 
-          <TextInput
-            autoFocus={true}
-            style={focus === "email" ? styles.inputFocus : styles.input}
-            value={email}
-            placeholder="Email"
-            onChangeText={setEmail}
-            onFocus={() => setFocus("email")}
-          />
-          <TextInput
-            style={focus === "password" ? styles.inputFocus : styles.input}
-            value={password}
-            placeholder="Password"
-            onChangeText={setPassword}
-            onFocus={() => setFocus("password")}
-          />
-
-          {currentView === "register" && (
-            <TextInput
-            style={focus === "confirm-password" ? styles.inputFocus : styles.input}
-            value={confirmPassword}
-            placeholder="Confirm password"
-            onChangeText={setConfirmPassword}
-            onFocus={() => setFocus("confirm-password")}
-          />
-          )}
-
-          {/* Sign in button will appears when user types in both email and password */}
-          {(email !== '' && password !== '') && 
-            <TouchableOpacity style={styles.signInButton}>
-              <Text style={styles.buttonText}>
-                {currentView === "landing" ? "Sign in" : "Sign up"}
+          <View style={styles.footer}>
+            {currentView === "landing" ? (
+              <Text
+                style={styles.footerText}
+                onPress={() => {
+                  setCurrentView("register");
+                  setUsername("");
+                  setPassword("");
+                  setFocus("email");
+                  toggleWrongLogin(false);
+                }}
+              >
+                Don't have an account? Sign up!
               </Text>
-            </TouchableOpacity>
-          }
+            ) : (
+              <Text
+                style={styles.footerText}
+                onPress={() => {
+                  setCurrentView("landing");
+                  setUsername("");
+                  setPassword("");
+                }}
+              >
+                Already have account? Sign in!
+              </Text>
+            )}
+          </View>
         </View>
-
-        <View style={styles.footer}>
-          {currentView === "landing" ? (
-            <Text style={styles.footerText} onPress={() => setCurrentView("register")}>
-              Don't have an account? Sign up!
-            </Text>
-          ) : (
-            <Text style={styles.footerText} onPress={() => setCurrentView("landing")}>
-              Already have account? Sign in!
-            </Text>
-          )}
-        </View>
-      </View>
-    </SafeAreaView>
+      </SafeAreaView>
+    </KeyboardAwareScrollView>
   );
-}
+};
 
 const styles = StyleSheet.create({
   mainContainer: {
@@ -79,29 +250,29 @@ const styles = StyleSheet.create({
     height: "100%",
   },
   innerContainer: {
-    display: 'flex',
+    display: "flex",
     flex: 1,
     justifyContent: "space-between",
     width: "100%",
     height: "100%",
     paddingTop: 80,
     paddingLeft: 10,
-    paddingRight: 10
+    paddingRight: 10,
   },
   heading: {
     alignItems: "center",
-    marginBottom: 20
+    marginBottom: 20,
   },
   logo: {
     marginTop: 20,
-    height: 150
+    height: 150,
   },
   input: {
     height: 40,
     margin: 8,
     borderWidth: 1,
     borderRadius: 7,
-    padding: 10
+    padding: 10,
   },
   inputFocus: {
     height: 40,
@@ -109,7 +280,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 7,
     padding: 10,
-    borderColor: "#007bff"
+    borderColor: "#007bff",
   },
   signInButton: {
     justifyContent: "center",
@@ -118,19 +289,21 @@ const styles = StyleSheet.create({
     margin: 8,
     borderWidth: 1,
     borderRadius: 7,
-    backgroundColor: '#007bff',
+    marginTop: 15,
   },
   buttonText: {
     color: "#fff",
     fontWeight: "bold",
-    fontSize: 17
+    fontSize: 17,
   },
   footer: {
     alignItems: "center",
-    marginBottom: 5
+    marginBottom: 5,
   },
   footerText: {
     fontSize: 17,
-    color: "#007bff"
-  }
+    color: "#007bff",
+  },
 });
+
+export default LandingPage;

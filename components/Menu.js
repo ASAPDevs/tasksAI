@@ -2,34 +2,28 @@ import {
   StyleSheet,
   View,
   TouchableOpacity,
-  FlatList,
-  Dimensions,
 } from "react-native";
 import { useState, useEffect } from "react";
 import { Slide, Text, Button, Icon, Pressable } from "native-base";
 import { MaterialCommunityIcons, Ionicons } from "@expo/vector-icons";
-import * as Font from "expo-font";
+import { useDispatch } from "react-redux";
+import { logoutUser } from "../redux/slices/storageSlice";
 
-export default function Menu({ currentView, updateCurrentView }) {
+const Menu = ({ currentView, updateCurrentView }) => {
   const [menu, openMenu] = useState(false);
-  const [fontsLoaded, updateFonts] = useState(false);
 
-  //FOR IMPORTING FONTS ASYNC
-  async function loadFonts() {
-    await Font.loadAsync({
-      Sofia: require("../assets/fonts/sofiapro-light.ttf"),
-    });
-    updateFonts(true);
-  }
+  const dispatch = useDispatch();
 
-  //Loads Font On FIRST/Initial Mount
-  useEffect(() => {
-    loadFonts();
-  }, []);
+
   //Whenever currentView updates, we will close the menu with this useEffect
   useEffect(() => {
     openMenu(false);
   }, [currentView]);
+
+  const handleLogout = () => {
+    dispatch(logoutUser())
+    updateCurrentView('landing')
+  }
 
   const MenuComponent = () => {
     return (
@@ -72,6 +66,14 @@ export default function Menu({ currentView, updateCurrentView }) {
           >
             <Text style={styles.menuItemButtonText}>Settings</Text>
           </Button>
+          <Button
+            justifyContent={"flex-start"}
+            variant="ghost"
+            onPress={handleLogout}
+            colorScheme="white"
+          >
+            <Text style={styles.menuItemButtonText}>Log out</Text>
+          </Button>
         </View>
         <View
           onPress={() => openMenu(false)}
@@ -90,23 +92,19 @@ export default function Menu({ currentView, updateCurrentView }) {
     );
   };
 
-  if (fontsLoaded) {
-    return (
-      <View style={styles.container}>
-        <TouchableOpacity
-          style={styles.menuButton}
-          onPress={() => openMenu(!menu)}
-        >
-          <Icon as={Ionicons} size={8} name="ios-menu" color="black" />
-        </TouchableOpacity>
-        <Slide duration={150} in={menu} out={menu} placement="left">
-          <MenuComponent />
-        </Slide>
-      </View>
-    );
-  } else {
-    return null;
-  }
+  return (
+    <View style={styles.container}>
+      <TouchableOpacity
+        style={styles.menuButton}
+        onPress={() => openMenu(!menu)}
+      >
+        <Icon as={Ionicons} size={8} name="ios-menu" color="black" />
+      </TouchableOpacity>
+      <Slide duration={150} in={menu} out={menu} placement="left">
+        <MenuComponent />
+      </Slide>
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
@@ -180,3 +178,5 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
 });
+
+export default Menu;

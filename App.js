@@ -1,60 +1,55 @@
-import { StatusBar } from "expo-status-bar";
-import { StyleSheet, Text, View } from "react-native";
-import React, { useState, useEffect, Suspense } from "react";
-import Menu from "./components/Menu";
+import React, { useState, useEffect } from "react";
 import { Provider } from "react-redux";
+import * as Font from "expo-font";
 import store from "./redux/store";
-import { NativeBaseProvider, Box } from "native-base";
-const LazyLoadLanding = React.lazy(() => import("./components/Landing"));
-const LazyLoadDashboard = React.lazy(() => import("./components/Dashboard"));
-const LazyLoadCalendar = React.lazy(() => import("./components/Calendar"));
-const LazyLoadToday = React.lazy(() => import("./components/Today"));
-const LazyLoadSettings = React.lazy(() => import("./components/Settings"));
+import {
+  ApolloClient,
+  InMemoryCache,
+  ApolloProvider,
+} from "@apollo/client";
+import { NativeBaseProvider } from "native-base";
+import Navigation from "./components/Navigation";
+
+
+
+//use localhost:3000 for dev / if u want to see logs
+const client = new ApolloClient({
+  uri: "https://ai-todo-server-production.up.railway.app/graphql",
+  // uri: "http://localhost:3000/graphql",
+  cache: new InMemoryCache(),
+  onError: ({ networkError, graphQLErrors }) => {
+    console.log("graphQLErrors", graphQLErrors);
+    console.log("networkError", networkError);
+  },
+  // credentials: 'same-origin',
+});
 
 export default function App() {
-  const [currentView, updateCurrentView] = useState("dashboard");
+  const [fontsLoaded, updateFontsLoaded] = useState(false);
 
-  //Lazy load the view
-  function conditionalRender() {
-    if (currentView === "landing") return <LazyLoadLanding />;
-    else if (currentView === "dashboard") return <LazyLoadDashboard />;
-    else if (currentView === "calendar") return <LazyLoadCalendar />;
-    else if (currentView === "today") return <LazyLoadToday />;
-    else if (currentView === "settings") return <LazyLoadSettings />;
+  async function loadFonts() {
+    await Font.loadAsync({
+      Sofia: require("./assets/fonts/sofiapro-light.ttf"),
+      FamiljenGrotesk: require("./assets/fonts/FamiljenGrotesk-Regular.ttf"),
+      FamiljenBold: require("./assets/fonts/FamiljenGrotesk-SemiBold.ttf"),
+    });
+    updateFontsLoaded(true);
   }
 
-  return (
-    <NativeBaseProvider>
-      <Provider store={store}>
-        <View style={styles.container}>
-          {/* Only show hamburger menu when user successfully logs in */}
-          {currentView !== "landing" && (
-            <Menu
-              currentView={currentView}
-              updateCurrentView={updateCurrentView}
-            />
-          )}
-          <Suspense
-            fallback={
-              <View>
-                <Text>Loading..</Text>
-              </View>
-            }
-          >
-            {conditionalRender()}
-          </Suspense>
-        </View>
-      </Provider>
-    </NativeBaseProvider>
-  );
-}
+  //load fonts
+  useEffect(() => {
+    loadFonts();
+  }, []);
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
-    flexDirection: "column",
-  },
-});
+  if (fontsLoaded) {
+    return (
+      <ApolloProvider client={client}>
+        <NativeBaseProvider>
+          <Provider store={store}>
+            <Navigation />
+          </Provider>
+        </NativeBaseProvider>
+      </ApolloProvider>
+    );
+  } else return null;
+}

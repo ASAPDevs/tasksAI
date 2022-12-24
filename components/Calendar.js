@@ -1,10 +1,12 @@
-import { Text, View } from 'native-base';
-import { StyleSheet, TouchableOpacity } from 'react-native';
+import { View } from 'native-base';
+import { StyleSheet } from 'react-native';
+import { Modal } from "native-base";
 import React, { useState } from 'react';
 import Month from './Month';
 
-function Calendar() {
-  const today = new Date();
+function Calendar({ calendarModal, openCalendarModal, setDate, date }) {
+  const today = date;
+  const [activeDay, setActiveDay] = useState(`${today.getFullYear()}-${today.getMonth()}-${today.getDate()}`);
   const [monthToShow, setMonthToShow] = useState([today.getFullYear(), today.getMonth()]);
 
   const changeMonth = (change) => {
@@ -14,32 +16,53 @@ function Calendar() {
       setMonthToShow(lastMonth);
     } else if (change === 'next') {
       const nextMonth = monthToShow.slice();
-      nextMonth[1] += 1;
+      nextMonth[1] += 1;  
       setMonthToShow(nextMonth);
     }
   }
 
+  const changeDay = () => {
+    const arr = activeDay.split('-');
+    const activeYearMonthDate = arr.map(str => parseInt(str));
+    const activeDate = new Date(activeYearMonthDate[0], activeYearMonthDate[1], activeYearMonthDate[2]);
+    setDate(activeDate);
+  }
+
   return (
     <>
-      <View style={[styles.container]}>
-        <Month changeMonth={changeMonth} date={`${monthToShow.join('-')}-${today.getDate()}`} />
-      </View>
+      <Modal top={5} isOpen={calendarModal} onClose={() => {
+        openCalendarModal(false)
+        changeDay();
+      }}>
+        <View style={styles.container}>
+          <Month
+            changeMonth={changeMonth}
+            date={`${monthToShow.join('-')}-${today.getDate()}`}
+            setDate={setDate}
+            activeDay={activeDay}
+            setActiveDay={setActiveDay}
+          />
+        </View>
+      </Modal>
     </>
   )
 }
 
 const styles = StyleSheet.create({
   container: {
-    zIndex: -1,
-    flex: 1,
-    borderWidth: 4,
-    backgroundColor: "#fff",
-    position: 'absolute',
-    width: '100%',
-    height: '100%',
-    flexDirection: 'column',
-    alignItems: "center",
-    justifyContent: "flex-start"
+    backgroundColor: "#F0F0F0",
+    borderColor: "#ADB7B8",
+    borderWidth: 1,
+    padding: 10,
+    borderRadius: '5%',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   }
 });
 
