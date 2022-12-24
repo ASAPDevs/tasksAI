@@ -107,7 +107,7 @@ const Today = () => {
 
   //this handler creates a new task using the current state inputs and sends it to the useMutation function
   //then closes the modal
-  const addTaskHandler = (taskTitle, taskDescription, startTime, endTime) => {
+  const addTaskHandler = (taskTitle, taskDescription, startTime, endTime, category) => {
     const newTask = {
       task_name: taskTitle,
       task_description: taskDescription,
@@ -116,6 +116,7 @@ const Today = () => {
       time_finished: endTime.toString(),
       time_of_day: getTimeOfDay(startTime.toString()),
       completed: false,
+      category: category,
       user_id: Number(userID),
     };
     createTaskMutation({ variables: { task: newTask } });

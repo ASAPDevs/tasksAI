@@ -44,6 +44,7 @@ const Dashboard = () => {
     variables: { date: today.toISOString().split('T')[0], user_id: userID },
   });
 
+
    //this function used to update the message under the progress circle.
    const progressMessageHandler = useCallback(() => {
     if (completionProgress === 0 && !totalTasksLength) {

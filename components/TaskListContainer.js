@@ -102,6 +102,7 @@ const TaskListContainer = ({
               <Task
                 prevDay={prevDay}
                 date={date}
+                category={item.category}
                 description={item.task_description}
                 title={item.task_name}
                 startTime={item.time_start}

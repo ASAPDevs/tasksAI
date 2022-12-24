@@ -3,6 +3,7 @@ import {
   Button,
   Pressable,
   Input,
+  Text,
   Select,
   Modal,
   FormControl,
@@ -19,6 +20,7 @@ const NewTaskModal = ({ date, newTask, openNewTask, addTaskHandler }) => {
   const [endTime, updateEndTime] = useState("");
   const [taskTitle, updateTaskTitle] = useState("");
   const [taskDescription, updateTaskDescription] = useState("");
+  const [taskCategory, updateTaskCategory] = useState(1);
   const [invalidSubmission, toggleInvalidSubmission] = useState(false);
 
   //useCallback is more efficient here, since we can cache this function in between re-renders. 
@@ -28,6 +30,7 @@ const NewTaskModal = ({ date, newTask, openNewTask, addTaskHandler }) => {
     updateTaskDescription("");
     updateStartTime("");
     updateEndTime("")
+    updateTaskCategory(1);
   }, [])
 
   //handles main functionality of onPress
@@ -40,8 +43,7 @@ const NewTaskModal = ({ date, newTask, openNewTask, addTaskHandler }) => {
       const endOfDay = startOfDay + 86400000 - 60000;
       const start = (typeof startTime === 'number') ? startTime : startOfDay;
       let end = (typeof endTime === 'number') ? endTime : endOfDay;
-
-      addTaskHandler(taskTitle, taskDescription, start, end);
+      addTaskHandler(taskTitle, taskDescription, start, end, taskCategory);
       clearInputs();
     }
   }
@@ -115,7 +117,7 @@ const NewTaskModal = ({ date, newTask, openNewTask, addTaskHandler }) => {
 
   return (
     <Modal
-      top={-65}
+      top={-75}
       isOpen={newTask}
       onClose={() => openNewTask(false)}
       size="xl"
@@ -139,7 +141,7 @@ const NewTaskModal = ({ date, newTask, openNewTask, addTaskHandler }) => {
 
       <Modal.Content
         width="375"
-        height="400"
+        height="420"
         display="flex"
         flexDirection="column"
         alignItems="center"
@@ -213,9 +215,17 @@ const NewTaskModal = ({ date, newTask, openNewTask, addTaskHandler }) => {
               date={date}
             />
           </View>
-          <View>
-            <Select>
-
+          {/* Category Section */}
+          
+          <View alignItems="center">
+            <Text fontFamily="FamiljenGrotesk" >Category</Text>
+            <Select width="80%" defaultValue={1} onValueChange={(itemValue) => updateTaskCategory(itemValue)} >
+                <Select.Item label="Chore/Errand" value={1} />
+                <Select.Item label="Academic" value={2} />
+                <Select.Item label="Work" value={3} />
+                <Select.Item label="Social" value={4} />
+                <Select.Item label="Spiritual" value={5} />
+                <Select.Item label="Other" value={6} />
             </Select>
           </View>
           <CreateButton onPress={onPress} />

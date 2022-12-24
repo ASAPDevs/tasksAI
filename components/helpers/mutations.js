@@ -51,6 +51,7 @@ export const CREATE_TASKS = gql`
       time_finished
       completed
       user_id
+      category
     }
   }
 `;
@@ -66,6 +67,7 @@ export const UPDATE_TASK = gql`
       time_finished
       completed
       user_id
+      category
     }
   }
 `;

@@ -14,7 +14,7 @@ import { StartTimeInput, EndTimeInput } from './NewTaskModal';
 import { getTimeOfDay } from "./helpers/dateHelperFunc";
 
 
-const TaskModal = ({ prevDay, date, updateTaskMutation, openTask, toggleOpenTask, taskTitle, taskDescription, taskStartTime, taskEndTime, taskId, completed }) => {
+const TaskModal = ({ prevDay, date, updateTaskMutation, openTask, toggleOpenTask, taskTitle, taskDescription, taskStartTime, taskEndTime, taskId, completed, taskCategory }) => {
   const [editMode, toggleEditMode] = useState(false);
   const [editTime, toggleEditTime] = useState(false);
   const [startTime, updateStartTime] = useState(taskStartTime);

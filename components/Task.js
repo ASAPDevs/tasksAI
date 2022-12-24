@@ -17,7 +17,26 @@ import { getTimeOfDay } from "./helpers/dateHelperFunc";
 const LazyLoadModal = React.lazy(() => import('./TaskModal'))
 const LazyLoadPushModal = React.lazy(() => import('./PushComponent'))
 
-const Task = ({ prevDay, date, taskId, title, description, startTime, endTime, completed }) => {
+
+const taskCategories = {
+  1: 'Errand',
+  2: 'Academic',
+  3: 'Work',
+  4: 'Social',
+  5: 'Spiritual',
+  6: 'Other'
+}
+
+const taskCategoryColors = {
+  1: '#FF9900',
+  2: '#0B486B',
+  3: '#FE4365',
+  4: '#630947',
+  5: '#A8DBA8',
+  6: 'black'
+}
+
+const Task = ({ prevDay, date, taskId, title, description, startTime, endTime, completed, category }) => {
   const [openTask, toggleOpenTask] = useState(false);
   const [pushTaskModal, openPushTaskModal] = useState(false);
   const dispatch = useDispatch()
@@ -58,8 +77,21 @@ const Task = ({ prevDay, date, taskId, title, description, startTime, endTime, c
     >
       <View style={styles.taskContainer} key={title}>
         <View style={styles.taskContainerInnerWrapper}>
-          <Heading style={styles.taskHeading}>{title}</Heading>
-
+          <View display="flex" flexDirection="column" width="55%">
+            <Heading style={styles.taskHeading}>{title}</Heading>
+            <View 
+            borderColor={taskCategoryColors[category]}
+            borderWidth={1}
+            style={styles.categoryContainer}
+            >
+              <Text
+              fontFamily="FamiljenGrotesk"
+              color={taskCategoryColors[category]}
+              >
+                {taskCategories[category]}
+              </Text>
+            </View>
+          </View>
           {/* Push Task Button */}
           <Pressable onPress={() => openPushTaskModal(true)} style={{ borderColor: "black", borderWidth: 0, position: 'absolute', right: 115 }}>
             <Icon as={AntDesign} name="rightcircle" size={6} color="amber.500" style={{ position: 'relative' }} />
@@ -119,6 +151,16 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     padding: 5,
   },
+  categoryContainer: {
+    maxWidth: '55%',
+    maxHeight: 30,
+    width: '35%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 0,
+    display: 'flex',
+    marginTop: 2
+  },
   taskContainerTimeContainer: {
     display: "flex",
     flexDirection: "column",
@@ -151,7 +193,7 @@ const styles = StyleSheet.create({
   taskHeading: {
     fontSize: 18,
     fontFamily: "FamiljenGrotesk",
-    textDecorationLine: "underline"
+    // textDecorationLine: "underline"
   },
   swipeRightIcon: {
     position: "absolute",
