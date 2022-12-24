@@ -3,6 +3,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 const initialState = {
   username: '',
   user_id: null,
+  email: '',
   loggedIn: false,
   avatar: '',
   tasks: {
@@ -24,6 +25,7 @@ export const storageSlice = createSlice({
     loginUser: (state, action) => {
       state.username = action.payload.username;
       state.user_id = action.payload.user_id;
+      state.email = action.payload.email;
       state.loggedIn = true;
     },
     logoutUser: (state, action) => {

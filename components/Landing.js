@@ -35,10 +35,12 @@ const LandingPage = ({ updateCurrentView, navigation }) => {
   // data received from useMutation
   const [login] = useMutation(LOGIN_MUTATION, {
     onCompleted: (data) => {
+      console.log("DATA: ", data)
       dispatch(
         loginUser({
           username: data.login.username,
           user_id: Number(data.login.id),
+          email: data.login.email,
         })
       );
       navigation.navigate("Root", { screen: "Dashboard" })
@@ -79,6 +81,7 @@ const LandingPage = ({ updateCurrentView, navigation }) => {
       if (result.data) {
         await SecureStore.setItemAsync("username", result.data.login.username);
         await SecureStore.setItemAsync("userid", result.data.login.id);
+        await SecureStore.setItemAsync("email", result.data.login.email);
         // navigation.navigate('Root', { screen: 'Dashboard' })
       }
     } catch (err) {

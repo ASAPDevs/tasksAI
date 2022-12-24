@@ -1,11 +1,16 @@
 import React, {useState} from'react';
 import { View, Text, Pressable, Icon} from 'native-base';
 import { StyleSheet } from 'react-native';
+import { useSelector } from 'react-redux';
 import { Ionicons } from '@expo/vector-icons';
 const LazyLoadChangePassword = React.lazy(() => import('./ChangePasswordForm'));
 
 export default function Account({updateCurrentView}) {
   const [currentAccountView, updateCurrentAccountView] = useState('main')
+  const username = useSelector((state) => state.storage.username)
+  const email = useSelector((state) => state.storage.email)
+
+console.log("EMAIL: ", email)
 
   const conditionalRender = () => {
     switch (currentAccountView) {
@@ -24,6 +29,24 @@ export default function Account({updateCurrentView}) {
             <Text style={styles.text}>
               Change Email Address
             </Text>
+            <View flexDirection="row" justifyContent="start" width={135}>
+              <Text style={styles.text}>
+                Username:
+              </Text>
+              <Text style={styles.text} color="amber.500">
+                {username}
+              </Text>
+            </View>
+            <View flexDirection="row" justifyContent="start" width={295}>
+              <Text style={styles.text} >
+                Email:
+              </Text>
+              <View >
+                <Text style={styles.text} color="amber.500">
+                  {email}
+                </Text>
+              </View>
+            </View>
         </View>
         );
       case 'change-password':

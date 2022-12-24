@@ -74,12 +74,15 @@ function Navigation() {
   const sessionHandler = async () => {
     let username = await SecureStore.getItemAsync("username");
     let user_id = await SecureStore.getItemAsync("userid");
+    let email = await SecureStore.getItemAsync("email");
     console.log("loggedin state:", username, user_id);
     if (username && user_id) {
+      console.log("email navig: ", email)
       dispatch(
         loginUser({
           username: username,
           user_id: Number(user_id),
+          email: email
         })
       );
       updateLoading(false)

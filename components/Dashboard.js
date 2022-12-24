@@ -15,10 +15,10 @@ import { loadTasks } from "../redux/slices/storageSlice";
 const progressMessages = {
   0: "Let's create some tasks for today!",
   0.5: "Let's get some tasks done!\n You got this!",
-  1: "One task a time.\n Nice progress!",
-  2: "Halfway there!\n Let's go!",
-  3: "Nearly done!\n You got this!",
-  4: "Awesome job!\n All tasks completed!"
+  1: "Always a good start.\n Nice progress!",
+  2: "Halfway there!\nLet's go!",
+  3: "Nearly done!\nYou got this!",
+  4: "Awesome job!\nAll tasks completed!"
 }
 
 const Dashboard = () => {
@@ -54,7 +54,7 @@ const Dashboard = () => {
   const progressMessageHandler = useCallback(() => {
     if (completionProgress === 0 && !totalTasksLength) {
       return updateMessage(progressMessages[0])
-    } else if (completionProgress === 0 && !totalTasksLength) {
+    } else if (completionProgress === 0 && totalTasksLength) {
       return updateMessage(progressMessages[0.5])
     } else if (completionProgress > 0 && completionProgress < 50) {
       return updateMessage(progressMessages[1])
@@ -112,7 +112,7 @@ const Dashboard = () => {
         progressValueColor={'black'}
         />
         <View style={styles.progressMessageContainer}> 
-          <Text color="white" textAlign="center" fontFamily="FamiljenBold" fontSize={15} lineHeight={18}  >{currentMessage}</Text>
+          <Text color="#FDF1CB" textAlign="center"  fontFamily="FamiljenBold" fontSize={15} lineHeight={18}  >{currentMessage}</Text>
         </View>
       </View>
     </View>
