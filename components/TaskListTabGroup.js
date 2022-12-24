@@ -1,9 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Icon, IconButton, Button } from "native-base";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 const TaskListTabGroup = ({ currentTab, switchTab }) => {
-  // useEffect(() => {}, [currentTab]);
 
   return (
     <Button.Group

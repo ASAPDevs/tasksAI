@@ -1,9 +1,7 @@
 import { StyleSheet } from "react-native";
-import { View, Text, Heading, Center, Switch, Divider } from "native-base";
-import { useEffect, useState, useLayoutEffect, useCallback } from "react";
-import { updateUsername } from "../redux/slices/storageSlice";
+import { View, Text, Heading, Divider } from "native-base";
+import { useState, useLayoutEffect, useCallback } from "react";
 import { useSelector } from "react-redux";
-import Emoji from "./helpers/Emoji";
 import CircularProgress from 'react-native-circular-progress-indicator';
 import { useQuery } from "@apollo/client";
 import { GET_TODAYS_TASKS } from "./helpers/queries";
@@ -33,11 +31,8 @@ const Dashboard = () => {
   const [currentMessage, updateMessage] = useState(progressMessages[0])
 
 
- 
-
-
   //Preload today's tasks / This prefetches once.
-  const { data, error, loading, refetch } = useQuery(GET_TODAYS_TASKS, {
+  const { data, error, loading } = useQuery(GET_TODAYS_TASKS, {
     notifyOnNetworkStatusChange: true,
     fetchPolicy: 'cache-first',
     onCompleted: (data) => {
@@ -49,9 +44,8 @@ const Dashboard = () => {
     variables: { date: today.toISOString().split('T')[0], user_id: userID },
   });
 
-
-  //this function used to update the message under the progress circle.
-  const progressMessageHandler = useCallback(() => {
+   //this function used to update the message under the progress circle.
+   const progressMessageHandler = useCallback(() => {
     if (completionProgress === 0 && !totalTasksLength) {
       return updateMessage(progressMessages[0])
     } else if (completionProgress === 0 && totalTasksLength) {

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   View,
   Text,
@@ -11,6 +11,7 @@ import {
 import { StyleSheet, TextInput } from "react-native";
 import { Entypo, Feather } from '@expo/vector-icons';
 import { StartTimeInput, EndTimeInput } from './NewTaskModal';
+import { getTimeOfDay } from "./helpers/dateHelperFunc";
 
 
 const TaskModal = ({ prevDay, date, updateTaskMutation, openTask, toggleOpenTask, taskTitle, taskDescription, taskStartTime, taskEndTime, taskId, completed }) => {
@@ -20,25 +21,6 @@ const TaskModal = ({ prevDay, date, updateTaskMutation, openTask, toggleOpenTask
   const [endTime, updateEndTime] = useState(taskEndTime);
   const [title, updateTaskTitle] = useState(taskTitle);
   const [description, updateTaskDescription] = useState(taskDescription);
-
-  const getTimeOfDay = (startTime) => {
-    let time_of_day;
-    const timeOfDayHour = new Date(Number(startTime)).getHours();
-    if (timeOfDayHour < 7) {
-      // dawn
-      time_of_day = 1;
-    } else if (timeOfDayHour >= 7 && timeOfDayHour < 12) {
-      // morning
-      time_of_day = 2;
-    } else if (timeOfDayHour >= 12 && timeOfDayHour <= 18) {
-      // afternoon
-      time_of_day = 3;
-    } else {
-      // evening
-      time_of_day = 4;
-    }
-    return time_of_day
-  }
 
   const updateTaskHandler = () => {
     const updatedTask = {
@@ -95,11 +77,6 @@ const TaskModal = ({ prevDay, date, updateTaskMutation, openTask, toggleOpenTask
               <Modal.CloseButton />
               <Modal.Content style={styles.editTimeModal}>
                 <Heading>Update Time</Heading>
-
-                {/* <StartTimeInput startTime={Number(startTime)} updateStartTime={updateStartTime} /> */}
-
-                {/* <EndTimeInput endTime={Number(endTime)} updateEndTime={updateEndTime} /> */}
-
                 <StartTimeInput
                   startTime={startTime}
                   endTime={endTime}

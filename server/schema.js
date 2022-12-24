@@ -82,7 +82,6 @@ const resolvers = {
       const user = await db.query("SELECT * FROM users WHERE id = $1;", [
         user_id,
       ]);
-      console.log("Associated User: " + user.rows[0]);
       return user.rows[0];
     },
   },
@@ -90,9 +89,7 @@ const resolvers = {
     getTasksByDay: async (_, args) => {
       // grab day from args and use to get tasks for the day
       const { date, user_id } = args; //"1670522400000"
-      console.log("Inside of getTasksByDay", args)
       // date: '2022-12-11'   1day = 86.4 mil ms
-      // const dateToQuery = new Date(date.split('-').map(el => Number(el)));
       const startOfDay = new Date(date).getTime();
       const endOfDay = startOfDay + 86400000;
       const params = [startOfDay - 1, endOfDay, user_id];
@@ -100,7 +97,6 @@ const resolvers = {
         "SELECT * FROM tasks WHERE date > $1 AND date < $2 AND user_id = ($3) ORDER BY time_start ASC;",
         params
       );
-      console.log("Checking Task in getTaskByday: " + task.rows);
       return task.rows;
     },
   },
@@ -128,11 +124,6 @@ const resolvers = {
       } else {
         throw new GraphQLError("Password is incorrect");
       }
-
-      // if (user.password !== password) {
-      //   throw new GraphQLError('Password is incorrect');
-      // }
-      // return user;
     },
     signup: async (_, args) => {
       // create user with email username and pass from args
@@ -175,7 +166,6 @@ const resolvers = {
     },
     changePassword: async (_, args) => {
       const { username, oldPassword, newPassword } = args.userInput;
-      console.log(username, oldPassword, newPassword);
       // Check if there is a same username exists in database. Throw error if not
       const dbResult = await db.query(
         "SELECT * FROM users WHERE username = $1",
@@ -294,7 +284,6 @@ const resolvers = {
     },
     deleteTask: async (_, args) => {
       const { id } = args;
-      console.log("Deleted Args: ", args)
       const results = await db.query(
         "DELETE FROM tasks WHERE id = $1 RETURNING *;",
         [id]
@@ -304,7 +293,6 @@ const resolvers = {
     },
     completeTask: async (_, args) => {
       const { id, completed_on_time } = args;
-      console.log("Completed Args: ", args)
       const completedTask = await db.query(
         "UPDATE tasks SET completed = true, completed_on_time = $1 WHERE id = $2 RETURNING *;",
         [completed_on_time ?? 0, id]
@@ -313,7 +301,6 @@ const resolvers = {
     },
     pushTask: async (_, args) => {
       const { id, newStartTime, newEndTime } = args;
-      console.log("Push Task Backend Args: ", args)
       const newTimeOfDayHour = new Date(newStartTime).getHours();
       let newTimeOfDay;
       if (newTimeOfDayHour < 7) {
