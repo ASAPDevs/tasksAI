@@ -4,6 +4,7 @@ import { StyleSheet } from 'react-native';
 import { useSelector } from 'react-redux';
 import { Ionicons } from '@expo/vector-icons';
 const LazyLoadChangePassword = React.lazy(() => import('./ChangePasswordForm'));
+const LazyLoadChangeEmail = React.lazy(() => import('./ChangeEmailForm'));
 
 export default function Account({updateCurrentView}) {
   const [currentAccountView, updateCurrentAccountView] = useState('main')
@@ -26,7 +27,10 @@ console.log("EMAIL: ", email)
             >
               Change Password
             </Text>
-            <Text style={styles.text}>
+            <Text 
+              style={styles.text}
+              onPress={() => updateCurrentAccountView('change-email')}
+              >
               Change Email Address
             </Text>
             <View flexDirection="row" justifyContent="start" width={135}>
@@ -52,6 +56,10 @@ console.log("EMAIL: ", email)
       case 'change-password':
         return (
           <LazyLoadChangePassword updateCurrentAccountView={updateCurrentAccountView} />
+        )
+      case 'change-email':
+        return (
+          <LazyLoadChangeEmail updateCurrentAccountView={updateCurrentAccountView} />
         )
     }
   }

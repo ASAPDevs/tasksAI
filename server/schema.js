@@ -12,6 +12,7 @@ const typeDefs = gql`
     login(username: String!, password: String!): User!
     signup(email: String!, username: String!, password: String!): User!
     changePassword(userInput: ChangePasswordInput!): User!
+    changeEmail(userInput: ChangeEmailInput!): User!
     createTask(task: TaskInput): Task!
     updateTask(task: UpdateTaskInput): Task
     deleteTask(id: ID!): Task
@@ -19,6 +20,11 @@ const typeDefs = gql`
     pushTask(id: ID!, newStartTime: String!, newEndTime: String!): Task
   }
 
+
+  input ChangeEmailInput {
+    username: String!
+    email: String!
+  }
 
   input ChangePasswordInput {
     username: String!
@@ -164,6 +170,24 @@ const resolvers = {
 
       return newUser.rows[0];
     },
+    changeEmail: async(_, args) => {
+      const { username, email} = args.userInput;
+      // Check if there is a same username exists in database. Throw error if not
+      const dbResult = await db.query(
+        "SELECT * FROM users WHERE username = $1",
+        [username]
+      );
+      const existingUser = dbResult.rows[0];
+      if (!existingUser) {
+        throw new GraphQLError("User does not exist");
+      }
+      //update the email
+      const updatedUser = await db.query(
+        "UPDATE users SET email = $1 WHERE username = $2 RETURNING id, username, email;",
+        [email, username]
+      );
+      return updatedUser.rows[0];
+    },
     changePassword: async (_, args) => {
       const { username, oldPassword, newPassword } = args.userInput;
       // Check if there is a same username exists in database. Throw error if not
@@ -175,7 +199,6 @@ const resolvers = {
       if (!existingUser) {
         throw new GraphQLError("User does not exist");
       }
-
       // Verify old password against hashed password in database
       if (await bcrypt.compare(oldPassword, existingUser.password)) {
         const salt = await bcrypt.genSalt(10);

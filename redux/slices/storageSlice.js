@@ -28,6 +28,9 @@ export const storageSlice = createSlice({
       state.email = action.payload.email;
       state.loggedIn = true;
     },
+    updateEmail: (state, action) => {
+      state.email = action.payload.email;
+    },
     logoutUser: (state, action) => {
       state = initialState
       return state;
@@ -86,5 +89,5 @@ export const storageSlice = createSlice({
 })
 
 
-export const { loginUser, logoutUser, loadTasks, addTask, deleteTask, completeTask, updateTask, pushTask } = storageSlice.actions;
+export const { loginUser, logoutUser, loadTasks, addTask, deleteTask, completeTask, updateTask, pushTask, updateEmail } = storageSlice.actions;
 export default storageSlice.reducer;
