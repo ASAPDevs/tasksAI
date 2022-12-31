@@ -23,14 +23,6 @@ const Today = () => {
     return newDate;
   }
 
-  const setTodayFirstMoment = () => {
-    console.log('today', today)
-    const todayWithTimeZoneOffset = offsetTime(today);
-    console.log('today with offset', todayWithTimeZoneOffset)
-    const todayFirstMoment = new Date(todayWithTimeZoneOffset.getFullYear(), todayWithTimeZoneOffset.getMonth(), todayWithTimeZoneOffset.getDate());
-    return todayFirstMoment;
-  }
-
   // Figure out where we pull date or refetch date
   const [date, setDate] = useState(today);
   // Need alg to read and determine (completed tasks) / (total tasks)

@@ -20,16 +20,23 @@ const progressMessages = {
 }
 
 const Dashboard = () => {
+  // this function offsets the passed in date with any time zone difference
+  const offsetTime = (dateObj) => {
+    const newDate = new Date(dateObj.getTime() - (timezoneOffset * 60000));
+    return newDate;
+  }
+
   const username = useSelector((state) => state.storage.username);
   const userID = useSelector((state) => state.storage.user_id)
   const totalTasksLength = useSelector((state) => state.storage.tasks.all.length);
   const completedTasksLength = useSelector((state) => state.storage.tasks.all.filter((task) => task.completed).length)
   const [completionProgress, updateProgress] = useState(0);
-  const today = new Date();
   const dispatch = useDispatch();
   const welcomeText = "Welcome Back, \n"
   const [currentMessage, updateMessage] = useState(progressMessages[0])
-
+  const now = new Date();
+  const timezoneOffset = now.getTimezoneOffset();
+  const today = offsetTime(now);
 
   //Preload today's tasks / This prefetches once.
   const { data, error, loading } = useQuery(GET_TODAYS_TASKS, {
@@ -44,9 +51,8 @@ const Dashboard = () => {
     variables: { date: today.toISOString().split('T')[0], user_id: userID },
   });
 
-
-   //this function used to update the message under the progress circle.
-   const progressMessageHandler = useCallback(() => {
+  //this function used to update the message under the progress circle.
+  const progressMessageHandler = useCallback(() => {
     if (completionProgress === 0 && !totalTasksLength) {
       return updateMessage(progressMessages[0])
     } else if (completionProgress === 0 && totalTasksLength) {
@@ -64,8 +70,8 @@ const Dashboard = () => {
 
 
   useLayoutEffect(() => {
-    if (!isNaN(completedTasksLength/totalTasksLength)) {
-      updateProgress((completedTasksLength/totalTasksLength) * 100)
+    if (!isNaN(completedTasksLength / totalTasksLength)) {
+      updateProgress((completedTasksLength / totalTasksLength) * 100)
     }
   }, [totalTasksLength, completedTasksLength])
 
@@ -85,7 +91,7 @@ const Dashboard = () => {
       <View style={styles.overviewContainer}>
         <View style={styles.todayContainer} >
           <Heading style={styles.todayHeader}>Today</Heading>
-          <Text style={styles.todayDate} fontSize={20}>{today.toLocaleDateString('en-us', {year: 'numeric', month: 'long', day: 'numeric' })}</Text>
+          <Text style={styles.todayDate} fontSize={20}>{now.toLocaleDateString('en-us', { year: 'numeric', month: 'long', day: 'numeric' })}</Text>
           <Text style={styles.todayDate} fontSize={15}>{new Intl.DateTimeFormat("en-US", { weekday: "long" }).format(today)}</Text>
         </View>
         <Divider orientation="horizontal" />
@@ -93,21 +99,21 @@ const Dashboard = () => {
           <View style={styles.taskCountContainer} alignItems="center" >
             <View style={styles.innerTaskCountContainer}><Text fontFamily="FamiljenGrotesk" >Today's Tasks:</Text><Text fontFamily="FamiljenBold" fontSize={20} color="white">{totalTasksLength}</Text></View>
             <View style={styles.innerTaskCountContainer}><Text fontFamily="FamiljenGrotesk" >Tasks Completed:</Text><Text fontFamily="FamiljenBold" fontSize={20} color="white">{completedTasksLength}</Text></View>
-            </View>
+          </View>
           {/* <View style={styles.taskCountContainer} alignItems="center"></View> */}
         </View>
-        <CircularProgress 
-        value={isNaN(completionProgress) ? 0 : completionProgress}
-        maxValue={100}
-        radius={40}
-        title={'%'}
-        titleColor={'black'}
-        activeStrokeColor={'#FAA946'}
-        titleStyle={{fontWeight: 'bold'}} 
-        progressValueColor={'black'}
+        <CircularProgress
+          value={isNaN(completionProgress) ? 0 : completionProgress}
+          maxValue={100}
+          radius={40}
+          title={'%'}
+          titleColor={'black'}
+          activeStrokeColor={'#FAA946'}
+          titleStyle={{ fontWeight: 'bold' }}
+          progressValueColor={'black'}
         />
-        <View style={styles.progressMessageContainer}> 
-          <Text color="#FDF1CB" textAlign="center"  fontFamily="FamiljenBold" fontSize={15} lineHeight={18}  >{currentMessage}</Text>
+        <View style={styles.progressMessageContainer}>
+          <Text color="#FDF1CB" textAlign="center" fontFamily="FamiljenBold" fontSize={15} lineHeight={18}  >{currentMessage}</Text>
         </View>
       </View>
     </View>
@@ -172,7 +178,7 @@ const styles = StyleSheet.create({
     minHeight: "45.5%",
     maxHeight: "45.5%",
     backgroundColor: '#DBE6EC'
-  },  
+  },
   todayContainer: {
     display: "flex",
     flexDirection: "column",
@@ -220,7 +226,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
     elevation: 5,
-    
+
   },
   innerTaskCountContainer: {
     display: 'flex',
