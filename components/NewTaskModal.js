@@ -13,9 +13,12 @@ import { StyleSheet, Animated, View } from "react-native";
 import { FontAwesome, Octicons } from "@expo/vector-icons";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { convertDate, displayTime } from "./helpers/dateHelperFunc";
+import { useKeyboardVisible } from "./hooks/useKeyboardVisible";
 
 
 const NewTaskModal = ({ date, newTask, openNewTask, addTaskHandler }) => {
+  //this is for the keyboard, keeps track of if the sw keyboard is on or not
+  const keyboardVisible = useKeyboardVisible();
   const [startTime, updateStartTime] = useState("");
   const [endTime, updateEndTime] = useState("");
   const [taskTitle, updateTaskTitle] = useState("");
@@ -115,20 +118,30 @@ const NewTaskModal = ({ date, newTask, openNewTask, addTaskHandler }) => {
       setTimeout(() => toggleInvalidSubmission(false), 5000);
   }, [invalidSubmission]);
 
+
   return (
     <Modal
-      top={-75}
+      top={keyboardVisible ? -115 : -50}
       isOpen={newTask}
       onClose={() => openNewTask(false)}
       size="xl"
+      style={{shadowColor: '#000',
+        shadowOffset: {
+          width: 0,
+          height: 2,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+        elevation: 5,
+      }}
     >
       <Modal.Header
         borderTopLeftRadius="5%"
         borderTopRadius="5%"
         width="375"
-        bgColor="#F0F0F0"
+        bgColor="#DBE6EC"
         borderBottomRadius={0}
-        borderColor="#ADB7B8"
+        borderColor="darkgrey"
         borderWidth={1}
         display="flex"
         justifyContent="center"
@@ -141,17 +154,25 @@ const NewTaskModal = ({ date, newTask, openNewTask, addTaskHandler }) => {
 
       <Modal.Content
         width="375"
-        height="420"
+        height="440"
         display="flex"
         flexDirection="column"
         alignItems="center"
-        borderColor="#ADB7B8"
+        borderColor="darkgrey"
         borderWidth={1}
         borderTopWidth={0}
         paddingTop={5}
-        bgColor="#F0F0F0"
+        bgColor="#DBE6EC"
         borderTopRadius={0}
         borderBottomRadius="5%"
+        style={{shadowColor: '#000',
+        shadowOffset: {
+          width: 0,
+          height: 2,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+        elevation: 5,}}
       >
         <Modal.Body>
           <FormControl style={styles.taskNameContainer}>
@@ -162,6 +183,7 @@ const NewTaskModal = ({ date, newTask, openNewTask, addTaskHandler }) => {
               invalidOutlineColor="red.500"
               isInvalid={invalidSubmission ? true : false}
               borderColor="black"
+              bgColor="rgb(243,228,197)"
               value={taskTitle}
               focusOutlineColor="black"
               _focus={{
@@ -178,7 +200,7 @@ const NewTaskModal = ({ date, newTask, openNewTask, addTaskHandler }) => {
             />
           </FormControl>
           <FormControl style={styles.taskDescriptionContainer}>
-            <FormControl.Label style={{ fontFamily: "FamiljenGrotesk" }}>
+            <FormControl.Label fontFamily="FamiljenGrotesk" style={{ fontFamily: "FamiljenGrotesk" }}>
               Description:
             </FormControl.Label>
             <View style={{ height: "100%" }}>
@@ -186,6 +208,7 @@ const NewTaskModal = ({ date, newTask, openNewTask, addTaskHandler }) => {
                 multiline={true}
                 height={"75%"}
                 maxHeight={"75%"}
+                bgColor="rgb(243,228,197)"
                 borderColor="black"
                 _focus={{
                   bgColor: "rgb(243,228,197)",
@@ -216,18 +239,17 @@ const NewTaskModal = ({ date, newTask, openNewTask, addTaskHandler }) => {
             />
           </View>
           {/* Category Section */}
-          
-          <View alignItems="center">
-            <Text fontFamily="FamiljenGrotesk" >Category</Text>
-            <Select width="80%" defaultValue={1} onValueChange={(itemValue) => updateTaskCategory(itemValue)} >
-                <Select.Item label="Chore/Errand" value={1} />
-                <Select.Item label="Academic" value={2} />
-                <Select.Item label="Work" value={3} />
-                <Select.Item label="Social" value={4} />
-                <Select.Item label="Spiritual" value={5} />
-                <Select.Item label="Other" value={6} />
-            </Select>
-          </View>
+            <FormControl alignItems="center">
+              <FormControl.Label style={{ fontFamily: "FamiljenGrotesk" }}>Category: </FormControl.Label>
+              <Select bgColor="rgb(243,228,197)" borderColor="black" borderWidth={1} width="80%" defaultValue={1} onValueChange={(itemValue) => updateTaskCategory(itemValue)} >
+                  <Select.Item label="Chore/Errand" value={1} />
+                  <Select.Item label="Academic" value={2} />
+                  <Select.Item label="Work" value={3} />
+                  <Select.Item label="Social" value={4} />
+                  <Select.Item label="Spiritual" value={5} />
+                  <Select.Item label="Other" value={6} />
+              </Select>
+            </FormControl>
           <CreateButton onPress={onPress} />
         </Modal.Body>
       </Modal.Content>
@@ -265,6 +287,7 @@ export const StartTimeInput = ({ startTime, endTime, updateStartTime, updateEndT
       <View style={styles.timeInputWrapper}>
         <Input
           isReadOnly
+          bgColor="rgb(243,228,197)"
           borderColor="black"
           style={styles.timeInput}
           value={Number(startTime) ? displayTime(startTime) : "None"}
@@ -323,6 +346,7 @@ export const EndTimeInput = ({ startTime, endTime, updateStartTime, updateEndTim
         <Input
           isReadOnly
           borderColor="black"
+          bgColor="rgb(243,228,197)"
           style={styles.timeInput}
           value={Number(startTime) ? displayTime(endTime) : "None"}
           InputRightElement={
