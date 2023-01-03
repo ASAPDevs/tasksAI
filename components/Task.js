@@ -36,14 +36,26 @@ const taskCategoryColors = {
   6: 'black'
 }
 
-const Task = ({ prevDay, date, taskId, title, description, startTime, endTime, completed, category }) => {
+const Task = ({ prevDay, date, taskId, title, description, startTime, endTime, completed, category, refetch }) => {
   const [openTask, toggleOpenTask] = useState(false);
   const [pushTaskModal, openPushTaskModal] = useState(false);
   const dispatch = useDispatch()
 
-  const [updateTaskMutation] = useMutation(UPDATE_TASK, {
+  const [updateTaskMutationNoRefetch] = useMutation(UPDATE_TASK, {
     onCompleted: (data) => {
+      console.log("no refetch")
       dispatch(updateTask(data.updateTask))
+    },
+    onError: (err) => {
+      console.log("Error Updating Task: ", err)
+    }
+  });
+
+  const [updateTaskMutationRefetch] = useMutation(UPDATE_TASK, {
+    onCompleted: (data) => {
+      console.log("refetch")
+      dispatch(updateTask(data.updateTask))
+      refetch();
     },
     onError: (err) => {
       console.log("Error Updating Task: ", err)
@@ -111,7 +123,14 @@ const Task = ({ prevDay, date, taskId, title, description, startTime, endTime, c
           </View>
         </View>
         {openTask &&
-          <LazyLoadModal prevDay={prevDay} date={date} updateTaskMutation={updateTaskMutation} openTask={openTask} toggleOpenTask={toggleOpenTask} taskTitle={title} taskDescription={description} taskStartTime={startTime} taskEndTime={endTime} taskId={taskId} completed={completed} />
+          <LazyLoadModal 
+          taskCategory={category} prevDay={prevDay} 
+          taskDate={date} taskDescription={description}
+          openTask={openTask} toggleOpenTask={toggleOpenTask} taskTitle={title} 
+          taskStartTime={startTime} taskEndTime={endTime} 
+          taskId={taskId} completed={completed} 
+          updateTaskMutationNoRefetch={updateTaskMutationNoRefetch} updateTaskMutationRefetch={updateTaskMutationRefetch}
+          />
         }
       </View>
     </Pressable>

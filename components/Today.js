@@ -152,6 +152,7 @@ const Today = () => {
       />
       <TaskListContainer
         date={date}
+        refetch={refetch}
         today={today}
         prevDay={prevDay}
         addTask={addTask}
