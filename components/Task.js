@@ -43,7 +43,6 @@ const Task = ({ prevDay, date, taskId, title, description, startTime, endTime, c
 
   const [updateTaskMutationNoRefetch] = useMutation(UPDATE_TASK, {
     onCompleted: (data) => {
-      console.log("no refetch")
       dispatch(updateTask(data.updateTask))
     },
     onError: (err) => {
@@ -53,7 +52,6 @@ const Task = ({ prevDay, date, taskId, title, description, startTime, endTime, c
 
   const [updateTaskMutationRefetch] = useMutation(UPDATE_TASK, {
     onCompleted: (data) => {
-      console.log("refetch")
       dispatch(updateTask(data.updateTask))
       refetch();
     },
