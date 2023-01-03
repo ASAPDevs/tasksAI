@@ -12,7 +12,7 @@ const ProgressBar = ({ progress }) => {
   const load = (progress) => {
     Animated.timing(animatedValue, {
       toValue: progress, //final value
-      duration: 500, //update value in 500 milliseconds
+      duration: 1500, //update value in 500 milliseconds
       useNativeDriver: false,
     }).start();
   };

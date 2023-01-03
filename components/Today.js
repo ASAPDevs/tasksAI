@@ -36,7 +36,12 @@ const Today = () => {
 
   //maps to redux storage Slice.
   const tasks = useSelector((state) => state.storage.tasks.all);
-  const completedTasks = useSelector((state) => state.storage.tasks.completed);
+  const completedTasks = tasks.reduce((acc, task) => {
+    if (task.completed) {
+      return acc + 1;
+    }
+    return acc;
+  }, 0);
   const userID = useSelector((state) => state.storage.user_id);
 
   const dispatch = useDispatch();
@@ -119,8 +124,9 @@ const Today = () => {
 
   // useEffect to update and render progress bar
   useEffect(() => {
-    tasks ? setProgress(((completedTasks.length / tasks.length) * 100).toFixed(2)) : null;
+    completedTasks ? setProgress(((completedTasks / tasks.length) * 100).toFixed(2)) : null;
     changePrevDay(compareDateWithToday);
+    console.log("Progress: ", progress, completedTasks, tasks.length)
   }, [tasks, date]);
 
   return (
@@ -135,13 +141,24 @@ const Today = () => {
             <FontAwesome name="calendar" size={24} color="white" />
           </Pressable>
         </View>
-        <Box w="50%" p="3" _text={{ textAlign: "center" }}>
-          <ProgressBar progress={Number(progress)} />
+        <Box w="50%" p="3" top={1} _text={{ textAlign: "center" }}>
+          <ProgressBar progress={progress} />
           <Text style={styles.progressText}>
             {" "}
             Daily Progress: {!isNaN(progress) ? progress : "0.00"}%
           </Text>
+          <View overflow="hidden" borderColor="grey" borderWidth={1} borderRadius={2.5} padding={0.5} justifyContent="center" alignItems="center" top={1} bgColor="darkgrey">
+            <View flexDirection="row">
+              <Text fontSize={15} fontFamily="FamiljenGrotesk"> Total Tasks:   </Text>
+              <Text fontSize={17} fontFamily="FamiljenBold" bottom={0.5}>{tasks.length}</Text>
+            </View>
+            <View width="105%" borderTopColor="grey" borderTopWidth={1} justifyContent="center" flexDirection="row" alignItems="center">
+              <Text fontFamily="FamiljenGrotesk" fontSize={15} top={0.25}> Tasks Finished:   </Text>
+              <Text fontFamily="FamiljenBold" fontSize={17} top={0.25} style={{color: '#fac146'}}>{completedTasks}</Text>
+            </View>
+          </View>
         </Box>
+       
       </ImageBackground>
 
       <Calendar
@@ -191,7 +208,7 @@ const styles = StyleSheet.create({
     width: "110%",
     borderBottomColor: "black",
     borderWidth: 1,
-    maxHeight: 120,
+    maxHeight: 135,
     paddingHorizontal: 40,
     flex: 1,
     flexDirection: "row",

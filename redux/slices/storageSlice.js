@@ -8,8 +8,6 @@ const initialState = {
   avatar: '',
   tasks: {
     all: [],
-    completed: [],
-    progress: [],
   },
   recommendations: [],
   settings: {
