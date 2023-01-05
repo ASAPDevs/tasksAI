@@ -3,12 +3,11 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 const initialState = {
   username: '',
   user_id: null,
+  email: '',
   loggedIn: false,
   avatar: '',
   tasks: {
     all: [],
-    completed: [],
-    progress: [],
   },
   recommendations: [],
   settings: {
@@ -24,7 +23,11 @@ export const storageSlice = createSlice({
     loginUser: (state, action) => {
       state.username = action.payload.username;
       state.user_id = action.payload.user_id;
+      state.email = action.payload.email;
       state.loggedIn = true;
+    },
+    updateEmail: (state, action) => {
+      state.email = action.payload.email;
     },
     logoutUser: (state, action) => {
       state = initialState
@@ -84,5 +87,5 @@ export const storageSlice = createSlice({
 })
 
 
-export const { loginUser, logoutUser, loadTasks, addTask, deleteTask, completeTask, updateTask, pushTask } = storageSlice.actions;
+export const { loginUser, logoutUser, loadTasks, addTask, deleteTask, completeTask, updateTask, pushTask, updateEmail } = storageSlice.actions;
 export default storageSlice.reducer;

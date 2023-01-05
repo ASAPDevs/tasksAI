@@ -15,6 +15,7 @@ const TaskListContainer = ({
   prevDay,
   today,
   date,
+  refetch,
   changePrevDay,
   handleDeleteTask,
   loading,
@@ -102,6 +103,8 @@ const TaskListContainer = ({
               <Task
                 prevDay={prevDay}
                 date={date}
+                refetch={refetch}
+                category={item.category}
                 description={item.task_description}
                 title={item.task_name}
                 startTime={item.time_start}

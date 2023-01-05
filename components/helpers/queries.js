@@ -11,6 +11,7 @@ export const GET_TODAYS_TASKS = gql`
       time_finished
       completed
       user_id
+      category
     }
 }
 `

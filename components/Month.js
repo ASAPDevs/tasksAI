@@ -13,7 +13,11 @@ function Calendar(props) {
   const lastMonthDay = lastMonthDate.getDay(); // 0 based
   const { activeDay, setActiveDay, changeMonth } = props;
 
-    // This function creates empty dates at the beginning of the month starting Sunday
+  // console.log('date', date);
+  // console.log('firstMonthDate', firstMonthDate);
+  // console.log('firstMonthDate', );
+
+  // This function creates empty dates at the beginning of the month starting Sunday
   const addEmptyDays = (option) => {
     const listOfDays = [];
     const lastMonthLastDate = new Date(date.getFullYear(), date.getMonth(), 0);
@@ -29,68 +33,68 @@ function Calendar(props) {
     return listOfDays;
   };
 
-    // This function creates this month's dates
-    const addActualDays = () => {
-      const listOfDays = [];
-      for (let i = 1; i <= lastMonthDate.getDate(); i++) {
-        const day = [date.getFullYear(), date.getMonth(), i];
-        listOfDays.push(
-          <TouchableOpacity key={`${day}-${i}`}
-            style={[(activeDay === day.join('-')) ? styles.activeDay : styles.day,
-            (`${today.getFullYear()}-${today.getMonth()}-${today.getDate()}` === day.join('-')) ? styles.today : styles.day]}
-            onPress={() => {
-              setActiveDay(day.join('-'));
-            }}
-          >
-            <Text>{i}</Text>
-          </TouchableOpacity>
-        );
-      }
-      return listOfDays;
+  // This function creates this month's dates
+  const addActualDays = () => {
+    const listOfDays = [];
+    for (let i = 1; i <= lastMonthDate.getDate(); i++) {
+      const day = [date.getFullYear(), date.getMonth(), i];
+      listOfDays.push(
+        <TouchableOpacity key={`${day}-${i}`}
+          style={[(activeDay === day.join('-')) ? styles.activeDay : styles.day,
+          (`${today.getFullYear()}-${today.getMonth()}-${today.getDate()}` === day.join('-')) ? styles.today : styles.day]}
+          onPress={() => {
+            setActiveDay(day.join('-'));
+          }}
+        >
+          <Text>{i}</Text>
+        </TouchableOpacity>
+      );
     }
+    return listOfDays;
+  }
 
-    return (
-      <View style={styles.container}>
+  return (
+    <View style={styles.container}>
 
-        {/* Header displays month, year and month control */}
-        <View style={styles.month}>
-          <TouchableOpacity
-            style={styles.monthControl}
-            onPress={() => { changeMonth('prev') }}>
-            <Text style={styles.monthControl.text}>&#8249;</Text>
-          </TouchableOpacity>
-          <View style={styles.monthYear}>
-            <Text style={styles.centerText}>{months[date.getMonth()]}  {date.getFullYear()}</Text>
-          </View>
-          <TouchableOpacity
-            style={styles.monthControl}
-            onPress={() => { changeMonth('next') }}>
-            <Text style={styles.monthControl.text}>&#8250;</Text>
-          </TouchableOpacity>
+      {/* Header displays month, year and month control */}
+      <View style={styles.month}>
+        <TouchableOpacity
+          style={styles.monthControl}
+          onPress={() => { changeMonth('prev') }}>
+          <Text style={styles.monthControl.text}>&#8249;</Text>
+        </TouchableOpacity>
+        <View style={styles.monthYear}>
+          <Text style={styles.centerText}>{months[date.getMonth()]}  {date.getFullYear()}</Text>
         </View>
+        <TouchableOpacity
+          style={styles.monthControl}
+          onPress={() => { changeMonth('next') }}>
+          <Text style={styles.monthControl.text}>&#8250;</Text>
+        </TouchableOpacity>
+      </View>
 
-        {/* This section shows the title of weekdays */}
-        <View style={styles.weekdays}>
-          {days.map((day, index) => {
-            return (
-              <View key={`${props.date}-${index}`} style={styles.daysTitle}>
-                <Text>{day}</Text>
-              </View>
-            )
-          })}
-        </View>
+      {/* This section shows the title of weekdays */}
+      <View style={styles.weekdays}>
+        {days.map((day, index) => {
+          return (
+            <View key={`${props.date}-${index}`} style={styles.daysTitle}>
+              <Text>{day}</Text>
+            </View>
+          )
+        })}
+      </View>
 
-        {/* This section shows the days of the month with corresponding day of the week */}
-        <View style={styles.days}>
-          {/* add empty days at the beginning of month if any */}
-          {addEmptyDays('start')}
-          {/* add actual days of the months */}
-          {addActualDays()}
-          {/* add empty days at the end of the month if any */}
-          {addEmptyDays()}
-        </View>
-      </View >
-    )
+      {/* This section shows the days of the month with corresponding day of the week */}
+      <View style={styles.days}>
+        {/* add empty days at the beginning of month if any */}
+        {addEmptyDays('start')}
+        {/* add actual days of the months */}
+        {addActualDays()}
+        {/* add empty days at the end of the month if any */}
+        {addEmptyDays()}
+      </View>
+    </View >
+  )
 }
 
 const styles = StyleSheet.create({

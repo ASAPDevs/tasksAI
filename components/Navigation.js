@@ -24,11 +24,13 @@ const Navigation = () => {
   const sessionHandler = async () => {
     let username = await SecureStore.getItemAsync("username");
     let user_id = await SecureStore.getItemAsync("userid");
+    let email = await SecureStore.getItemAsync("email");
     if (username && user_id) {
       dispatch(
         loginUser({
           username: username,
           user_id: Number(user_id),
+          email: email
         })
       );
       updateLoading(false)

@@ -17,7 +17,7 @@ export const getTimeOfDay = (startTime) => {
   return time_of_day;
 }
 
-  // this function takes a user selected date and time,
+// this function takes a user selected date and time,
 // then it returns the correct time in miliseconds
 export const convertDate = (selectedDate, selectedTime) => {
   const tempDate = new Date(selectedDate);

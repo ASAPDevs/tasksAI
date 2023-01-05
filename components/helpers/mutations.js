@@ -30,6 +30,16 @@ export const CHANGE_PASSWORD = gql`
   }
 `;
 
+export const CHANGE_EMAIL = gql`
+  mutation ChangeEmail($userInput: ChangeEmailInput!) {
+    changeEmail(userInput: $userInput) {
+      id
+      username
+      email
+    }
+  }
+`;
+
 export const CREATE_TASKS = gql`
   mutation CreateTask($task: TaskInput) {
     createTask(task: $task) {
@@ -39,8 +49,10 @@ export const CREATE_TASKS = gql`
       date
       time_start
       time_finished
+      time_of_day
       completed
       user_id
+      category
     }
   }
 `;
@@ -54,8 +66,10 @@ export const UPDATE_TASK = gql`
       date
       time_start
       time_finished
+      time_of_day
       completed
       user_id
+      category
     }
   }
 `;
