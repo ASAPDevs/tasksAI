@@ -15,7 +15,7 @@ import CreateTaskCircle from "./CreateTaskCircle";
 import { getTimeOfDay } from "./helpers/dateHelperFunc";
 
 const Today = () => {
-  const today = new Date();
+  let today = new Date();
   const timezoneOffset = today.getTimezoneOffset();
   // this function offsets the passed in date with any time zone difference
   const offsetTime = (dateObj) => {

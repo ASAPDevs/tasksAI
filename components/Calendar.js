@@ -9,6 +9,9 @@ function Calendar({ calendarModal, openCalendarModal, setDate, date }) {
   const [activeDay, setActiveDay] = useState(`${today.getFullYear()}-${today.getMonth()}-${today.getDate()}`);
   const [monthToShow, setMonthToShow] = useState([today.getFullYear(), today.getMonth()]);
 
+  console.log('today', today);
+  console.log('month to show', monthToShow)
+
   const changeMonth = (change) => {
     if (change === 'prev') {
       const lastMonth = monthToShow.slice();
@@ -16,9 +19,10 @@ function Calendar({ calendarModal, openCalendarModal, setDate, date }) {
       setMonthToShow(lastMonth);
     } else if (change === 'next') {
       const nextMonth = monthToShow.slice();
-      nextMonth[1] += 1;  
+      nextMonth[1] += 1;
       setMonthToShow(nextMonth);
     }
+    console.log('in change month', monthToShow)
   }
 
   const changeDay = () => {
