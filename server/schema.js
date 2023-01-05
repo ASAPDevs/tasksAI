@@ -17,7 +17,7 @@ const typeDefs = gql`
     updateTask(task: UpdateTaskInput): Task
     deleteTask(id: ID!): Task
     completeTask(id: ID!): Task
-    pushTask(id: ID!, newStartTime: String!, newEndTime: String!): Task
+    pushTask(id: ID!, newStartTime: String!, newEndTime: String!, newTimeOfDay: Int!): Task
   }
 
 
@@ -170,8 +170,8 @@ const resolvers = {
 
       return newUser.rows[0];
     },
-    changeEmail: async(_, args) => {
-      const { username, email} = args.userInput;
+    changeEmail: async (_, args) => {
+      const { username, email } = args.userInput;
       // Check if there is a same username exists in database. Throw error if not
       const dbResult = await db.query(
         "SELECT * FROM users WHERE username = $1",
@@ -223,26 +223,11 @@ const resolvers = {
         date,
         time_start,
         time_finished,
+        time_of_day,
         completed,
         completed_on_time,
         user_id,
       } = args.task;
-
-      let time_of_day;
-      const timeOfDayHour = new Date(time_start).getHours();
-      if (timeOfDayHour < 7) {
-        // dawn
-        time_of_day = 1;
-      } else if (timeOfDayHour < 12) {
-        // morning
-        time_of_day = 2;
-      } else if (timeOfDayHour < 18) {
-        // afternoon
-        time_of_day = 3;
-      } else {
-        // evening
-        time_of_day = 4;
-      }
 
       const newTask = await db.query(
         "INSERT INTO tasks (task_name, task_description, category, date, time_start, time_finished, time_of_day, completed, completed_on_time, user_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *;",
@@ -270,25 +255,10 @@ const resolvers = {
         date,
         time_start,
         time_finished,
+        time_of_day,
         completed,
         completed_on_time
       } = args.task;
-
-      const newTimeOfDayHour = new Date(time_start).getHours();
-      let time_of_day;
-      if (newTimeOfDayHour < 7) {
-        // dawn
-        time_of_day = 1;
-      } else if (newTimeOfDayHour < 12) {
-        // morning
-        time_of_day = 2;
-      } else if (newTimeOfDayHour < 18) {
-        // afternoon
-        time_of_day = 3;
-      } else {
-        // evening
-        time_of_day = 4;
-      }
 
       const queryString = `UPDATE tasks SET task_name = $1, task_description = $2, category = $3, date = $4, time_start = $5, time_finished = $6, time_of_day = $7, completed = $8, completed_on_time = $9 WHERE id = $10 RETURNING *;`;
       const updatedTask = await db.query(queryString, [
@@ -323,22 +293,8 @@ const resolvers = {
       return completedTask.rows[0]
     },
     pushTask: async (_, args) => {
-      const { id, newStartTime, newEndTime } = args;
-      const newTimeOfDayHour = new Date(newStartTime).getHours();
-      let newTimeOfDay;
-      if (newTimeOfDayHour < 7) {
-        // dawn
-        newTimeOfDay = 1;
-      } else if (newTimeOfDayHour < 12) {
-        // morning
-        newTimeOfDay = 2;
-      } else if (newTimeOfDayHour < 18) {
-        // afternoon
-        newTimeOfDay = 3;
-      } else {
-        // evening
-        newTimeOfDay = 4;
-      }
+      const { id, newStartTime, newEndTime, newTimeOfDay } = args;
+      console.log('newTimeOfDay', newTimeOfDay)
       const updatedTask = await db.query("UPDATE tasks SET time_start = $1, time_finished = $2, time_of_day = $3 WHERE id = $4 RETURNING *;",
         [newStartTime, newEndTime, newTimeOfDay, id])
       return updatedTask.rows[0]

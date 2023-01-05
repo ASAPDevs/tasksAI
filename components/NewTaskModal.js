@@ -46,7 +46,7 @@ const NewTaskModal = ({ date, newTask, openNewTask, addTaskHandler }) => {
       const endOfDay = startOfDay + 86400000 - 60000;
       const start = typeof startTime === "number" ? startTime : startOfDay;
       const end = typeof endTime === "number" ? endTime : endOfDay;
-      start < end &&
+      start <= end &&
         addTaskHandler(taskTitle, taskDescription, start, end, taskCategory) &&
         clearInputs();
     }
@@ -84,7 +84,7 @@ const NewTaskModal = ({ date, newTask, openNewTask, addTaskHandler }) => {
         onPressIn={onPressIn}
         onPressOut={onPressOut}
         onPress={onPress}
-        // disabled={true}
+      // disabled={true}
       >
         <Animated.View
           style={{
