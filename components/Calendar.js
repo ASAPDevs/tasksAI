@@ -13,10 +13,14 @@ function Calendar({ calendarModal, openCalendarModal, setDate, date }) {
     if (change === 'prev') {
       const lastMonth = monthToShow.slice();
       lastMonth[1] -= 1;
+      if (lastMonth[1] < 0) {
+        lastMonth[0] -= 1;
+        lastMonth[1] = 11;
+      }
       setMonthToShow(lastMonth);
     } else if (change === 'next') {
       const nextMonth = monthToShow.slice();
-      nextMonth[1] += 1;  
+      nextMonth[1] += 1;
       setMonthToShow(nextMonth);
     }
   }

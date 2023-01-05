@@ -15,7 +15,6 @@ import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { convertDate, displayTime } from "./helpers/dateHelperFunc";
 import { useKeyboardVisible } from "./hooks/useKeyboardVisible";
 
-
 const NewTaskModal = ({ date, newTask, openNewTask, addTaskHandler }) => {
   //this is for the keyboard, keeps track of if the sw keyboard is on or not
   const keyboardVisible = useKeyboardVisible();
@@ -25,16 +24,17 @@ const NewTaskModal = ({ date, newTask, openNewTask, addTaskHandler }) => {
   const [taskDescription, updateTaskDescription] = useState("");
   const [taskCategory, updateTaskCategory] = useState(1);
   const [invalidSubmission, toggleInvalidSubmission] = useState(false);
+  const [invalidTimes, setInvalidTimes] = useState(false);
 
-  //useCallback is more efficient here, since we can cache this function in between re-renders. 
+  //useCallback is more efficient here, since we can cache this function in between re-renders.
   //Dependency is an empty array because we don't need these values or functions to recalculate.
   const clearInputs = useCallback(() => {
     updateTaskTitle("");
     updateTaskDescription("");
     updateStartTime("");
-    updateEndTime("")
+    updateEndTime("");
     updateTaskCategory(1);
-  }, [])
+  }, []);
 
   //handles main functionality of onPress
   //useCallback is efficient here as well.
@@ -44,14 +44,15 @@ const NewTaskModal = ({ date, newTask, openNewTask, addTaskHandler }) => {
     } else {
       const startOfDay = new Date(date).getTime();
       const endOfDay = startOfDay + 86400000 - 60000;
-      const start = (typeof startTime === 'number') ? startTime : startOfDay;
-      let end = (typeof endTime === 'number') ? endTime : endOfDay;
-      addTaskHandler(taskTitle, taskDescription, start, end, taskCategory);
-      clearInputs();
+      const start = typeof startTime === "number" ? startTime : startOfDay;
+      const end = typeof endTime === "number" ? endTime : endOfDay;
+      start <= end &&
+        addTaskHandler(taskTitle, taskDescription, start, end, taskCategory) &&
+        clearInputs();
     }
-  }
+  };
 
-  //Memoize this functional component so we don't need to re-render again. 
+  //Memoize this functional component so we don't need to re-render again.
   //More Effieicny
   const CreateButton = ({ onPress }) => {
     const [animatedValue, setAnimatedValue] = useState(new Animated.Value(1));
@@ -83,6 +84,7 @@ const NewTaskModal = ({ date, newTask, openNewTask, addTaskHandler }) => {
         onPressIn={onPressIn}
         onPressOut={onPressOut}
         onPress={onPress}
+      // disabled={true}
       >
         <Animated.View
           style={{
@@ -95,6 +97,7 @@ const NewTaskModal = ({ date, newTask, openNewTask, addTaskHandler }) => {
             backgroundColor: "#FAA946",
             flexDirection: "column",
             display: "flex",
+            opacity: `${invalidTimes ? 0.5 : 1}`,
             borderColor: "black",
             borderWidth: 1,
             justifyContent: "center",
@@ -111,13 +114,12 @@ const NewTaskModal = ({ date, newTask, openNewTask, addTaskHandler }) => {
         </Animated.View>
       </Pressable>
     );
-  }
+  };
 
   useEffect(() => {
     if (invalidSubmission)
       setTimeout(() => toggleInvalidSubmission(false), 5000);
   }, [invalidSubmission]);
-
 
   return (
     <Modal
@@ -125,7 +127,8 @@ const NewTaskModal = ({ date, newTask, openNewTask, addTaskHandler }) => {
       isOpen={newTask}
       onClose={() => openNewTask(false)}
       size="xl"
-      style={{shadowColor: '#000',
+      style={{
+        shadowColor: "#000",
         shadowOffset: {
           width: 0,
           height: 2,
@@ -165,14 +168,16 @@ const NewTaskModal = ({ date, newTask, openNewTask, addTaskHandler }) => {
         bgColor="#DBE6EC"
         borderTopRadius={0}
         borderBottomRadius="5%"
-        style={{shadowColor: '#000',
-        shadowOffset: {
-          width: 0,
-          height: 2,
-        },
-        shadowOpacity: 0.25,
-        shadowRadius: 3.84,
-        elevation: 5,}}
+        style={{
+          shadowColor: "#000",
+          shadowOffset: {
+            width: 0,
+            height: 2,
+          },
+          shadowOpacity: 0.25,
+          shadowRadius: 3.84,
+          elevation: 5,
+        }}
       >
         <Modal.Body>
           <FormControl style={styles.taskNameContainer}>
@@ -200,7 +205,10 @@ const NewTaskModal = ({ date, newTask, openNewTask, addTaskHandler }) => {
             />
           </FormControl>
           <FormControl style={styles.taskDescriptionContainer}>
-            <FormControl.Label fontFamily="FamiljenGrotesk" style={{ fontFamily: "FamiljenGrotesk" }}>
+            <FormControl.Label
+              fontFamily="FamiljenGrotesk"
+              style={{ fontFamily: "FamiljenGrotesk" }}
+            >
               Description:
             </FormControl.Label>
             <View style={{ height: "100%" }}>
@@ -229,6 +237,8 @@ const NewTaskModal = ({ date, newTask, openNewTask, addTaskHandler }) => {
               updateStartTime={updateStartTime}
               updateEndTime={updateEndTime}
               date={date}
+              invalidTimes={invalidTimes}
+              setInvalidTimes={setInvalidTimes}
             />
             <EndTimeInput
               startTime={startTime}
@@ -236,20 +246,32 @@ const NewTaskModal = ({ date, newTask, openNewTask, addTaskHandler }) => {
               updateStartTime={updateStartTime}
               updateEndTime={updateEndTime}
               date={date}
+              invalidTimes={invalidTimes}
+              setInvalidTimes={setInvalidTimes}
             />
           </View>
+          {/* <Text>Invalid End Time</Text> */}
           {/* Category Section */}
-            <FormControl alignItems="center">
-              <FormControl.Label style={{ fontFamily: "FamiljenGrotesk" }}>Category: </FormControl.Label>
-              <Select bgColor="rgb(243,228,197)" borderColor="black" borderWidth={1} width="80%" defaultValue={1} onValueChange={(itemValue) => updateTaskCategory(itemValue)} >
-                  <Select.Item label="Chore/Errand" value={1} />
-                  <Select.Item label="Academic" value={2} />
-                  <Select.Item label="Work" value={3} />
-                  <Select.Item label="Social" value={4} />
-                  <Select.Item label="Spiritual" value={5} />
-                  <Select.Item label="Other" value={6} />
-              </Select>
-            </FormControl>
+          <FormControl alignItems="center">
+            <FormControl.Label style={{ fontFamily: "FamiljenGrotesk" }}>
+              Category:{" "}
+            </FormControl.Label>
+            <Select
+              bgColor="rgb(243,228,197)"
+              borderColor="black"
+              borderWidth={1}
+              width="80%"
+              defaultValue={1}
+              onValueChange={(itemValue) => updateTaskCategory(itemValue)}
+            >
+              <Select.Item label="Chore/Errand" value={1} />
+              <Select.Item label="Academic" value={2} />
+              <Select.Item label="Work" value={3} />
+              <Select.Item label="Social" value={4} />
+              <Select.Item label="Spiritual" value={5} />
+              <Select.Item label="Other" value={6} />
+            </Select>
+          </FormControl>
           <CreateButton onPress={onPress} />
         </Modal.Body>
       </Modal.Content>
@@ -257,23 +279,29 @@ const NewTaskModal = ({ date, newTask, openNewTask, addTaskHandler }) => {
   );
 };
 
-
-
-export const StartTimeInput = ({ startTime, endTime, updateStartTime, updateEndTime, date }) => {
+export const StartTimeInput = ({
+  startTime,
+  endTime,
+  updateStartTime,
+  updateEndTime,
+  date,
+  invalidTimes,
+  setInvalidTimes,
+}) => {
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
 
   const handleSetStartTime = (time) => {
     const tempDate = new Date(time);
     const hourAndMinutes = tempDate.toLocaleTimeString([], {
-      hour: '2-digit',
-      minute: "2-digit"
+      hour: "2-digit",
+      minute: "2-digit",
     });
     const timeZoneOffset = tempDate.getTimezoneOffset();
     const convertedTime = convertDate(date, hourAndMinutes, timeZoneOffset);
 
     updateStartTime(convertedTime);
     // convert end time to start time if it's falsy or before start time
-    if (endTime !== '' && endTime < convertedTime) {
+    if (endTime !== "" && endTime < convertedTime) {
       updateEndTime(convertedTime);
     }
     setDatePickerVisibility(false);
@@ -317,22 +345,33 @@ export const StartTimeInput = ({ startTime, endTime, updateStartTime, updateEndT
   );
 };
 
-export const EndTimeInput = ({ startTime, endTime, updateStartTime, updateEndTime, date }) => {
+export const EndTimeInput = ({
+  startTime,
+  endTime,
+  updateStartTime,
+  updateEndTime,
+  date,
+  invalidTimes,
+  setInvalidTimes,
+}) => {
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
 
   const handleSetEndTime = (time) => {
     const tempDate = new Date(time);
     const hourAndMinutes = tempDate.toLocaleTimeString([], {
-      hour: '2-digit',
-      minute: "2-digit"
+      hour: "2-digit",
+      minute: "2-digit",
     });
     const timeZoneOffset = tempDate.getTimezoneOffset();
     const convertedTime = convertDate(date, hourAndMinutes, timeZoneOffset);
 
     updateEndTime(convertedTime);
     // convert start time to end time if it's falsy or before start time
-    if (startTime !== '' && convertedTime < startTime) {
+    if (startTime !== "" && convertedTime < startTime) {
       updateStartTime(convertedTime);
+      setInvalidTimes(true);
+    } else {
+      setInvalidTimes(false);
     }
     setDatePickerVisibility(false);
   };
@@ -345,7 +384,7 @@ export const EndTimeInput = ({ startTime, endTime, updateStartTime, updateEndTim
       <View style={styles.timeInputWrapper}>
         <Input
           isReadOnly
-          borderColor="black"
+          borderColor={invalidTimes ? "red.500" : "black"}
           bgColor="rgb(243,228,197)"
           style={styles.timeInput}
           value={Number(startTime) ? displayTime(endTime) : "None"}

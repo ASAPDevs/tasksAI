@@ -75,6 +75,7 @@ const Task = ({ prevDay, date, taskId, title, description, startTime, endTime, c
     let newStartTime = Number(startTime) + timeToAdd
     let newEndTime = Number(endTime) + timeToAdd
 
+    console.log('time of day after push', getTimeOfDay(newStartTime.toString()))
     pushTaskMutation({ variables: { id: Number(taskId), newStartTime: newStartTime.toString(), newEndTime: newEndTime.toString(), newTimeOfDay: getTimeOfDay(newStartTime.toString()) } })
 
     openPushTaskModal(false)
@@ -89,14 +90,14 @@ const Task = ({ prevDay, date, taskId, title, description, startTime, endTime, c
         <View style={styles.taskContainerInnerWrapper}>
           <View display="flex" flexDirection="column" width="55%">
             <Heading style={styles.taskHeading}>{title}</Heading>
-            <View 
-            borderColor={taskCategoryColors[category]}
-            borderWidth={1}
-            style={styles.categoryContainer}
+            <View
+              borderColor={taskCategoryColors[category]}
+              borderWidth={1}
+              style={styles.categoryContainer}
             >
               <Text
-              fontFamily="FamiljenGrotesk"
-              color={taskCategoryColors[category]}
+                fontFamily="FamiljenGrotesk"
+                color={taskCategoryColors[category]}
               >
                 {taskCategories[category]}
               </Text>
@@ -121,13 +122,13 @@ const Task = ({ prevDay, date, taskId, title, description, startTime, endTime, c
           </View>
         </View>
         {openTask &&
-          <LazyLoadModal 
-          taskCategory={category} prevDay={prevDay} 
-          taskDate={date} taskDescription={description}
-          openTask={openTask} toggleOpenTask={toggleOpenTask} taskTitle={title} 
-          taskStartTime={startTime} taskEndTime={endTime} 
-          taskId={taskId} completed={completed} 
-          updateTaskMutationNoRefetch={updateTaskMutationNoRefetch} updateTaskMutationRefetch={updateTaskMutationRefetch}
+          <LazyLoadModal
+            taskCategory={category} prevDay={prevDay}
+            taskDate={date} taskDescription={description}
+            openTask={openTask} toggleOpenTask={toggleOpenTask} taskTitle={title}
+            taskStartTime={startTime} taskEndTime={endTime}
+            taskId={taskId} completed={completed}
+            updateTaskMutationNoRefetch={updateTaskMutationNoRefetch} updateTaskMutationRefetch={updateTaskMutationRefetch}
           />
         }
       </View>

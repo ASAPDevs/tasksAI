@@ -15,13 +15,14 @@ import CreateTaskCircle from "./CreateTaskCircle";
 import { getTimeOfDay } from "./helpers/dateHelperFunc";
 
 const Today = () => {
-  const today = new Date();
-  const timezoneOffset = today.getTimezoneOffset();
+  const now = new Date();
+  const timezoneOffset = now.getTimezoneOffset();
   // this function offsets the passed in date with any time zone difference
   const offsetTime = (dateObj) => {
-    const newDate = new Date(dateObj.getTime() - (timezoneOffset * 60000));
+    const newDate = new Date(dateObj.getTime() - timezoneOffset * 60000);
     return newDate;
-  }
+  };
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
   // Figure out where we pull date or refetch date
   const [date, setDate] = useState(today);
@@ -29,6 +30,7 @@ const Today = () => {
   const [progress, setProgress] = useState(0);
   const [newTask, openNewTask] = useState(false);
   const [calendarModal, openCalendarModal] = useState(false);
+  const [isDisabled, setIsDisabled] = useState(false);
 
   // prevDay will determine if the user is looking at pass days,
   // if true, nothing should be editable
@@ -48,26 +50,29 @@ const Today = () => {
 
   const compareDateWithToday = () => {
     const todayTime = offsetTime(today);
-    const todayFirstMoment = new Date(todayTime.getFullYear(), todayTime.getMonth(), todayTime.getDate());
+    const todayFirstMoment = new Date(
+      todayTime.getFullYear(),
+      todayTime.getMonth(),
+      todayTime.getDate()
+    );
     return offsetTime(todayFirstMoment).getTime() > offsetTime(date).getTime();
-  }
-
+  };
 
   const { data, error, loading, refetch } = useQuery(GET_TODAYS_TASKS, {
     notifyOnNetworkStatusChange: true,
-    fetchPolicy: 'cache-first',
+    fetchPolicy: "cache-and-network",
     onCompleted: (data) => {
       dispatch(loadTasks(data.getTasksByDay)); // update redux toolkit state
     },
     onError: (error) => {
       console.log("Error in loading tasks: ", error);
     },
-    variables: { date: date.toISOString().split('T')[0], user_id: userID },
+    variables: { date: date.toISOString().split("T")[0], user_id: userID },
   });
 
   const [createTaskMutation] = useMutation(CREATE_TASKS, {
     onCompleted: (data) => {
-      dispatch(addTask(data.createTask))
+      dispatch(addTask(data.createTask));
     },
     onError: (err) => {
       console.log("Error Creating Task: ", err);
@@ -76,8 +81,12 @@ const Today = () => {
 
   const [deleteTaskMutation] = useMutation(DELETE_TASK, {
     onCompleted: (data) => {
-      console.log("data.deleteTask.id: ", data.deleteTask.id, typeof data.deleteTask.id,)
-      dispatch(deleteTask(data.deleteTask.id))
+      console.log(
+        "data.deleteTask.id: ",
+        data.deleteTask.id,
+        typeof data.deleteTask.id
+      );
+      dispatch(deleteTask(data.deleteTask.id));
     },
     onError: (err) => {
       console.log("Error Deleting Task: ", err);
@@ -86,17 +95,15 @@ const Today = () => {
 
   // this function converts the date state to mm/dd/yy format
   // const convertDateTitle = () => {
+  //   console.log('date', date);
   //   const yy = date.getFullYear();
-  //   const mm =
-  //     date.getMonth() + 1 < 10
-  //       ? `0${date.getMonth() + 1}`
-  //       : date.getMonth() + 1;
-  //   const dd = date.getDate() < 10 ? `0${date.getDate()}` : date.getDate();
-  //   return `${mm}/${dd}/${yy % 100}`;
+  //   const mm = date.getMonth() + 1;
+  //   const dd = date.getDate();
+  //   return `${mm}/${dd}/${yy}`;
   // };
 
   const handleDeleteTask = (taskId) => {
-    console.log("type of task id in handleDeleteTask: ", typeof taskId)
+    console.log("type of task id in handleDeleteTask: ", typeof taskId);
     deleteTaskMutation({
       variables: { taskId: taskId },
     });
@@ -104,7 +111,13 @@ const Today = () => {
 
   //this handler creates a new task using the current state inputs and sends it to the useMutation function
   //then closes the modal
-  const addTaskHandler = (taskTitle, taskDescription, startTime, endTime, category) => {
+  const addTaskHandler = (
+    taskTitle,
+    taskDescription,
+    startTime,
+    endTime,
+    category
+  ) => {
     const newTask = {
       task_name: taskTitle,
       task_description: taskDescription,
@@ -116,24 +129,27 @@ const Today = () => {
       category: category,
       user_id: Number(userID),
     };
+    console.log('add task', newTask)
+    // console.log("start and end in addTaskHandler: ", startTime, endTime);
     createTaskMutation({ variables: { task: newTask } });
     openNewTask(false);
   };
 
-
-
   // useEffect to update and render progress bar
   useEffect(() => {
-    completedTasks ? setProgress(((completedTasks / tasks.length) * 100).toFixed(2)) : null;
+    completedTasks
+      ? setProgress(((completedTasks / tasks.length) * 100).toFixed(2))
+      : null;
     changePrevDay(compareDateWithToday);
-    console.log("Progress: ", progress, completedTasks, tasks.length)
   }, [tasks, date]);
 
   return (
     <View style={styles.mainContainer}>
       <ImageBackground style={styles.topContainer} resizeMode="cover">
-        <View alignItems="center" >
-          <Text style={styles.topContainerText}>{date.toLocaleDateString()}</Text>
+        <View alignItems="center">
+          <Text style={styles.topContainerText}>
+            {date.toLocaleDateString()}
+          </Text>
           <Pressable
             onPress={() => openCalendarModal(true)}
             style={styles.calendarRow}
@@ -147,18 +163,49 @@ const Today = () => {
             {" "}
             Daily Progress: {!isNaN(progress) ? progress : "0.00"}%
           </Text>
-          <View overflow="hidden" borderColor="grey" borderWidth={1} borderRadius={2.5} padding={0.5} justifyContent="center" alignItems="center" top={1} bgColor="darkgrey">
+          <View
+            overflow="hidden"
+            borderColor="grey"
+            borderWidth={1}
+            borderRadius={2.5}
+            padding={0.5}
+            justifyContent="center"
+            alignItems="center"
+            top={1}
+            bgColor="darkgrey"
+          >
             <View flexDirection="row">
-              <Text fontSize={15} fontFamily="FamiljenGrotesk"> Total Tasks:   </Text>
-              <Text fontSize={17} fontFamily="FamiljenBold" bottom={0.5}>{tasks.length}</Text>
+              <Text fontSize={15} fontFamily="FamiljenGrotesk">
+                {" "}
+                Total Tasks:{" "}
+              </Text>
+              <Text fontSize={17} fontFamily="FamiljenBold" bottom={0.5}>
+                {tasks.length}
+              </Text>
             </View>
-            <View width="105%" borderTopColor="grey" borderTopWidth={1} justifyContent="center" flexDirection="row" alignItems="center">
-              <Text fontFamily="FamiljenGrotesk" fontSize={15} top={0.25}> Tasks Finished:   </Text>
-              <Text fontFamily="FamiljenBold" fontSize={17} top={0.25} style={{color: '#fac146'}}>{completedTasks}</Text>
+            <View
+              width="105%"
+              borderTopColor="grey"
+              borderTopWidth={1}
+              justifyContent="center"
+              flexDirection="row"
+              alignItems="center"
+            >
+              <Text fontFamily="FamiljenGrotesk" fontSize={15} top={0.25}>
+                {" "}
+                Tasks Finished:{" "}
+              </Text>
+              <Text
+                fontFamily="FamiljenBold"
+                fontSize={17}
+                top={0.25}
+                style={{ color: "#fac146" }}
+              >
+                {completedTasks}
+              </Text>
             </View>
           </View>
         </Box>
-       
       </ImageBackground>
 
       <Calendar
@@ -183,14 +230,16 @@ const Today = () => {
         newTask={newTask}
         openNewTask={openNewTask}
       />
-      {!prevDay && <CreateTaskCircle
-        radius={45}
-        borderWidth={2}
-        color="#00FF00"
-        text="Hello"
-        icon="clock"
-        onPress={() => openNewTask(true)}
-      />}
+      {!prevDay && (
+        <CreateTaskCircle
+          radius={45}
+          borderWidth={2}
+          color="#00FF00"
+          text="Hello"
+          icon="clock"
+          onPress={() => openNewTask(true)}
+        />
+      )}
     </View>
   );
 };
@@ -214,8 +263,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    backgroundColor: '#DBE6EC',
-    shadowColor: '#000',
+    backgroundColor: "#DBE6EC",
+    shadowColor: "#000",
     shadowOffset: {
       width: 0,
       height: 2,
@@ -241,7 +290,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     borderColor: "darkgrey",
     backgroundColor: "orange",
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: {
       width: 0,
       height: 1,
@@ -249,7 +298,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.175,
     shadowRadius: 3.84,
     elevation: 5,
-    width: 100
+    width: 100,
   },
   progressText: {
     fontSize: 13,
