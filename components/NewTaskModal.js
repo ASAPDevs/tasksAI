@@ -45,9 +45,10 @@ const NewTaskModal = ({ date, newTask, openNewTask, addTaskHandler }) => {
       const startOfDay = new Date(date).getTime();
       const endOfDay = startOfDay + 86400000 - 60000;
       const start = typeof startTime === "number" ? startTime : startOfDay;
-      let end = typeof endTime === "number" ? endTime : endOfDay;
-      addTaskHandler(taskTitle, taskDescription, start, end, taskCategory);
-      clearInputs();
+      const end = typeof endTime === "number" ? endTime : endOfDay;
+      start < end &&
+        addTaskHandler(taskTitle, taskDescription, start, end, taskCategory) &&
+        clearInputs();
     }
   };
 
@@ -83,6 +84,7 @@ const NewTaskModal = ({ date, newTask, openNewTask, addTaskHandler }) => {
         onPressIn={onPressIn}
         onPressOut={onPressOut}
         onPress={onPress}
+        // disabled={true}
       >
         <Animated.View
           style={{
@@ -95,6 +97,7 @@ const NewTaskModal = ({ date, newTask, openNewTask, addTaskHandler }) => {
             backgroundColor: "#FAA946",
             flexDirection: "column",
             display: "flex",
+            opacity: `${invalidTimes ? 0.5 : 1}`,
             borderColor: "black",
             borderWidth: 1,
             justifyContent: "center",
