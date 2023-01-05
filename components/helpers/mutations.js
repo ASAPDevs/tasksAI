@@ -49,6 +49,7 @@ export const CREATE_TASKS = gql`
       date
       time_start
       time_finished
+      time_of_day
       completed
       user_id
       category
@@ -65,6 +66,7 @@ export const UPDATE_TASK = gql`
       date
       time_start
       time_finished
+      time_of_day
       completed
       user_id
       category

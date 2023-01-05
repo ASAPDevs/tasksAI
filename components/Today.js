@@ -15,13 +15,14 @@ import CreateTaskCircle from "./CreateTaskCircle";
 import { getTimeOfDay } from "./helpers/dateHelperFunc";
 
 const Today = () => {
-  let today = new Date();
-  const timezoneOffset = today.getTimezoneOffset();
+  const now = new Date();
+  const timezoneOffset = now.getTimezoneOffset();
   // this function offsets the passed in date with any time zone difference
   const offsetTime = (dateObj) => {
     const newDate = new Date(dateObj.getTime() - timezoneOffset * 60000);
     return newDate;
   };
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
   // Figure out where we pull date or refetch date
   const [date, setDate] = useState(today);
@@ -94,13 +95,11 @@ const Today = () => {
 
   // this function converts the date state to mm/dd/yy format
   // const convertDateTitle = () => {
+  //   console.log('date', date);
   //   const yy = date.getFullYear();
-  //   const mm =
-  //     date.getMonth() + 1 < 10
-  //       ? `0${date.getMonth() + 1}`
-  //       : date.getMonth() + 1;
-  //   const dd = date.getDate() < 10 ? `0${date.getDate()}` : date.getDate();
-  //   return `${mm}/${dd}/${yy % 100}`;
+  //   const mm = date.getMonth() + 1;
+  //   const dd = date.getDate();
+  //   return `${mm}/${dd}/${yy}`;
   // };
 
   const handleDeleteTask = (taskId) => {
@@ -130,6 +129,7 @@ const Today = () => {
       category: category,
       user_id: Number(userID),
     };
+    console.log('add task', newTask)
     // console.log("start and end in addTaskHandler: ", startTime, endTime);
     createTaskMutation({ variables: { task: newTask } });
     openNewTask(false);
