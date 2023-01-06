@@ -2,6 +2,8 @@
   "expo": {
     "name": "taskAI",
     "slug": "taskAI",
+    "owner": "taskaiapp",
+    "privacy": "public",
     "jsEngine": "hermes",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -20,7 +22,8 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.taskaiapp.taskAI"
+      "bundleIdentifier": "com.taskaiapp.taskAI",
+      "buildNumber": "1.0.0"
     },
     "android": {
       "adaptiveIcon": {
@@ -31,14 +34,6 @@
     "web": {
       "favicon": "./assets/favicon.png"
     },
-    "sourceExts": [
-      "js",
-      "json",
-      "ts",
-      "tsx",
-      "jsx",
-      "vue"
-    ],
     "extra": {
       "eas": {
         "projectId": "c0d0f1af-16cf-4f44-a15e-a9dbf4b0214c"
