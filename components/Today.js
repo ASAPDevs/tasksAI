@@ -13,8 +13,10 @@ import ProgressBar from "./ProgressBar";
 import NewTaskModal from "./NewTaskModal";
 import CreateTaskCircle from "./CreateTaskCircle";
 import { getTimeOfDay } from "./helpers/dateHelperFunc";
+import { useIsFocused } from '@react-navigation/native';
 
 const Today = () => {
+  const isFocused = useIsFocused();
   const now = new Date();
   const timezoneOffset = now.getTimezoneOffset();
   // this function offsets the passed in date with any time zone difference
@@ -93,14 +95,7 @@ const Today = () => {
     },
   });
 
-  // this function converts the date state to mm/dd/yy format
-  // const convertDateTitle = () => {
-  //   console.log('date', date);
-  //   const yy = date.getFullYear();
-  //   const mm = date.getMonth() + 1;
-  //   const dd = date.getDate();
-  //   return `${mm}/${dd}/${yy}`;
-  // };
+  
 
   const handleDeleteTask = (taskId) => {
     console.log("type of task id in handleDeleteTask: ", typeof taskId);
@@ -137,12 +132,17 @@ const Today = () => {
 
   // useEffect to update and render progress bar
   useEffect(() => {
-    console.log("Completed Tasks: ", completedTasks)
     completedTasks
       ? setProgress(((completedTasks / tasks.length) * 100).toFixed(2))
       : setProgress(0);
     changePrevDay(compareDateWithToday);
   }, [tasks, date, prevDay]);
+
+  //useEffect, this procs the today component to switch back the date to "today"
+  useEffect(() => {
+    if (isFocused === false) setDate(today);
+  }, [isFocused])
+  
 
   return (
     <View style={styles.mainContainer}>

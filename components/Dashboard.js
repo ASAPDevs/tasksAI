@@ -35,7 +35,7 @@ const Dashboard = ({navigation}) => {
     }
     return acc;
   }, 0);
-  const [completionProgress, updateProgress] = useState(0);
+  const [completionProgress, setProgress] = useState(0);
   const dispatch = useDispatch();
   const welcomeText = "Welcome Back, \n"
   const [currentMessage, updateMessage] = useState(progressMessages[0])
@@ -75,25 +75,26 @@ const Dashboard = ({navigation}) => {
 
 
   useLayoutEffect(() => {
-    if (!isNaN(completedTasks / totalTasks.length)) {
-      updateProgress((completedTasks / totalTasks.length) * 100)
-    }
-  }, [totalTasks, completedTasks])
-
-  useLayoutEffect(() => {
     progressMessageHandler()
   }, [completionProgress])
 
 
-  useLayoutEffect(() => {
-    const unsubscribe = navigation.addListener('focus', () => {
-      console.log("dashboard")
-      refetch();
-    });
+  // useLayoutEffect(() => {
+  //   completedTasks
+  //   ? setProgress(((completedTasks / totalTasks.length) * 100).toFixed(2))
+  //   : setProgress(0);
+  // }, [totalTasks, completedTasks])
 
-    // Return the function to unsubscribe from the event so it gets removed on unmount
-    return unsubscribe;
-  }, [navigation]);
+
+  // useLayoutEffect(() => {
+  //   const unsubscribe = navigation.addListener('focus', () => {
+  //     console.log("dashboard")
+  //     refetch();
+  //   });
+
+  //   // Return the function to unsubscribe from the event so it gets removed on unmount
+  //   return unsubscribe;
+  // }, [navigation]);
 
   return (
     <View style={styles.mainContainer}>
