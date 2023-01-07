@@ -1,13 +1,13 @@
 {
   "expo": {
-    "name": "taskAI",
+    "name": "tasksAI",
     "slug": "taskAI",
     "owner": "taskaiapp",
     "privacy": "public",
     "jsEngine": "hermes",
-    "version": "1.0.0",
+    "version": "1.1.1",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/iosicon.png",
     "userInterfaceStyle": "light",
     "splash": {
       "image": "./assets/splash.png",
