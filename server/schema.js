@@ -2,10 +2,14 @@ const { gql } = require("apollo-server-express");
 const { GraphQLError } = require("graphql");
 const bcrypt = require("bcrypt");
 const db = require("./models/db");
+const axios = require("axios")
 
 const typeDefs = gql`
   type Query {
     getTasksByDay(date: String!, user_id: Int): [Task]
+    
+    # for ML
+    getDataML: [MLData] 
   }
 
   type Mutation {
@@ -18,6 +22,13 @@ const typeDefs = gql`
     deleteTask(id: ID!): Task
     completeTask(id: ID!): Task
     pushTask(id: ID!, newStartTime: String!, newEndTime: String!, newTimeOfDay: Int!): Task
+
+  }
+
+  # for ML
+  type MLData {
+    username: String
+    email: String
   }
 
 
@@ -105,6 +116,15 @@ const resolvers = {
       );
       return task.rows;
     },
+    
+    getDataML: async (_, args) => {
+      const res = await axios.get("http://127.0.0.1:5000")
+      
+      const dataML = res.data
+
+      return dataML
+    }
+    
   },
   Mutation: {
     login: async (_, args) => {
