@@ -181,6 +181,7 @@ const styles = StyleSheet.create({
     borderColor: "darkgrey",
     alignItems: "center",
     borderWidth: 1,
+    marginTop: 3,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
@@ -193,7 +194,8 @@ const styles = StyleSheet.create({
     width: "80%",
     minHeight: "47.5%",
     maxHeight: "50.5%",
-    backgroundColor: '#DBE6EC'
+    backgroundColor: '#DBE6EC',
+    paddingBottom: 10 
   },
   todayContainer: {
     display: "flex",
