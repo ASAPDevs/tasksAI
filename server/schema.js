@@ -13,6 +13,7 @@ const typeDefs = gql`
     signup(email: String!, username: String!, password: String!): User!
     changePassword(userInput: ChangePasswordInput!): User!
     changeEmail(userInput: ChangeEmailInput!): User!
+    deleteUser(id: ID!): User!
     createTask(task: TaskInput): Task!
     updateTask(task: UpdateTaskInput): Task
     deleteTask(id: ID!): Task
@@ -213,6 +214,15 @@ const resolvers = {
           "Invalid password. Please provide correct password"
         );
       }
+    },
+    deleteUser: async (_, args) => {
+      const { id } = args;
+      const results = await db.query(
+        "DELETE FROM users WHERE id = $1 RETURNING *;",
+        [id]
+      );
+      const deletedUser = results.rows[0]
+      return deletedUser;
     },
     createTask: async (_, args) => {
       // post req to Task db table
