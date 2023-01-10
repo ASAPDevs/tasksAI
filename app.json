@@ -1,11 +1,13 @@
 {
   "expo": {
-    "name": "todo",
-    "slug": "todo",
+    "name": "tasksAI",
+    "slug": "taskAI",
+    "owner": "taskaiapp",
+    "privacy": "public",
     "jsEngine": "hermes",
-    "version": "1.0.0",
+    "version": "1.1.2",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/iosicon.png",
     "userInterfaceStyle": "light",
     "splash": {
       "image": "./assets/splash.png",
@@ -19,7 +21,9 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.taskaiapp.taskAI",
+      "buildNumber": "1.1.2"
     },
     "android": {
       "adaptiveIcon": {
@@ -30,6 +34,10 @@
     "web": {
       "favicon": "./assets/favicon.png"
     },
-    "sourceExts": [ "js", "json", "ts", "tsx", "jsx", "vue"]
+    "extra": {
+      "eas": {
+        "projectId": "c0d0f1af-16cf-4f44-a15e-a9dbf4b0214c"
+      }
+    }
   }
 }

@@ -1,6 +1,6 @@
 import { StyleSheet } from "react-native";
 import { View, Text, Heading, Divider } from "native-base";
-import { useState, useLayoutEffect, useCallback } from "react";
+import { useState, useLayoutEffect, useCallback, useEffect } from "react";
 import { useSelector } from "react-redux";
 import CircularProgress from 'react-native-circular-progress-indicator';
 import { useQuery } from "@apollo/client";
@@ -19,7 +19,7 @@ const progressMessages = {
   4: "Awesome job!\nAll tasks completed!"
 }
 
-const Dashboard = () => {
+const Dashboard = ({navigation}) => {
   // this function offsets the passed in date with any time zone difference
   const offsetTime = (dateObj) => {
     const newDate = new Date(dateObj.getTime() - (timezoneOffset * 60000));
@@ -28,9 +28,14 @@ const Dashboard = () => {
 
   const username = useSelector((state) => state.storage.username);
   const userID = useSelector((state) => state.storage.user_id)
-  const totalTasksLength = useSelector((state) => state.storage.tasks.all.length);
-  const completedTasksLength = useSelector((state) => state.storage.tasks.all.filter((task) => task.completed).length)
-  const [completionProgress, updateProgress] = useState(0);
+  const totalTasks = useSelector((state) => state.storage.tasks.all);
+  const completedTasks = totalTasks.reduce((acc, task) => {
+    if (task.completed) {
+      return acc + 1;
+    }
+    return acc;
+  }, 0);
+  const [completionProgress, setProgress] = useState(0);
   const dispatch = useDispatch();
   const welcomeText = "Welcome Back, \n"
   const [currentMessage, updateMessage] = useState(progressMessages[0])
@@ -39,7 +44,7 @@ const Dashboard = () => {
   const today = offsetTime(now);
 
   //Preload today's tasks / This prefetches once.
-  const { data, error, loading } = useQuery(GET_TODAYS_TASKS, {
+  const { data, error, loading, refetch } = useQuery(GET_TODAYS_TASKS, {
     notifyOnNetworkStatusChange: true,
     fetchPolicy: 'cache-first',
     onCompleted: (data) => {
@@ -53,9 +58,9 @@ const Dashboard = () => {
 
   //this function used to update the message under the progress circle.
   const progressMessageHandler = useCallback(() => {
-    if (completionProgress === 0 && !totalTasksLength) {
+    if (completionProgress === 0 && !totalTasks) {
       return updateMessage(progressMessages[0])
-    } else if (completionProgress === 0 && totalTasksLength) {
+    } else if (completionProgress === 0 && totalTasks) {
       return updateMessage(progressMessages[0.5])
     } else if (completionProgress > 0 && completionProgress < 50) {
       return updateMessage(progressMessages[1])
@@ -66,19 +71,30 @@ const Dashboard = () => {
     } else if (completionProgress === 100) {
       return updateMessage(progressMessages[4])
     }
-  }, [completionProgress, totalTasksLength])
+  }, [completionProgress, totalTasks])
 
-
-  useLayoutEffect(() => {
-    if (!isNaN(completedTasksLength / totalTasksLength)) {
-      updateProgress((completedTasksLength / totalTasksLength) * 100)
-    }
-  }, [totalTasksLength, completedTasksLength])
 
   useLayoutEffect(() => {
     progressMessageHandler()
   }, [completionProgress])
 
+
+  // useLayoutEffect(() => {
+  //   completedTasks
+  //   ? setProgress(((completedTasks / totalTasks.length) * 100).toFixed(2))
+  //   : setProgress(0);
+  // }, [totalTasks, completedTasks])
+
+
+  // useLayoutEffect(() => {
+  //   const unsubscribe = navigation.addListener('focus', () => {
+  //     console.log("dashboard")
+  //     refetch();
+  //   });
+
+  //   // Return the function to unsubscribe from the event so it gets removed on unmount
+  //   return unsubscribe;
+  // }, [navigation]);
 
   return (
     <View style={styles.mainContainer}>
@@ -97,8 +113,8 @@ const Dashboard = () => {
         <Divider orientation="horizontal" />
         <View style={styles.todayTaskContainer} >
           <View style={styles.taskCountContainer} alignItems="center" >
-            <View style={styles.innerTaskCountContainer}><Text fontFamily="FamiljenGrotesk" >Today's Tasks:</Text><Text fontFamily="FamiljenBold" fontSize={20} color="white">{totalTasksLength}</Text></View>
-            <View style={styles.innerTaskCountContainer}><Text fontFamily="FamiljenGrotesk" >Tasks Completed:</Text><Text fontFamily="FamiljenBold" fontSize={20} color="white">{completedTasksLength}</Text></View>
+            <View style={styles.innerTaskCountContainer}><Text fontFamily="FamiljenGrotesk" >Today's Tasks:</Text><Text fontFamily="FamiljenBold" fontSize={20} color="white">{totalTasks.length}</Text></View>
+            <View style={styles.innerTaskCountContainer}><Text fontFamily="FamiljenGrotesk" >Tasks Completed:</Text><Text fontFamily="FamiljenBold" fontSize={20} color="white">{completedTasks}</Text></View>
           </View>
           {/* <View style={styles.taskCountContainer} alignItems="center"></View> */}
         </View>
@@ -165,6 +181,7 @@ const styles = StyleSheet.create({
     borderColor: "darkgrey",
     alignItems: "center",
     borderWidth: 1,
+    marginTop: 3,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
@@ -175,9 +192,10 @@ const styles = StyleSheet.create({
     elevation: 5,
     borderRadius: 10,
     width: "80%",
-    minHeight: "45.5%",
-    maxHeight: "45.5%",
-    backgroundColor: '#DBE6EC'
+    minHeight: "47.5%",
+    maxHeight: "50.5%",
+    backgroundColor: '#DBE6EC',
+    paddingBottom: 10 
   },
   todayContainer: {
     display: "flex",
@@ -244,7 +262,7 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
-    height: 65,
+    height: "15%",
     marginTop: 10.5,
     shadowColor: '#000',
     shadowOffset: {

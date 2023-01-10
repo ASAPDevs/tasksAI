@@ -99,3 +99,13 @@ export const PUSH_TASK = gql`
     }
   }
 `
+
+export const DELETE_ACCOUNT = gql`
+ mutation DeleteUser($deleteUserId: ID!) {
+  deleteUser(id: $deleteUserId) {
+    email
+    id
+    username
+  }
+}
+`

@@ -13,8 +13,10 @@ import ProgressBar from "./ProgressBar";
 import NewTaskModal from "./NewTaskModal";
 import CreateTaskCircle from "./CreateTaskCircle";
 import { getTimeOfDay } from "./helpers/dateHelperFunc";
+import { useIsFocused } from '@react-navigation/native';
 
 const Today = () => {
+  const isFocused = useIsFocused();
   const now = new Date();
   const timezoneOffset = now.getTimezoneOffset();
   // this function offsets the passed in date with any time zone difference
@@ -93,14 +95,7 @@ const Today = () => {
     },
   });
 
-  // this function converts the date state to mm/dd/yy format
-  // const convertDateTitle = () => {
-  //   console.log('date', date);
-  //   const yy = date.getFullYear();
-  //   const mm = date.getMonth() + 1;
-  //   const dd = date.getDate();
-  //   return `${mm}/${dd}/${yy}`;
-  // };
+  
 
   const handleDeleteTask = (taskId) => {
     console.log("type of task id in handleDeleteTask: ", typeof taskId);
@@ -139,9 +134,15 @@ const Today = () => {
   useEffect(() => {
     completedTasks
       ? setProgress(((completedTasks / tasks.length) * 100).toFixed(2))
-      : null;
+      : setProgress(0);
     changePrevDay(compareDateWithToday);
-  }, [tasks, date]);
+  }, [tasks, date, prevDay]);
+
+  //useEffect, this procs the today component to switch back the date to "today"
+  useEffect(() => {
+    if (isFocused === false) setDate(today);
+  }, [isFocused])
+  
 
   return (
     <View style={styles.mainContainer}>
@@ -159,10 +160,14 @@ const Today = () => {
         </View>
         <Box w="50%" p="3" top={1} _text={{ textAlign: "center" }}>
           <ProgressBar progress={progress} />
-          <Text style={styles.progressText}>
-            {" "}
-            Daily Progress: {!isNaN(progress) ? progress : "0.00"}%
-          </Text>
+          <View width="100%" flexDirection="row">
+            <Text style={styles.progressText} fontFamily="FamiljenGrotesk">
+              Daily Progress:{"  "}
+            </Text>
+            <Text style={styles.progressText} fontFamily="FamiljenBold">
+              {!isNaN(progress) ? progress : "0.00"}%
+            </Text>
+          </View>
           <View
             overflow="hidden"
             borderColor="grey"
@@ -257,7 +262,8 @@ const styles = StyleSheet.create({
     width: "110%",
     borderBottomColor: "black",
     borderWidth: 1,
-    maxHeight: 135,
+    minHeight: "15%",
+    maxHeight: "18%",
     paddingHorizontal: 40,
     flex: 1,
     flexDirection: "row",

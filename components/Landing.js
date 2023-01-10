@@ -9,7 +9,7 @@ import {
   Image,
   TouchableOpacity,
 } from "react-native";
-import logo from "../assets/AI-TODO.png";
+import logo from "../assets/iostransparent.png";
 import { useMutation } from "@apollo/client";
 import { useDispatch, useSelector } from "react-redux";
 import { loginUser } from "../redux/slices/storageSlice";
@@ -269,8 +269,9 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   logo: {
-    marginTop: 20,
-    height: 150,
+    marginTop: 10,
+    height: 250,
+    aspectRatio: "1"
   },
   input: {
     height: 40,

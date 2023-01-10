@@ -53,7 +53,7 @@ const TaskListContainer = ({
 
   return (
     <View style={styles.bottomContainer}>
-      <View style={{ minHeight: "7.25%", maxHeight: '7.25%', borderColor: "black" }}>
+      <View style={{ minHeight: "8%", maxHeight: '8.5%', borderColor: "black", alignItems: "center", justifyContent: "center" }}>
         <Heading style={styles.bottomContainerHeading}>Task List</Heading>
         <TaskListTabGroup currentTab={currentTab} switchTab={switchTab} />
         <Divider bgColor="black" thickness={1} orientation="horizontal" />
@@ -157,15 +157,13 @@ const styles = StyleSheet.create({
     fontFamily: "FamiljenGrotesk",
     fontWeight: "bold",
     fontSize: 25,
-    marginTop: 5,
-
+    marginTop: "2%",
     marginBottom: 10,
     textAlign: "center",
   },
   taskListContainer: {
     borderBottomColor: 'black',
     minHeight: "85%",
-    height: "85%",
     maxHeight: "85%",
     borderBottomWidth: 0,
   },
