@@ -5,7 +5,7 @@
     "owner": "taskaiapp",
     "privacy": "public",
     "jsEngine": "hermes",
-    "version": "1.1.1",
+    "version": "1.1.2",
     "orientation": "portrait",
     "icon": "./assets/iosicon.png",
     "userInterfaceStyle": "light",
@@ -23,7 +23,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.taskaiapp.taskAI",
-      "buildNumber": "1.0.0"
+      "buildNumber": "1.1.2"
     },
     "android": {
       "adaptiveIcon": {
