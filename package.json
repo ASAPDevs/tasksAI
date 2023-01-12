@@ -20,6 +20,7 @@
     "@react-navigation/native": "^6.1.1",
     "@reduxjs/toolkit": "^1.9.1",
     "apollo-server-express": "^3.11.1",
+    "axios": "^1.2.2",
     "bcrypt": "^5.1.0",
     "dotenv": "^16.0.3",
     "env": "^0.0.2",
