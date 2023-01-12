@@ -79,11 +79,11 @@ const Dashboard = ({navigation}) => {
   }, [completionProgress])
 
 
-  // useLayoutEffect(() => {
-  //   completedTasks
-  //   ? setProgress(((completedTasks / totalTasks.length) * 100).toFixed(2))
-  //   : setProgress(0);
-  // }, [totalTasks, completedTasks])
+  useLayoutEffect(() => {
+    completedTasks
+    ? setProgress(((completedTasks / totalTasks.length) * 100).toFixed(2))
+    : setProgress(0);
+  }, [totalTasks, completedTasks])
 
 
   // useLayoutEffect(() => {
@@ -191,6 +191,8 @@ const styles = StyleSheet.create({
     elevation: 5,
     borderRadius: 10,
     width: "80%",
+    paddingBottom: 15,
+    marginTop: 5,
     minHeight: "47.5%",
     maxHeight: "50.5%",
     backgroundColor: '#DBE6EC'

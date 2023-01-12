@@ -83,11 +83,6 @@ const Today = () => {
 
   const [deleteTaskMutation] = useMutation(DELETE_TASK, {
     onCompleted: (data) => {
-      console.log(
-        "data.deleteTask.id: ",
-        data.deleteTask.id,
-        typeof data.deleteTask.id
-      );
       dispatch(deleteTask(data.deleteTask.id));
     },
     onError: (err) => {
