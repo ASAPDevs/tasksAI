@@ -20,9 +20,8 @@ const typeDefs = gql`
     createTask(task: TaskInput): Task!
     updateTask(task: UpdateTaskInput): Task
     deleteTask(id: ID!): Task
-    completeTask(id: ID!): Task
+    completeTask(id: ID!, onTime: Boolean!): Task
     pushTask(id: ID!, newStartTime: String!, newEndTime: String!, newTimeOfDay: Int!): Task
-
   }
 
   # for ML
@@ -305,10 +304,11 @@ const resolvers = {
       return deletedTask;
     },
     completeTask: async (_, args) => {
-      const { id, completed_on_time } = args;
+      const { id, onTime } = args;
+
       const completedTask = await db.query(
         "UPDATE tasks SET completed = true, completed_on_time = $1 WHERE id = $2 RETURNING *;",
-        [completed_on_time ?? 0, id]
+        [onTime ? 1 : 0, id]
       );
       return completedTask.rows[0]
     },

@@ -83,8 +83,8 @@ export const DELETE_TASK = gql`
 `;
 
 export const COMPLETE_TASK = gql`
-  mutation CompleteTask($taskId: ID!) {
-    completeTask(id: $taskId) {
+  mutation CompleteTask($taskId: ID!, $onTime: Boolean!) {
+    completeTask(id: $taskId, onTime: $onTime) {
       id
     }
   }
