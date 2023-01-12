@@ -14,8 +14,8 @@ headers = {
 }
 
 data = {
-    "prompt": "Send a list as a response. This user tends to finish tasks in the morning the most, then evening, then afternoon, and night last. Generate 5 recommendations for this user going forward. ",
-    "model": "text-davinci-002",
+    "prompt": "Send a list as a response. This user tends to finish tasks in the morning the most, then evening, then afternoon, and night last. Generate 5 recommendations for this user going forward. These recommendations are for a user that is using a mobile task organization app, do not mention anything regarding the app's functionality or capabilities other than being able to create and delete tasks at scheduled times. ",
+    "model": "text-davinci-003",
     "max_tokens": 500
 }
 
