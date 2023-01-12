@@ -51,6 +51,14 @@ const TaskListContainer = ({
     },
   });
 
+  function completeTaskHandler(id) {
+    const task = tasks.filter(task => task.id === id);
+    const endTime = (Number(task[0].time_finished)) + 3600000; // 1 hr grace period to mark completed
+    const currentTime = new Date().getTime();
+    if (endTime > currentTime) completeTaskMutation({variables: {taskId: id, onTime: true}})
+    else completeTaskMutation({variables: {taskId: id, onTime: false}})
+  }
+
   return (
     <View style={styles.bottomContainer}>
       <View style={{ minHeight: "8%", maxHeight: '8.5%', borderColor: "black", alignItems: "center", justifyContent: "center" }}>
@@ -130,9 +138,8 @@ const TaskListContainer = ({
           leftActivationValue={80}
           // onLeftAction={(data, rowMap) => console.log("Left: ", rowMap.item)}
           onLeftAction={(rowData, rowKey) => {
-            console.log("rowData:", rowData);
-            console.log("rowKey:", Object.keys(rowKey)[0]);
-            completeTaskMutation({ variables: { taskId: rowData } });
+            // completeTaskMutation({ variables: { taskId: rowData } });
+            completeTaskHandler(rowData)
           }}
 
         // onSwipeValueChange={() => console.log("SwipeLEFT")}
