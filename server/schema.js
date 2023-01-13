@@ -7,9 +7,9 @@ const axios = require("axios")
 const typeDefs = gql`
   type Query {
     getTasksByDay(date: String!, user_id: Int): [Task]
-    
+    getAllTasks(user_id: Int): [Task]
     # for ML
-    getDataML: [MLData] 
+    getDataML(user_id: Int!): [String]
   }
 
   type Mutation {
@@ -116,9 +116,14 @@ const resolvers = {
       );
       return task.rows;
     },
-    
+    getAllTasks: async (_, args) => {
+      const { user_id } = args;
+      const task = await db.query("SELECT * FROM tasks WHERE user_id = ($1) AND completed_on_time = 1;", [user_id]);
+      return task.rows;
+    },
     getDataML: async (_, args) => {
-      const res = await axios.get("http://127.0.0.1:5000")
+      const { user_id } = args;
+      const res = await axios.post(`http://127.0.0.1:5000/recommend/${user_id}`)
       
       const dataML = res.data
 
