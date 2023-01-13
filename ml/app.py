@@ -62,7 +62,10 @@ def analyzeOnTime(tasks):
     response_string = response_text["choices"][0]['text']
     recommendations = response_string.split("\n")
     recommendations = [i.split('. ')[1] for i in recommendations if i]
-    return recommendations
+    #Creates an object with corresponding key names: DAWN, MORNING, AFTERNOON, NIGHT AND VALUES FROM FREQUENCY
+    onTimeMetrics = {times[key]: value for key, value in frequency.items()}
+    print(onTimeMetrics)
+    return {"recommendations": recommendations, "metrics": {"onTimeMetrics": onTimeMetrics}}
 
 
 @app.post("/recommend/<user_id>")

@@ -9,7 +9,7 @@ const typeDefs = gql`
     getTasksByDay(date: String!, user_id: Int): [Task]
     getAllTasks(user_id: Int): [Task]
     # for ML
-    getDataML(user_id: Int!): [String]
+    getDataML(user_id: Int!): MLData!
   }
 
   type Mutation {
@@ -27,10 +27,22 @@ const typeDefs = gql`
 
   # for ML
   type MLData {
-    username: String
-    email: String
+    recommendations: [String],
+    metrics: Metrics
   }
 
+
+  type Metrics {
+    onTimeMetrics: OnTimeMetrics
+  }
+
+
+  type OnTimeMetrics {
+    Dawn: Int,
+    Morning: Int,
+    Afternoon: Int,
+    Evening: Int
+}
 
   input ChangeEmailInput {
     username: String!
