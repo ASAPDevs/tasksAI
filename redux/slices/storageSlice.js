@@ -10,6 +10,7 @@ const initialState = {
     all: [],
   },
   recommendations: [],
+  metrics: [],
   settings: {
     darkMode: false,
   }
@@ -82,10 +83,15 @@ export const storageSlice = createSlice({
           return task
         }
       })
-    } 
+    },
+    generateRec: (state, action) => {
+      console.log("checking payload in genRec: ", action.payload)
+      state.recommendations = action.payload
+
+    }
   }
 })
 
 
-export const { loginUser, logoutUser, loadTasks, addTask, deleteTask, completeTask, updateTask, pushTask, updateEmail } = storageSlice.actions;
+export const { loginUser, logoutUser, loadTasks, addTask, deleteTask, completeTask, updateTask, pushTask, updateEmail, generateRec } = storageSlice.actions;
 export default storageSlice.reducer;

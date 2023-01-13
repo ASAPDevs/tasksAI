@@ -9,7 +9,8 @@ const typeDefs = gql`
     getTasksByDay(date: String!, user_id: Int): [Task]
     getAllTasks(user_id: Int): [Task]
     # for ML
-    getDataML(user_id: Int!): MLData!
+    # getRecMessage(user_id: )
+    getDataML(user_id: Int!): MLData
   }
 
   type Mutation {
@@ -23,6 +24,7 @@ const typeDefs = gql`
     deleteTask(id: ID!): Task
     completeTask(id: ID!, onTime: Boolean!): Task
     pushTask(id: ID!, newStartTime: String!, newEndTime: String!, newTimeOfDay: Int!): Task
+    generateDataML(user_id: Int!): MLData!
   }
 
   # for ML
@@ -135,12 +137,22 @@ const resolvers = {
     },
     getDataML: async (_, args) => {
       const { user_id } = args;
-      const res = await axios.post(`http://127.0.0.1:5000/recommend/${user_id}`)
+      //check in the metrics table if there is a row that matches the user_id
+      //if there is, we will just fetch and return that row
+      const check = await db.query("SELECT * FROM metrics WHERE user_id = ($1);", [user_id]);
+      //if there isnt, we make a call to the python service to generate the relevant data and insert into the DB and return.
+      return check.rows.length !== 0 ? {recommendations: check.rows[0].recommendations, metrics: JSON.parse(check.rows[0].metrics)} : null
+      // let dataML;
+      // if (check.rows.length == 0) {
+      //   const res = await axios.post(`http://127.0.0.1:5000/recommend/${user_id}`);
+      //   dataML = res.data;
+      //   await db.query('INSERT INTO metrics (recommendations, metrics, user_id) VALUES ($1, $2, $3)', [dataML.recommendations, JSON.stringify(dataML.metrics), user_id])
+      // } else {
+      //   dataML = {recommendations: check.rows[0].recommendations, metrics: JSON.parse(check.rows[0].metrics)}
+      // }
       
-      const dataML = res.data
-
-      return dataML
-    }
+      // return dataML
+    },
     
   },
   Mutation: {
@@ -345,6 +357,24 @@ const resolvers = {
       const updatedTask = await db.query("UPDATE tasks SET time_start = $1, time_finished = $2, time_of_day = $3 WHERE id = $4 RETURNING *;",
         [newStartTime, newEndTime, newTimeOfDay, id])
       return updatedTask.rows[0]
+    },
+
+    generateDataML: async(_, args) => {
+      const { user_id } = args;
+      //check in the metrics table if there is a row that matches the user_id
+      //if there is, we will just fetch and return that row
+      const check = await db.query("SELECT * FROM metrics WHERE user_id = ($1);", [user_id]);
+      //if there isnt, we make a call to the python service to generate the relevant data and insert into the DB and return.
+      const res = await axios.post(`http://127.0.0.1:5000/recommend/${user_id}`);
+      const dataML = res.data;
+      if (check.rows.length == 0) {
+        await db.query('INSERT INTO metrics (recommendations, metrics, user_id) VALUES ($1, $2, $3)', [dataML.recommendations, JSON.stringify(dataML.metrics), user_id])
+      } else {
+        // if (check.rows[0].expiry)
+        await db.query('UPDATE metrics SET recommendations = ($1), metrics = ($2) WHERE user_id = ($3)', [dataML.recommendations, JSON.stringify(dataML.metrics), user_id])
+      }
+     
+      return dataML
     }
   },
 };

@@ -109,3 +109,19 @@ export const DELETE_ACCOUNT = gql`
   }
 }
 `
+
+export const GENERATE_DATA_ML = gql`
+  mutation GenerateDataML($user_id: Int!) {
+    generateDataML(user_id: $user_id) {
+      metrics {
+        onTimeMetrics {
+          Dawn
+          Morning
+          Afternoon
+          Evening
+        }
+      }
+      recommendations
+    }
+  }
+`

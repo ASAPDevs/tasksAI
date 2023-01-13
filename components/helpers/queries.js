@@ -15,3 +15,19 @@ export const GET_TODAYS_TASKS = gql`
     }
 }
 `
+
+export const GET_DATA_ML = gql`
+  query GetDataML($user_id: Int!) {
+    getDataML(user_id: $user_id) {
+      metrics {
+        onTimeMetrics {
+          Dawn
+          Morning
+          Afternoon
+          Evening
+        }
+      }
+      recommendations
+  }
+  }
+`

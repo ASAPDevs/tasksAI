@@ -1,12 +1,12 @@
-import { StyleSheet } from "react-native";
-import { View, Text, Heading, Divider } from "native-base";
+import { StyleSheet, SafeAreaView } from "react-native";
+import { View, Text, Heading, Divider, Button, ScrollView } from "native-base";
 import { useState, useLayoutEffect, useCallback, useEffect } from "react";
-import { useSelector } from "react-redux";
 import CircularProgress from 'react-native-circular-progress-indicator';
-import { useQuery } from "@apollo/client";
-import { GET_TODAYS_TASKS } from "./helpers/queries";
-import { useDispatch } from "react-redux";
-import { loadTasks } from "../redux/slices/storageSlice";
+import { useQuery, useMutation } from "@apollo/client";
+import { GET_TODAYS_TASKS, GET_DATA_ML} from "./helpers/queries";
+import { GENERATE_DATA_ML } from "./helpers/mutations";
+import { useDispatch, useSelector} from "react-redux";
+import { loadTasks, generateRec } from "../redux/slices/storageSlice";
 
 
 
@@ -98,43 +98,92 @@ const Dashboard = ({navigation}) => {
 
   return (
     <View style={styles.mainContainer}>
-      <View style={styles.headingContainer}>
-        <Heading style={styles.heading}>
-          {welcomeText}{<Heading style={styles.username}>{username}.</Heading>}{" "}
-          {/* <Emoji symbol={0x1f44b} /> */}
-        </Heading>
-      </View>
-      <View style={styles.overviewContainer}>
-        <View style={styles.todayContainer} >
-          <Heading style={styles.todayHeader}>Today</Heading>
-          <Text style={styles.todayDate} fontSize={20}>{now.toLocaleDateString('en-us', { year: 'numeric', month: 'long', day: 'numeric' })}</Text>
-          <Text style={styles.todayDate} fontSize={15}>{new Intl.DateTimeFormat("en-US", { weekday: "long" }).format(today)}</Text>
+      <ScrollView contentContainerStyle={{alignItems: 'center', height:'80%'}} >
+        <View style={styles.headingContainer}>
+          <Heading style={styles.heading}>
+            {welcomeText}{<Heading style={styles.username}>{username}.</Heading>}{" "}
+            {/* <Emoji symbol={0x1f44b} /> */}
+          </Heading>
         </View>
-        <Divider orientation="horizontal" />
-        <View style={styles.todayTaskContainer} >
-          <View style={styles.taskCountContainer} alignItems="center" >
-            <View style={styles.innerTaskCountContainer}><Text fontFamily="FamiljenGrotesk" >Today's Tasks:</Text><Text fontFamily="FamiljenBold" fontSize={20} color="white">{totalTasks.length}</Text></View>
-            <View style={styles.innerTaskCountContainer}><Text fontFamily="FamiljenGrotesk" >Tasks Completed:</Text><Text fontFamily="FamiljenBold" fontSize={20} color="white">{completedTasks}</Text></View>
+        <View style={styles.overviewContainer}>
+          <View style={styles.todayContainer} >
+            <Heading style={styles.todayHeader}>Today</Heading>
+            <Text style={styles.todayDate} fontSize={20}>{now.toLocaleDateString('en-us', { year: 'numeric', month: 'long', day: 'numeric' })}</Text>
+            <Text style={styles.todayDate} fontSize={15}>{new Intl.DateTimeFormat("en-US", { weekday: "long" }).format(today)}</Text>
           </View>
-          {/* <View style={styles.taskCountContainer} alignItems="center"></View> */}
+          <Divider orientation="horizontal" />
+          <View style={styles.todayTaskContainer} >
+            <View style={styles.taskCountContainer} alignItems="center" >
+              <View style={styles.innerTaskCountContainer}><Text fontFamily="FamiljenGrotesk" >Today's Tasks:</Text><Text fontFamily="FamiljenBold" fontSize={20} color="white">{totalTasks.length}</Text></View>
+              <View style={styles.innerTaskCountContainer}><Text fontFamily="FamiljenGrotesk" >Tasks Completed:</Text><Text fontFamily="FamiljenBold" fontSize={20} color="white">{completedTasks}</Text></View>
+            </View>
+            {/* <View style={styles.taskCountContainer} alignItems="center"></View> */}
+          </View>
+          <CircularProgress
+            value={isNaN(completionProgress) ? 0 : completionProgress}
+            maxValue={100}
+            radius={40}
+            title={'%'}
+            titleColor={'black'}
+            activeStrokeColor={'#FAA946'}
+            titleStyle={{ fontWeight: 'bold' }}
+            progressValueColor={'black'}
+          />
+          <View style={styles.progressMessageContainer}>
+            <Text color="#FDF1CB" textAlign="center" fontFamily="FamiljenBold" fontSize={15} lineHeight={18}  >{currentMessage}</Text>
+          </View>
         </View>
-        <CircularProgress
-          value={isNaN(completionProgress) ? 0 : completionProgress}
-          maxValue={100}
-          radius={40}
-          title={'%'}
-          titleColor={'black'}
-          activeStrokeColor={'#FAA946'}
-          titleStyle={{ fontWeight: 'bold' }}
-          progressValueColor={'black'}
-        />
-        <View style={styles.progressMessageContainer}>
-          <Text color="#FDF1CB" textAlign="center" fontFamily="FamiljenBold" fontSize={15} lineHeight={18}  >{currentMessage}</Text>
-        </View>
-      </View>
+        
+        <RecommendationsContainer userID={userID} />
+      </ScrollView>
     </View>
   );
 };
+
+const RecommendationsContainer = ({ userID }) => {
+  const recommendations = useSelector((state) => state.storage.recommendations)
+  const dispatch = useDispatch()
+  console.log("user id:", typeof userID)
+  const { data, loading, error} = useQuery(GET_DATA_ML, {
+    onCompleted: (data) => {
+      console.log("data get data ml: ", data.getDataML.recommendations)
+      dispatch(generateRec(data.getDataML.recommendations))
+    },
+    onError: (error) => {
+      console.log("Error: ", error)
+    },
+    variables: {user_id: userID}
+  })
+  
+
+  const [generateDataML] = useMutation(GENERATE_DATA_ML, {
+    onCompleted: (data) => {
+      console.log("data from rec container: ", data)
+      dispatch(generateRec(data.generateDataML.recommendations))
+    },
+    onError: (error) => {
+      console.log("Error: ", error)
+    }
+  })
+  
+  const getRec = () => {
+    generateDataML({
+      variables: {
+        user_id: userID
+      }
+    })
+  }
+
+  return (
+    <View style={styles.recommendationsContainer}>
+      <Button onPress={getRec}>Get a rec!</Button>
+      <View>
+        {recommendations && 
+        recommendations.map(recommendation => <Text>{recommendation}</Text>)}
+      </View>
+    </View>
+  )
+}
 
 const styles = StyleSheet.create({
   mainContainer: {
@@ -144,7 +193,9 @@ const styles = StyleSheet.create({
     width: "100%",
     height: "100%",
     flexDirection: "column",
-    alignItems: "center",
+    position: "relative",
+    flex: 1,
+    // overflow: "visible"
   },
   headingContainer: {
     display: "flex",
@@ -153,27 +204,51 @@ const styles = StyleSheet.create({
     width: "100%",
     height: "15%",
     borderColor: "red",
-    borderWidth: 0,
+    borderWidth: 0
   },
   heading: {
     textAlign: "center",
     fontFamily: "FamiljenGrotesk",
     padding: 10,
-    fontSize: 45,
+    fontSize: 25,
     width: "100%",
-    lineHeight: 50,
+    lineHeight: 30,
     letterSpacing: 0,
   },
   username: {
     fontFamily: "FamiljenBold",
     padding: 10,
     flexWrap: "wrap",
-    fontSize: 50,
+    fontSize: 30,
     height: 25,
     width: "100%",
-    lineHeight: 50,
+    lineHeight: 33,
     letterSpacing: 0,
     color: "#FAA946",
+  },
+  recommendationsContainer: {
+    display: "flex",
+    flexDirection: "column",
+    borderColor: "darkgrey",
+    alignItems: "center",
+    borderWidth: 1,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+    borderRadius: 10,
+    width: "80%",
+    marginTop: 50,
+    marginBottom: 30,
+    minHeight: 200,
+    maxHeight: "50.5%",
+    backgroundColor: '#DBE6EC',
+    paddingBottom: 10,
+    position: "relative",
   },
   overviewContainer: {
     display: "flex",
@@ -181,7 +256,7 @@ const styles = StyleSheet.create({
     borderColor: "darkgrey",
     alignItems: "center",
     borderWidth: 1,
-    marginTop: 3,
+    top: 10,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
@@ -194,10 +269,8 @@ const styles = StyleSheet.create({
     width: "80%",
     paddingBottom: 15,
     marginTop: 5,
-    minHeight: "47.5%",
-    maxHeight: "50.5%",
+    height: 355,
     backgroundColor: '#DBE6EC',
-    paddingBottom: 10 
   },
   todayContainer: {
     display: "flex",
