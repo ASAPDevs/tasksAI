@@ -1,12 +1,14 @@
-import { StyleSheet, SafeAreaView } from "react-native";
-import { View, Text, Heading, Divider, Button, ScrollView } from "native-base";
+import { StyleSheet, SafeAreaView, ActivityIndicator, TouchableOpacity } from "react-native";
+import { View, Text, Heading, Divider, Button, ScrollView, Pressable, Icon, Image } from "native-base";
 import { useState, useLayoutEffect, useCallback, useEffect } from "react";
 import CircularProgress from 'react-native-circular-progress-indicator';
 import { useQuery, useMutation } from "@apollo/client";
 import { GET_TODAYS_TASKS, GET_DATA_ML} from "./helpers/queries";
 import { GENERATE_DATA_ML } from "./helpers/mutations";
+import { Fontisto } from '@expo/vector-icons';
 import { useDispatch, useSelector} from "react-redux";
 import { loadTasks, generateRec } from "../redux/slices/storageSlice";
+import taskRobot from '../assets/taskrobot.png'
 
 
 
@@ -98,7 +100,7 @@ const Dashboard = ({navigation}) => {
 
   return (
     <View style={styles.mainContainer}>
-      <ScrollView contentContainerStyle={{alignItems: 'center', height:'80%'}} >
+      <ScrollView contentContainerStyle={{alignItems: 'center', height:'150%', }} >
         <View style={styles.headingContainer}>
           <Heading style={styles.heading}>
             {welcomeText}{<Heading style={styles.username}>{username}.</Heading>}{" "}
@@ -141,12 +143,14 @@ const Dashboard = ({navigation}) => {
 };
 
 const RecommendationsContainer = ({ userID }) => {
+  const [loading, toggleLoading] = useState(false);
   const recommendations = useSelector((state) => state.storage.recommendations)
   const dispatch = useDispatch()
   console.log("user id:", typeof userID)
-  const { data, loading, error} = useQuery(GET_DATA_ML, {
+  const { data, error, refetch} = useQuery(GET_DATA_ML, {
+    notifyOnNetworkStatusChange: true,
     onCompleted: (data) => {
-      console.log("data get data ml: ", data.getDataML.recommendations)
+      toggleLoading(false);
       dispatch(generateRec(data.getDataML.recommendations))
     },
     onError: (error) => {
@@ -157,30 +161,60 @@ const RecommendationsContainer = ({ userID }) => {
   
 
   const [generateDataML] = useMutation(GENERATE_DATA_ML, {
+    notifyOnNetworkStatusChange: true,
     onCompleted: (data) => {
-      console.log("data from rec container: ", data)
-      dispatch(generateRec(data.generateDataML.recommendations))
+      refetch();
     },
     onError: (error) => {
       console.log("Error: ", error)
     }
   })
-  
-  const getRec = () => {
-    generateDataML({
-      variables: {
-        user_id: userID
-      }
-    })
+
+  function generateDataHandler() {
+    dispatch(generateRec([]))
+    toggleLoading(true);
+    generateDataML({variables: {user_id: userID}})
   }
+  
+
 
   return (
     <View style={styles.recommendationsContainer}>
-      <Button onPress={getRec}>Get a rec!</Button>
-      <View>
-        {recommendations && 
-        recommendations.map(recommendation => <Text>{recommendation}</Text>)}
+      <View style={styles.recHeaderContainer}>
+        <Heading style={styles.recHeader}>AI Recommendations</Heading>
       </View>
+      <View style={styles.innerRecContainer}>
+        {loading && <LoadingComp />}
+        {recommendations && 
+        recommendations.map(text => <Recommendation text={text} />)}
+      </View>
+     <View style={styles.regenerateContainer}>
+        <TouchableOpacity marginBottom={2}
+        onPress={generateDataHandler}
+        >
+            <Icon as={Fontisto} name="spinner-rotate-forward" size="xl" />
+        </TouchableOpacity>
+      <Text fontFamily="FamiljenGrotesk" textAlign="center" fontSize={12}>You can only regenerate AI metrics/recommendations{"\n"} once every three days.</Text>
+     </View>
+    </View>
+  )
+}
+
+const Recommendation = ({text}) => {
+  return (
+    <View style={styles.recommendationItemContainer}>
+      <Text style={styles.recommendationItem}>{text}</Text>
+    </View>
+  )
+}
+
+const LoadingComp = () => {
+  return (
+    <View alignItems="center">
+      <Image source={taskRobot} height={100} width={100} />
+      <Heading fontFamily="FamiljenBold" fontSize={20}>Analyzing Tasks</Heading>
+      <Heading fontFamily="FamiljenBold" fontSize={20}>...</Heading>
+      <ActivityIndicator style={{alignSelf: 'center', marginTop: 30}} size="large" />
     </View>
   )
 }
@@ -244,8 +278,7 @@ const styles = StyleSheet.create({
     width: "80%",
     marginTop: 50,
     marginBottom: 30,
-    minHeight: 200,
-    maxHeight: "50.5%",
+    height: 450,
     backgroundColor: '#DBE6EC',
     paddingBottom: 10,
     position: "relative",
@@ -256,7 +289,6 @@ const styles = StyleSheet.create({
     borderColor: "darkgrey",
     alignItems: "center",
     borderWidth: 1,
-    top: 10,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
@@ -268,9 +300,16 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     width: "80%",
     paddingBottom: 15,
-    marginTop: 5,
+    marginTop: -80,
     height: 355,
     backgroundColor: '#DBE6EC',
+  },
+  recHeaderContainer: {
+    width: "100%",
+    alignItems: "center",
+    marginTop: 3.5,
+    borderColor: 'darkgrey',
+    borderBottomWidth: 0.5
   },
   todayContainer: {
     display: "flex",
@@ -285,6 +324,10 @@ const styles = StyleSheet.create({
   },
   todayHeader: {
     fontFamily: "FamiljenBold",
+  },
+  recHeader: {
+    fontFamily: "FamiljenBold",
+    fontSize: 20
   },
   todayDate: {
     fontFamily: "FamiljenGrotesk",
@@ -348,6 +391,45 @@ const styles = StyleSheet.create({
     shadowRadius: 3.84,
     elevation: 5,
     borderRadius: 10,
+  },
+  innerRecContainer: {
+    width: "100%",
+    padding: 5,
+    alignItems: "center",
+    paddingTop: 20,
+    borderColor: "darkgrey",
+    borderWidth: 0,
+    borderBottomWidth: 1,
+    minHeight: 325,
+    maxHeight: 325
+  },
+  recommendationItemContainer: {
+    width: "90%",
+    margin: 6,
+    padding: 8,
+    textAlign: 'center',
+    backgroundColor: "darkgrey",
+    borderColor: "rgba(250, 169, 70, .15)",
+    borderWidth: 1,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+    borderRadius: 10,
+    maxHeight: '33%'
+  },
+  recommendationItem: {
+    fontFamily: "FamiljenGrotesk",
+    fontSize: 15,
+    textAlign: 'center'
+  },
+  regenerateContainer: {
+    alignItems: 'center',
+    marginTop: 10,
   }
 });
 

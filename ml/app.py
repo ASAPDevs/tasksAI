@@ -30,28 +30,39 @@ async def index():
 
 
 def analyzeOnTime(tasks):
+    #helper function 
     def stringify(frequency):
+        #Beginning prompt
         string_template = "Send a list as a response. This user tends to finish tasks (in descending order):"
+        #We want to invert it because the frequency argument is usually ordered in ascending order. Now, it should be descending.
         frequency = frequency[::-1]
+        #loop over the array and append the matching index and corresponding time of day (uses the time dictionary object to find the matching key)
         for i in range(len(frequency)):
             string_template += f" {i+1}. {times[frequency[i]]}"
         
         #add the rest of the prompt
-        string_template += " Generate 3 recommendations for this user going forward. These recommendations are for a user that is using a mobile task organization app, do not mention anything regarding the app's functionality or capabilities other than being able to create and delete tasks at scheduled times. "
+        string_template += " Generate 3 recommendations for this user going forward. These recommendations are for a user that is using a mobile task organization app, do not mention anything regarding the app's functionality or capabilities other than being able to create and delete tasks at scheduled times. Keep each recommendation between 100 and 200 characters long."
         return string_template
     
+    #function code starts here for analyzeOnTime
     frequency = {}
+    #corresponding keys
     times = {
         1: "Dawn",
         2: "Morning",
         3: "Afternoon", 
         4: "Evening"
     }
+    #loop over tasks array and increment counter in dictionary.
     for task in tasks:
         frequency[task["time_of_day"]] = 1 + frequency.get(task["time_of_day"], 0)
 
+    #put all the keys into an array, but their index is sorted by frequency values.
     sorted_frequency = sorted(frequency.keys(), key=lambda x: frequency[x])
+    #get the prompt from the hlper function.
     prompt = stringify(sorted_frequency)
+
+    #data object for openAI
     data = {
         "prompt": prompt,
         "model": "text-davinci-003",

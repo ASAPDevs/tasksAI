@@ -9,6 +9,7 @@ import {
   FormControl,
   Icon,
 } from "native-base";
+
 import { StyleSheet, Animated, View, TextInput} from "react-native";
 import { FontAwesome, Octicons } from "@expo/vector-icons";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
