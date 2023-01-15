@@ -6,6 +6,7 @@ export const LOGIN_MUTATION = gql`
       id
       username
       email
+      lastgeneration
     }
   }
 `;
@@ -16,6 +17,7 @@ export const SIGNUP_MUTATION = gql`
       id
       username
       email
+      lastgeneration
     }
   }
 `;

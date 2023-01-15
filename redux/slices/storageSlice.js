@@ -9,6 +9,7 @@ const initialState = {
   tasks: {
     all: [],
   },
+  canGenerate: false,
   recommendations: [],
   metrics: [],
   settings: {
@@ -26,6 +27,11 @@ export const storageSlice = createSlice({
       state.user_id = action.payload.user_id;
       state.email = action.payload.email;
       state.loggedIn = true;
+      //check if current time stamp is greater than action.payload.lastGeneration timestamp + 1 week.
+      //If it is, set state.canGenerate = true;
+      const nextGeneration = 604800000 + Number(action.payload.lastgeneration);
+      if (Date.now() > nextGeneration) state.canGenerate = true;
+      else state.canGenerate = false;
     },
     updateEmail: (state, action) => {
       state.email = action.payload.email;

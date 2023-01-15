@@ -9,6 +9,7 @@ import { Fontisto } from '@expo/vector-icons';
 import { useDispatch, useSelector} from "react-redux";
 import { loadTasks, generateRec } from "../redux/slices/storageSlice";
 import taskRobot from '../assets/taskrobot.png'
+import * as SecureStore from 'expo-secure-store';
 
 
 
@@ -23,6 +24,10 @@ const progressMessages = {
 
 const Dashboard = ({navigation}) => {
   // this function offsets the passed in date with any time zone difference
+  const canGenerate = useSelector((state) => state.storage.canGenerate);
+  
+  console.log("CAN GENERATE: " + canGenerate)
+  
   const offsetTime = (dateObj) => {
     const newDate = new Date(dateObj.getTime() - (timezoneOffset * 60000));
     return newDate;
@@ -164,6 +169,7 @@ const RecommendationsContainer = ({ userID }) => {
     notifyOnNetworkStatusChange: true,
     onCompleted: (data) => {
       refetch();
+      SecureStore.setItemAsync("lastgeneration", String(Date.now()))
     },
     onError: (error) => {
       console.log("Error: ", error)
@@ -186,7 +192,7 @@ const RecommendationsContainer = ({ userID }) => {
       <View style={styles.innerRecContainer}>
         {loading && <LoadingComp />}
         {recommendations && 
-        recommendations.map(text => <Recommendation text={text} />)}
+        recommendations.map((text, index) => <Recommendation key={index} text={text} />)}
       </View>
      <View style={styles.regenerateContainer}>
         <TouchableOpacity marginBottom={2}

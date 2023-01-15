@@ -38,6 +38,7 @@ const LandingPage = ({ navigation }) => {
           username: data.login.username,
           user_id: Number(data.login.id),
           email: data.login.email,
+          lastgeneration: data.login.lastgeneration
         })
       );
       navigation.navigate("Root", { screen: "Dashboard" })
@@ -56,6 +57,8 @@ const LandingPage = ({ navigation }) => {
         loginUser({
           username: data.signup.username,
           user_id: Number(data.signup.id),
+          email: data.signup.email,
+          lastgeneration: data.signup.lastgeneration
         })
       );
       navigation.navigate("Root", { screen: "Dashboard" })
@@ -77,6 +80,7 @@ const LandingPage = ({ navigation }) => {
         await SecureStore.setItemAsync("username", result.data.login.username);
         await SecureStore.setItemAsync("userid", result.data.login.id);
         await SecureStore.setItemAsync("email", result.data.login.email);
+        await SecureStore.setItemAsync("lastgeneration", result.data.login.lastGeneration);
         // navigation.navigate('Root', { screen: 'Dashboard' })
       }
     } catch (err) {
@@ -93,6 +97,7 @@ const LandingPage = ({ navigation }) => {
         await SecureStore.setItemAsync("username", result.data.signup.username);
         await SecureStore.setItemAsync("userid", result.data.signup.id);
         await SecureStore.setItemAsync("email", result.data.signup.email);
+        await SecureStore.setItemAsync("lastgeneration", "0");
       }
     } catch (err) {
       console.log("Signup error" + err);
