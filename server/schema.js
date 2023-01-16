@@ -25,7 +25,12 @@ const typeDefs = gql`
     deleteTask(id: ID!): Task
     completeTask(id: ID!, onTime: Boolean!): Task
     pushTask(id: ID!, newStartTime: String!, newEndTime: String!, newTimeOfDay: Int!): Task
-    generateDataML(user_id: Int!): MLData!
+    generateDataML(user_id: Int!): MLDataObject!
+  }
+
+  type MLDataObject {
+    ml: MLData
+    lastGeneration: String
   }
 
   # for ML
@@ -157,6 +162,7 @@ const resolvers = {
     },
     getLastGeneration: async (_, args) => {
       const { user_id } = args;
+      console.log("get last gen args: ", args)
       const lastGeneration = await db.query("SELECT lastgeneration FROM users WHERE ID = ($1)", [user_id])
       console.log("last generation: ", lastGeneration.rows[0].lastgeneration)
       return lastGeneration.rows[0].lastgeneration;
@@ -374,18 +380,19 @@ const resolvers = {
       //if there isnt, we make a call to the python service to generate the relevant data and insert into the DB and return.
       const res = await axios.post(`http://127.0.0.1:5000/recommend/${user_id}`);
       const dataML = res.data;
+      let lastGeneration;
       if (check.rows.length == 0) {
         await db.query('INSERT INTO metrics (recommendations, metrics, user_id) VALUES ($1, $2, $3)', [dataML.recommendations, JSON.stringify(dataML.metrics), user_id])
         await db.query('UPDATE users SET lastgeneration = ($1) WHERE id = ($2)', [String(Date.now()), user_id])
-        console.log("current time: ", String(Date.now()))
+        lastGeneration = await db.query("SELECT lastgeneration FROM users WHERE ID = ($1)", [user_id])
       } else {
         // if (check.rows[0].expiry)
         await db.query('UPDATE metrics SET recommendations = ($1), metrics = ($2) WHERE user_id = ($3)', [dataML.recommendations, JSON.stringify(dataML.metrics), user_id])
         await db.query('UPDATE users SET lastgeneration = ($1) WHERE id = ($2)', [String(Date.now()), user_id])
-        console.log("current time: ", String(Date.now()))
+        lastGeneration = await db.query("SELECT lastgeneration FROM users WHERE ID = ($1)", [user_id])
       }
      
-      return dataML
+      return {ml: dataML, lastGeneration: lastGeneration.rows[0].lastgeneration}
     }
   },
 };
