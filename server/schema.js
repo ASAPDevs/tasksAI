@@ -380,17 +380,14 @@ const resolvers = {
       //if there isnt, we make a call to the python service to generate the relevant data and insert into the DB and return.
       const res = await axios.post(`http://127.0.0.1:5000/recommend/${user_id}`);
       const dataML = res.data;
-      let lastGeneration;
       if (check.rows.length == 0) {
         await db.query('INSERT INTO metrics (recommendations, metrics, user_id) VALUES ($1, $2, $3)', [dataML.recommendations, JSON.stringify(dataML.metrics), user_id])
-        await db.query('UPDATE users SET lastgeneration = ($1) WHERE id = ($2)', [String(Date.now()), user_id])
-        lastGeneration = await db.query("SELECT lastgeneration FROM users WHERE ID = ($1)", [user_id])
       } else {
         // if (check.rows[0].expiry)
         await db.query('UPDATE metrics SET recommendations = ($1), metrics = ($2) WHERE user_id = ($3)', [dataML.recommendations, JSON.stringify(dataML.metrics), user_id])
-        await db.query('UPDATE users SET lastgeneration = ($1) WHERE id = ($2)', [String(Date.now()), user_id])
-        lastGeneration = await db.query("SELECT lastgeneration FROM users WHERE ID = ($1)", [user_id])
       }
+
+      const lastGeneration = await db.query('UPDATE users SET lastgeneration = ($1) WHERE id = ($2) RETURNING lastgeneration', [String(Date.now()), user_id])
      
       return {ml: dataML, lastGeneration: lastGeneration.rows[0].lastgeneration}
     }

@@ -141,6 +141,7 @@ const MLContainer = ({ userID }) => {
   const [generationStatus, toggleGenerationStatus] = useState(false);
   const [invalidGen, toggleInvalidGen] = useState(false);
   const [loading, toggleLoading] = useState(false);
+  const [timeUntilNextGeneration, updateTimeUntilNextGeneration] = useState(nextGeneration - Date.now())
   const dispatch = useDispatch()
 
 
@@ -164,7 +165,10 @@ const MLContainer = ({ userID }) => {
       dispatch(updateGenerationCooldown(data.generateDataML.lastGeneration))
     },
     onError: (error) => {
-      console.log("Error: ", error)
+      console.log("Error: ", error.networkError?.statusCode)
+      if (error.networkError?.statusCode === 500) {
+        generateDataHandler();
+      }
     }
   })
 
@@ -182,6 +186,10 @@ const MLContainer = ({ userID }) => {
     if (Date.now() > nextGeneration) toggleGenerationStatus(true);
     else toggleGenerationStatus(false);
   }, [nextGeneration])
+
+  useEffect(() => {
+    updateTimeUntilNextGeneration(nextGeneration - Date.now())
+  }, [refetch])
 
   return (
     <View style={styles.recommendationsContainer}>
@@ -211,7 +219,7 @@ const MLContainer = ({ userID }) => {
             <Icon as={Fontisto} color={generationStatus ? "#FAA946" : "grey"} name="spinner-rotate-forward" size="xl" />
         </TouchableOpacity>
       <Text fontFamily="FamiljenGrotesk" textAlign="center" marginTop={3} marginBottom={-2} fontSize={12} color={invalidGen ? 'red.500' : null}>You can only regenerate AI metrics/recommendations{"\n"} once every three days.</Text>
-      <Countdown startTime={nextGeneration - Date.now()} />
+      <Countdown startTime={timeUntilNextGeneration} />
      </View>
     </View>
   )
@@ -413,7 +421,15 @@ const styles = StyleSheet.create({
   aiTabButtons: {
     width: '50%',
     borderRadius: 0,
-    borderWidth: 0
+    borderWidth: 0,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.38,
+    shadowRadius: 2.25,
+    elevation: 2,
   },
   innerTaskCountContainer: {
     display: 'flex',
