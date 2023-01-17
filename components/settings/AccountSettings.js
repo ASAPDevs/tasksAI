@@ -5,13 +5,13 @@ import { useSelector } from 'react-redux';
 import { Ionicons } from '@expo/vector-icons';
 const LazyLoadChangePassword = React.lazy(() => import('./ChangePasswordForm'));
 const LazyLoadChangeEmail = React.lazy(() => import('./ChangeEmailForm'));
+const LazyLoadDeleteAccount = React.lazy(() => import('./DeleteAccount'));
 
-export default function Account({updateCurrentView}) {
+export default function Account({updateCurrentView, navigation}) {
   const [currentAccountView, updateCurrentAccountView] = useState('main')
   const username = useSelector((state) => state.storage.username)
   const email = useSelector((state) => state.storage.email)
 
-console.log("EMAIL: ", email)
 
   const conditionalRender = () => {
     switch (currentAccountView) {
@@ -51,6 +51,12 @@ console.log("EMAIL: ", email)
                 </Text>
               </View>
             </View>
+            <Text 
+              style={styles.text}
+              onPress={() => updateCurrentAccountView('delete-account')}
+              >
+              Delete Account
+            </Text>
         </View>
         );
       case 'change-password':
@@ -60,6 +66,10 @@ console.log("EMAIL: ", email)
       case 'change-email':
         return (
           <LazyLoadChangeEmail updateCurrentAccountView={updateCurrentAccountView} />
+        )
+      case 'delete-account':
+        return (
+          <LazyLoadDeleteAccount navigation={navigation} updateCurrentAccountView={updateCurrentAccountView} />
         )
     }
   }

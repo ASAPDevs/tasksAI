@@ -45,7 +45,7 @@ const Settings = ({navigation}) => {
         );
       case "account":
         return (
-          <LazyLoadAccountSettings updateCurrentView={updateCurrentView} />
+          <LazyLoadAccountSettings navigation={navigation} updateCurrentView={updateCurrentView} />
         );
     }
   };

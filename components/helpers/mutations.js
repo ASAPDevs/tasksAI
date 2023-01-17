@@ -6,6 +6,7 @@ export const LOGIN_MUTATION = gql`
       id
       username
       email
+      lastgeneration
     }
   }
 `;
@@ -16,6 +17,7 @@ export const SIGNUP_MUTATION = gql`
       id
       username
       email
+      lastgeneration
     }
   }
 `;
@@ -96,6 +98,35 @@ export const PUSH_TASK = gql`
       id
       time_start
       time_finished
+    }
+  }
+`
+
+export const DELETE_ACCOUNT = gql`
+ mutation DeleteUser($deleteUserId: ID!) {
+  deleteUser(id: $deleteUserId) {
+    email
+    id
+    username
+  }
+}
+`
+
+export const GENERATE_DATA_ML = gql`
+  mutation GenerateDataML($user_id: Int!) {
+    generateDataML(user_id: $user_id) {
+      lastGeneration
+    ml {
+      metrics {
+        onTimeMetrics {
+          Dawn
+          Morning
+          Afternoon
+          Evening
+        }
+      }
+      recommendations
+    }
     }
   }
 `

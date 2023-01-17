@@ -19,6 +19,7 @@ data = {
     "max_tokens": 500
 }
 
+
 # print(openai.APIKey.info())
 response = requests.post("https://api.openai.com/v1/completions", headers=headers, data=json.dumps(data))
 
