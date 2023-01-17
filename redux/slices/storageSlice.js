@@ -38,7 +38,7 @@ export const storageSlice = createSlice({
     updateGenerationCooldown: (state, action) => {
       //check if current time stamp is greater than action.payload.lastGeneration timestamp + 1 week.
       //If it is, set state.canGenerate = true;
-      const nextGeneration = 604800000 + Number(action.payload.lastgeneration);
+      const nextGeneration = 259200000 + Number(action.payload.lastgeneration);
       state.nextGeneration = nextGeneration;
     },
     loadTasks: (state, action) => {
