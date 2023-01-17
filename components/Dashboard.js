@@ -9,6 +9,7 @@ import { Fontisto } from '@expo/vector-icons';
 import { useDispatch, useSelector} from "react-redux";
 import { loadTasks, generateRec, updateGenerationCooldown } from "../redux/slices/storageSlice";
 import taskRobot from '../assets/taskrobot.png'
+import Countdown from "./Countdown";
 import * as SecureStore from 'expo-secure-store';
 import { useGetLastGeneration } from "./hooks/useGetLastGeneration";
 
@@ -160,7 +161,6 @@ const MLContainer = ({ userID }) => {
     notifyOnNetworkStatusChange: true,
     onCompleted: (data) => {
       refetch();
-      // fetch({variables: {user_id: userID}});
       dispatch(updateGenerationCooldown(data.generateDataML.lastGeneration))
     },
     onError: (error) => {
@@ -186,10 +186,19 @@ const MLContainer = ({ userID }) => {
   return (
     <View style={styles.recommendationsContainer}>
       <View style={styles.recHeaderContainer}>
-        <Heading style={styles.recHeader}></Heading>
-        <View flexDirection="row" >
-          <Button onPress={() => switchTab('recommendations')} >Recommendations</Button>
-          <Button onPress={() => switchTab('metrics')} >Metrics</Button>
+        <Heading style={styles.recHeader}>TaskAI Analysis</Heading>
+        <View flexDirection="row"  width="100%">
+          <Button style={styles.aiTabButtons}
+          bgColor={currentTab==='recommendations' ? "rgba(250,169,70, 0.9)" : "rgba(250,169,70, 0.2)"}
+           onPress={() => switchTab('recommendations')} width="50%" variant="outline">
+            <Text color="black" fontFamily={currentTab==='recommendations' ? "FamiljenBold" :  "FamiljenGrotesk"}>
+            Recommendations</Text>
+            </Button>
+          <Button 
+          bgColor={currentTab==='metrics' ? "rgba(250,169,70, 0.9)" : "rgba(250,169,70, 0.2)"}
+          style={styles.aiTabButtons} onPress={() => switchTab('metrics')} width="50%" variant="outline" >
+            <Text color="black" fontFamily={currentTab==='metrics' ? "FamiljenBold" :  "FamiljenGrotesk"}>Metrics</Text>
+            </Button>
         </View>
       </View>
       {/* Conditional Render Between Recommendations & Metrics */}
@@ -201,7 +210,8 @@ const MLContainer = ({ userID }) => {
         >
             <Icon as={Fontisto} color={generationStatus ? "#FAA946" : "grey"} name="spinner-rotate-forward" size="xl" />
         </TouchableOpacity>
-      <Text fontFamily="FamiljenGrotesk" textAlign="center" fontSize={12} color={invalidGen ? 'red.500' : null}>You can only regenerate AI metrics/recommendations{"\n"} once every three days.</Text>
+      <Text fontFamily="FamiljenGrotesk" textAlign="center" marginTop={3} marginBottom={-2} fontSize={12} color={invalidGen ? 'red.500' : null}>You can only regenerate AI metrics/recommendations{"\n"} once every three days.</Text>
+      <Countdown startTime={nextGeneration - Date.now()} />
      </View>
     </View>
   )
@@ -213,7 +223,7 @@ const MetricsContainer = ({userID, loading, toggleLoading}) => {
   return (
     <View style={styles.innerRecContainer}>
       {loading && <LoadingComp />}
-      {!loading && <Text>Metrics</Text>}
+      {!loading && <Text fontFamily="FamiljenGrotesk">UNDER CONSTRUCTION</Text>}
     </View>
   )
 }
@@ -313,7 +323,7 @@ const styles = StyleSheet.create({
     width: "80%",
     marginTop: 50,
     marginBottom: 30,
-    height: 450,
+    height: 580,
     backgroundColor: '#DBE6EC',
     paddingBottom: 10,
     position: "relative",
@@ -344,7 +354,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginTop: 3.5,
     borderColor: 'darkgrey',
-    borderBottomWidth: 0.5
+    borderBottomWidth: 0.5,
   },
   todayContainer: {
     display: "flex",
@@ -361,8 +371,9 @@ const styles = StyleSheet.create({
     fontFamily: "FamiljenBold",
   },
   recHeader: {
-    fontFamily: "FamiljenBold",
-    fontSize: 20
+    fontFamily: "FamiljenGrotesk",
+    fontSize: 20,
+    marginBottom: 5
   },
   todayDate: {
     fontFamily: "FamiljenGrotesk",
@@ -398,6 +409,11 @@ const styles = StyleSheet.create({
     shadowRadius: 3.84,
     elevation: 5,
 
+  },
+  aiTabButtons: {
+    width: '50%',
+    borderRadius: 0,
+    borderWidth: 0
   },
   innerTaskCountContainer: {
     display: 'flex',

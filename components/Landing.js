@@ -12,7 +12,7 @@ import {
 import logo from "../assets/iostransparent.png";
 import { useMutation } from "@apollo/client";
 import { useDispatch, useSelector } from "react-redux";
-import { loginUser } from "../redux/slices/storageSlice";
+import { loginUser, updateGenerationCooldown } from "../redux/slices/storageSlice";
 import { SIGNUP_MUTATION, LOGIN_MUTATION } from "./helpers/mutations";
 import * as SecureStore from "expo-secure-store";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
@@ -38,9 +38,11 @@ const LandingPage = ({ navigation }) => {
           username: data.login.username,
           user_id: Number(data.login.id),
           email: data.login.email,
-          lastgeneration: data.login.lastgeneration
         })
       );
+      dispatch(
+        updateGenerationCooldown({lastgeneration: data.login.lastgeneration})
+      )
       navigation.navigate("Root", { screen: "Dashboard" })
       setUsername('')
       setPassword('')
@@ -80,7 +82,6 @@ const LandingPage = ({ navigation }) => {
         await SecureStore.setItemAsync("username", result.data.login.username);
         await SecureStore.setItemAsync("userid", result.data.login.id);
         await SecureStore.setItemAsync("email", result.data.login.email);
-        await SecureStore.setItemAsync("lastgeneration", result.data.login.lastGeneration);
         // navigation.navigate('Root', { screen: 'Dashboard' })
       }
     } catch (err) {
