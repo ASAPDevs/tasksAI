@@ -9,7 +9,8 @@ import {
   FormControl,
   Icon,
 } from "native-base";
-import { StyleSheet, Animated, View } from "react-native";
+
+import { StyleSheet, Animated, View, TextInput} from "react-native";
 import { FontAwesome, Octicons } from "@expo/vector-icons";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { convertDate, displayTime } from "./helpers/dateHelperFunc";
@@ -46,9 +47,12 @@ const NewTaskModal = ({ date, newTask, openNewTask, addTaskHandler }) => {
       const endOfDay = startOfDay + 86400000 - 60000;
       const start = typeof startTime === "number" ? startTime : startOfDay;
       const end = typeof endTime === "number" ? endTime : endOfDay;
-      start <= end &&
-        addTaskHandler(taskTitle, taskDescription, start, end, taskCategory) &&
+      if (start <= end) {
+        addTaskHandler(taskTitle, taskDescription, start, end, taskCategory)
         clearInputs();
+      } else {
+        toggleInvalidSubmission(true);
+      }
     }
   };
 
@@ -121,11 +125,15 @@ const NewTaskModal = ({ date, newTask, openNewTask, addTaskHandler }) => {
       setTimeout(() => toggleInvalidSubmission(false), 5000);
   }, [invalidSubmission]);
 
+
   return (
     <Modal
       top={keyboardVisible ? -115 : -50}
       isOpen={newTask}
-      onClose={() => openNewTask(false)}
+      onClose={() => {
+        openNewTask(false)
+        clearInputs();
+      }}
       size="xl"
       style={{
         shadowColor: "#000",
@@ -185,6 +193,7 @@ const NewTaskModal = ({ date, newTask, openNewTask, addTaskHandler }) => {
               Title:
             </FormControl.Label>
             <Input
+              
               invalidOutlineColor="red.500"
               isInvalid={invalidSubmission ? true : false}
               borderColor="black"
@@ -298,11 +307,13 @@ export const StartTimeInput = ({
     });
     const timeZoneOffset = tempDate.getTimezoneOffset();
     const convertedTime = convertDate(date, hourAndMinutes, timeZoneOffset);
-
     updateStartTime(convertedTime);
     // convert end time to start time if it's falsy or before start time
     if (endTime !== "" && endTime < convertedTime) {
       updateEndTime(convertedTime);
+    } else if (endTime == "") {
+      //if end time is empty, then set end time to an hour past start time.
+      updateEndTime(convertedTime + 3600000);
     }
     setDatePickerVisibility(false);
   };

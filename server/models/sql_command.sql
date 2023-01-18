@@ -1,8 +1,33 @@
 CREATE TABLE users(
     id serial PRIMARY KEY,
     username varchar NOT NULL UNIQUE,
-    password varchar NOT NULL
+    password varchar NOT NULL,
+    lastgeneration varchar(255)
 );
+
+-- CREATE TABLE recommendations(
+--     id serial PRIMARY KEY,
+--     rec_text VARCHAR NOT NULL,
+--     expiry_time TIMESTAMPTZ DEFAULT NOW() + INTERVAL '1 minute',
+--     user_id integer NOT NULL
+-- );
+
+CREATE TABLE metrics(
+    id serial PRIMARY KEY,
+    recommendations TEXT[] NOT NULL,
+    expiry_time TIMESTAMPTZ DEFAULT NOW(),
+    metrics VARCHAR,
+    user_id integer NOT NULL
+);
+
+
+-- CREATE RULE recommendations_expire AS ON DELETE TO recommendations WHERE (NOW() > expiry_time)
+-- DO INSTEAD NOTHING;
+
+-- CREATE TRIGGER recommendations_expire_trigger
+-- AFTER INSERT OR UPDATE OF expiry_time
+-- ON recommendations
+-- EXECUTE FUNCTION recommendations_expire_trigger()
 
 ALTER TABLE users ADD COLUMN email VARCHAR constraint;
 

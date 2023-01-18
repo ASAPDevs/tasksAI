@@ -40,7 +40,6 @@ const Task = ({ prevDay, date, taskId, title, description, startTime, endTime, c
   const [openTask, toggleOpenTask] = useState(false);
   const [pushTaskModal, openPushTaskModal] = useState(false);
   const dispatch = useDispatch()
-
   const [updateTaskMutationNoRefetch] = useMutation(UPDATE_TASK, {
     onCompleted: (data) => {
       dispatch(updateTask(data.updateTask))
@@ -74,8 +73,6 @@ const Task = ({ prevDay, date, taskId, title, description, startTime, endTime, c
     let timeToAdd = selectedValue * 3600000
     let newStartTime = Number(startTime) + timeToAdd
     let newEndTime = Number(endTime) + timeToAdd
-
-    console.log('time of day after push', getTimeOfDay(newStartTime.toString()))
     pushTaskMutation({ variables: { id: Number(taskId), newStartTime: newStartTime.toString(), newEndTime: newEndTime.toString(), newTimeOfDay: getTimeOfDay(newStartTime.toString()) } })
 
     openPushTaskModal(false)
@@ -104,9 +101,9 @@ const Task = ({ prevDay, date, taskId, title, description, startTime, endTime, c
             </View>
           </View>
           {/* Push Task Button */}
-          <Pressable onPress={() => openPushTaskModal(true)} style={{ borderColor: "black", borderWidth: 0, position: 'absolute', right: 115 }}>
+          {completed === true || Date.now() > (Number(endTime) + 86400000) ? '' : <Pressable onPress={() => openPushTaskModal(true)} style={{ borderColor: "black", borderWidth: 0, position: 'absolute', right: 115 }}>
             <Icon as={AntDesign} name="rightcircle" size={6} color="amber.500" style={{ position: 'relative' }} />
-          </Pressable>
+          </Pressable>}
 
           {pushTaskModal && <LazyLoadPushModal pushTaskHandler={pushTaskHandler} pushTaskModal={pushTaskModal} openPushTaskModal={openPushTaskModal} />}
 
