@@ -12,7 +12,7 @@ import {
 import logo from "../assets/iostransparent.png";
 import { useMutation } from "@apollo/client";
 import { useDispatch, useSelector } from "react-redux";
-import { loginUser } from "../redux/slices/storageSlice";
+import { loginUser, updateGenerationCooldown } from "../redux/slices/storageSlice";
 import { SIGNUP_MUTATION, LOGIN_MUTATION } from "./helpers/mutations";
 import * as SecureStore from "expo-secure-store";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
@@ -40,6 +40,9 @@ const LandingPage = ({ navigation }) => {
           email: data.login.email,
         })
       );
+      dispatch(
+        updateGenerationCooldown({lastgeneration: data.login.lastgeneration})
+      )
       navigation.navigate("Root", { screen: "Dashboard" })
       setUsername('')
       setPassword('')
@@ -56,6 +59,8 @@ const LandingPage = ({ navigation }) => {
         loginUser({
           username: data.signup.username,
           user_id: Number(data.signup.id),
+          email: data.signup.email,
+          lastgeneration: data.signup.lastgeneration
         })
       );
       navigation.navigate("Root", { screen: "Dashboard" })
@@ -93,6 +98,7 @@ const LandingPage = ({ navigation }) => {
         await SecureStore.setItemAsync("username", result.data.signup.username);
         await SecureStore.setItemAsync("userid", result.data.signup.id);
         await SecureStore.setItemAsync("email", result.data.signup.email);
+        await SecureStore.setItemAsync("lastgeneration", "0");
       }
     } catch (err) {
       console.log("Signup error" + err);

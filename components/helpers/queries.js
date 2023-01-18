@@ -31,3 +31,15 @@ export const GET_DATA_ML = gql`
   }
   }
 `
+
+export const GET_LAST_GENERATION = gql`
+  query GetLastGeneration($user_id: Int!) {
+    getLastGeneration(user_id: $user_id)
+}
+`
+
+export const GET_LAST_GENERATION_NON_NAVIGATION = gql`
+  query GetLastGeneration($user_id: Int!) {
+    getLastGeneration(user_id: $user_id)
+}
+`

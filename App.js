@@ -14,8 +14,8 @@ import Navigation from "./components/Navigation";
 
 //use localhost:3000 for dev / if u want to see logs
 const client = new ApolloClient({
-  // uri: "https://ai-todo-server-production.up.railway.app/graphql",
-  uri: "http://localhost:3000/graphql",
+  uri: "https://tasksai-be-production.up.railway.app/graphql",
+  // uri: "http://localhost:3000/graphql",
   cache: new InMemoryCache(),
   onError: ({ networkError, graphQLErrors }) => {
     console.log("graphQLErrors", graphQLErrors);

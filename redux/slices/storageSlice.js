@@ -9,6 +9,7 @@ const initialState = {
   tasks: {
     all: [],
   },
+  nextGeneration: 0,
   recommendations: [],
   metrics: [],
   settings: {
@@ -34,8 +35,11 @@ export const storageSlice = createSlice({
       state = initialState
       return state;
     },
-    countCompleted: (state, action) => {
-      
+    updateGenerationCooldown: (state, action) => {
+      //check if current time stamp is greater than action.payload.lastGeneration timestamp + 1 week.
+      //If it is, set state.canGenerate = true;
+      const nextGeneration = 259200000 + Number(action.payload.lastgeneration);
+      state.nextGeneration = nextGeneration;
     },
     loadTasks: (state, action) => {
       state.tasks.all = action.payload.map((task) => ({...task, key: task.id}))
@@ -85,13 +89,11 @@ export const storageSlice = createSlice({
       })
     },
     generateRec: (state, action) => {
-      console.log("checking payload in genRec: ", action.payload)
       state.recommendations = action.payload
-
     }
   }
 })
 
 
-export const { loginUser, logoutUser, loadTasks, addTask, deleteTask, completeTask, updateTask, pushTask, updateEmail, generateRec } = storageSlice.actions;
+export const { loginUser, logoutUser, loadTasks, addTask, deleteTask, completeTask, updateTask, pushTask, updateEmail, generateRec, updateGenerationCooldown } = storageSlice.actions;
 export default storageSlice.reducer;

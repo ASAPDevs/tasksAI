@@ -11,6 +11,7 @@ const typeDefs = gql`
     # for ML
     # getRecMessage(user_id: )
     getDataML(user_id: Int!): MLData
+    getLastGeneration(user_id: Int!): String
   }
 
   type Mutation {
@@ -24,7 +25,12 @@ const typeDefs = gql`
     deleteTask(id: ID!): Task
     completeTask(id: ID!, onTime: Boolean!): Task
     pushTask(id: ID!, newStartTime: String!, newEndTime: String!, newTimeOfDay: Int!): Task
-    generateDataML(user_id: Int!): MLData!
+    generateDataML(user_id: Int!): MLDataObject!
+  }
+
+  type MLDataObject {
+    ml: MLData
+    lastGeneration: String
   }
 
   # for ML
@@ -88,6 +94,7 @@ const typeDefs = gql`
     id: ID!
     username: String
     email: String
+    lastgeneration: String
   }
 
   type Task {
@@ -153,7 +160,13 @@ const resolvers = {
       
       // return dataML
     },
-    
+    getLastGeneration: async (_, args) => {
+      const { user_id } = args;
+      console.log("get last gen args: ", args)
+      const lastGeneration = await db.query("SELECT lastgeneration FROM users WHERE ID = ($1)", [user_id])
+      console.log("last generation: ", lastGeneration.rows[0].lastgeneration)
+      return lastGeneration.rows[0].lastgeneration;
+    }
   },
   Mutation: {
     login: async (_, args) => {
@@ -373,8 +386,10 @@ const resolvers = {
         // if (check.rows[0].expiry)
         await db.query('UPDATE metrics SET recommendations = ($1), metrics = ($2) WHERE user_id = ($3)', [dataML.recommendations, JSON.stringify(dataML.metrics), user_id])
       }
+
+      const lastGeneration = await db.query('UPDATE users SET lastgeneration = ($1) WHERE id = ($2) RETURNING lastgeneration', [String(Date.now()), user_id])
      
-      return dataML
+      return {ml: dataML, lastGeneration: lastGeneration.rows[0].lastgeneration}
     }
   },
 };

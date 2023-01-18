@@ -1,7 +1,8 @@
 CREATE TABLE users(
     id serial PRIMARY KEY,
     username varchar NOT NULL UNIQUE,
-    password varchar NOT NULL
+    password varchar NOT NULL,
+    lastgeneration varchar(255)
 );
 
 -- CREATE TABLE recommendations(

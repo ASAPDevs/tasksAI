@@ -1,14 +1,15 @@
-import { StyleSheet, SafeAreaView, ActivityIndicator, TouchableOpacity } from "react-native";
-import { View, Text, Heading, Divider, Button, ScrollView, Pressable, Icon, Image } from "native-base";
-import { useState, useLayoutEffect, useCallback, useEffect } from "react";
+import { StyleSheet, TouchableOpacity } from "react-native";
+import { View, Text, Heading, Divider, Button, ScrollView, Icon } from "native-base";
+import React, { useState, useLayoutEffect, useCallback, useEffect } from "react";
 import CircularProgress from 'react-native-circular-progress-indicator';
-import { useQuery, useMutation } from "@apollo/client";
+import { useQuery, useLazyQuery, useMutation } from "@apollo/client";
 import { GET_TODAYS_TASKS, GET_DATA_ML} from "./helpers/queries";
 import { GENERATE_DATA_ML } from "./helpers/mutations";
 import { Fontisto } from '@expo/vector-icons';
 import { useDispatch, useSelector} from "react-redux";
-import { loadTasks, generateRec } from "../redux/slices/storageSlice";
-import taskRobot from '../assets/taskrobot.png'
+import { loadTasks, generateRec, updateGenerationCooldown } from "../redux/slices/storageSlice";
+import Countdown from "./Countdown";
+const LoadingComponent = React.lazy(() => import('./Loading'))
 
 
 
@@ -27,7 +28,6 @@ const Dashboard = ({navigation}) => {
     const newDate = new Date(dateObj.getTime() - (timezoneOffset * 60000));
     return newDate;
   }
-
   const username = useSelector((state) => state.storage.username);
   const userID = useSelector((state) => state.storage.user_id)
   const totalTasks = useSelector((state) => state.storage.tasks.all);
@@ -87,20 +87,9 @@ const Dashboard = ({navigation}) => {
     : setProgress(0);
   }, [totalTasks, completedTasks])
 
-
-  // useLayoutEffect(() => {
-  //   const unsubscribe = navigation.addListener('focus', () => {
-  //     console.log("dashboard")
-  //     refetch();
-  //   });
-
-  //   // Return the function to unsubscribe from the event so it gets removed on unmount
-  //   return unsubscribe;
-  // }, [navigation]);
-
   return (
     <View style={styles.mainContainer}>
-      <ScrollView contentContainerStyle={{alignItems: 'center', height:'150%', }} >
+      <ScrollView contentContainerStyle={{alignItems: 'center', height:'200%', }} >
         <View style={styles.headingContainer}>
           <Heading style={styles.heading}>
             {welcomeText}{<Heading style={styles.username}>{username}.</Heading>}{" "}
@@ -136,17 +125,24 @@ const Dashboard = ({navigation}) => {
           </View>
         </View>
         
-        <RecommendationsContainer userID={userID} />
+        <MLContainer userID={userID} />
       </ScrollView>
     </View>
   );
 };
 
-const RecommendationsContainer = ({ userID }) => {
+
+
+const MLContainer = ({ userID }) => {
+  const nextGeneration = useSelector((state) => state.storage.nextGeneration);
+  const [currentTab, switchTab] = useState("recommendations")
+  const [generationStatus, toggleGenerationStatus] = useState(false);
+  const [invalidGen, toggleInvalidGen] = useState(false);
   const [loading, toggleLoading] = useState(false);
-  const recommendations = useSelector((state) => state.storage.recommendations)
+  const [timeUntilNextGeneration, updateTimeUntilNextGeneration] = useState(nextGeneration - Date.now())
   const dispatch = useDispatch()
-  console.log("user id:", typeof userID)
+
+
   const { data, error, refetch} = useQuery(GET_DATA_ML, {
     notifyOnNetworkStatusChange: true,
     onCompleted: (data) => {
@@ -164,60 +160,105 @@ const RecommendationsContainer = ({ userID }) => {
     notifyOnNetworkStatusChange: true,
     onCompleted: (data) => {
       refetch();
+      dispatch(updateGenerationCooldown(data.generateDataML.lastGeneration))
     },
     onError: (error) => {
-      console.log("Error: ", error)
+      console.log("Error: ", error.networkError?.statusCode)
+      if (error.networkError?.statusCode === 500) {
+        generateDataHandler();
+      }
     }
   })
 
   function generateDataHandler() {
-    dispatch(generateRec([]))
-    toggleLoading(true);
-    generateDataML({variables: {user_id: userID}})
+    if (generationStatus === true) {
+      dispatch(generateRec([]))
+      toggleLoading(true);
+      generateDataML({variables: {user_id: userID}})
+    } else {
+      toggleInvalidGen(true);
+    }
   }
-  
 
+  useEffect(() => {
+    if (Date.now() > nextGeneration) toggleGenerationStatus(true);
+    else toggleGenerationStatus(false);
+  }, [nextGeneration])
+
+  useEffect(() => {
+    updateTimeUntilNextGeneration(nextGeneration - Date.now())
+  }, [refetch])
 
   return (
     <View style={styles.recommendationsContainer}>
       <View style={styles.recHeaderContainer}>
-        <Heading style={styles.recHeader}>AI Recommendations</Heading>
+        <Heading style={styles.recHeader}>TaskAI Analysis</Heading>
+        <View flexDirection="row"  width="100%">
+          <Button style={styles.aiTabButtons}
+          bgColor={currentTab==='recommendations' ? "rgba(250,169,70, 0.9)" : "rgba(250,169,70, 0.2)"}
+           onPress={() => switchTab('recommendations')} width="50%" variant="outline">
+            <Text color="black" fontFamily={currentTab==='recommendations' ? "FamiljenBold" :  "FamiljenGrotesk"}>
+            Recommendations</Text>
+            </Button>
+          <Button 
+          bgColor={currentTab==='metrics' ? "rgba(250,169,70, 0.9)" : "rgba(250,169,70, 0.2)"}
+          style={styles.aiTabButtons} onPress={() => switchTab('metrics')} width="50%" variant="outline" >
+            <Text color="black" fontFamily={currentTab==='metrics' ? "FamiljenBold" :  "FamiljenGrotesk"}>Metrics</Text>
+            </Button>
+        </View>
       </View>
-      <View style={styles.innerRecContainer}>
-        {loading && <LoadingComp />}
-        {recommendations && 
-        recommendations.map(text => <Recommendation text={text} />)}
-      </View>
+      {/* Conditional Render Between Recommendations & Metrics */}
+      {currentTab === 'recommendations' && <RecommendationsContainer userID={userID} loading={loading} refetch={refetch} toggleLoading={toggleLoading} />}
+      {currentTab === 'metrics' && <MetricsContainer userID={userID} loading={loading} refetch={refetch} toggleLoading={toggleLoading} />}
      <View style={styles.regenerateContainer}>
         <TouchableOpacity marginBottom={2}
         onPress={generateDataHandler}
         >
-            <Icon as={Fontisto} name="spinner-rotate-forward" size="xl" />
+            <Icon as={Fontisto} color={generationStatus ? "#FAA946" : "grey"} name="spinner-rotate-forward" size="xl" />
         </TouchableOpacity>
-      <Text fontFamily="FamiljenGrotesk" textAlign="center" fontSize={12}>You can only regenerate AI metrics/recommendations{"\n"} once every three days.</Text>
+      <Text fontFamily="FamiljenGrotesk" textAlign="center" marginTop={3} marginBottom={-2} fontSize={12} color={invalidGen ? 'red.500' : null}>You can only regenerate AI metrics/recommendations{"\n"} once every three days.</Text>
+      <Countdown startTime={timeUntilNextGeneration} />
      </View>
     </View>
   )
 }
 
-const Recommendation = ({text}) => {
+
+
+const MetricsContainer = ({userID, loading, toggleLoading}) => {
   return (
-    <View style={styles.recommendationItemContainer}>
-      <Text style={styles.recommendationItem}>{text}</Text>
+    <View style={styles.innerRecContainer}>
+      {loading && <LoadingComponent />}
+      {!loading && <Text fontFamily="FamiljenGrotesk">UNDER CONSTRUCTION</Text>}
     </View>
   )
 }
 
-const LoadingComp = () => {
+
+const RecommendationsContainer = ({userID, loading, toggleLoading}) => {
+  const recommendations = useSelector((state) => state.storage.recommendations)
+  const dispatch = useDispatch();
+
+  const Recommendation = ({text}) => {
+    return (
+      <View style={styles.recommendationItemContainer}>
+        <Text style={styles.recommendationItem}>{text}</Text>
+      </View>
+    )
+  }
+
   return (
-    <View alignItems="center">
-      <Image source={taskRobot} height={100} width={100} />
-      <Heading fontFamily="FamiljenBold" fontSize={20}>Analyzing Tasks</Heading>
-      <Heading fontFamily="FamiljenBold" fontSize={20}>...</Heading>
-      <ActivityIndicator style={{alignSelf: 'center', marginTop: 30}} size="large" />
+    <View style={styles.innerRecContainer}>
+            {loading && <LoadingComponent />}
+            {recommendations && 
+            recommendations.map((text, index) => <Recommendation key={index} text={text} />)}
     </View>
   )
 }
+
+
+
+
 
 const styles = StyleSheet.create({
   mainContainer: {
@@ -278,7 +319,8 @@ const styles = StyleSheet.create({
     width: "80%",
     marginTop: 50,
     marginBottom: 30,
-    height: 450,
+    minHeight: 580,
+    maxHeight: 650,
     backgroundColor: '#DBE6EC',
     paddingBottom: 10,
     position: "relative",
@@ -300,7 +342,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     width: "80%",
     paddingBottom: 15,
-    marginTop: -80,
+    marginTop: -125,
     height: 355,
     backgroundColor: '#DBE6EC',
   },
@@ -309,7 +351,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginTop: 3.5,
     borderColor: 'darkgrey',
-    borderBottomWidth: 0.5
+    borderBottomWidth: 0.5,
   },
   todayContainer: {
     display: "flex",
@@ -326,8 +368,9 @@ const styles = StyleSheet.create({
     fontFamily: "FamiljenBold",
   },
   recHeader: {
-    fontFamily: "FamiljenBold",
-    fontSize: 20
+    fontFamily: "FamiljenGrotesk",
+    fontSize: 20,
+    marginBottom: 5
   },
   todayDate: {
     fontFamily: "FamiljenGrotesk",
@@ -363,6 +406,19 @@ const styles = StyleSheet.create({
     shadowRadius: 3.84,
     elevation: 5,
 
+  },
+  aiTabButtons: {
+    width: '50%',
+    borderRadius: 0,
+    borderWidth: 0,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.38,
+    shadowRadius: 2.25,
+    elevation: 2,
   },
   innerTaskCountContainer: {
     display: 'flex',
@@ -401,7 +457,7 @@ const styles = StyleSheet.create({
     borderWidth: 0,
     borderBottomWidth: 1,
     minHeight: 325,
-    maxHeight: 325
+    maxHeight: 420
   },
   recommendationItemContainer: {
     width: "90%",
@@ -420,7 +476,7 @@ const styles = StyleSheet.create({
     shadowRadius: 3.84,
     elevation: 5,
     borderRadius: 10,
-    maxHeight: '33%'
+    maxHeight: '35%'
   },
   recommendationItem: {
     fontFamily: "FamiljenGrotesk",
