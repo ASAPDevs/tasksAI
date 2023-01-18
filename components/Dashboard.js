@@ -1,17 +1,15 @@
-import { StyleSheet, SafeAreaView, ActivityIndicator, TouchableOpacity } from "react-native";
-import { View, Text, Heading, Divider, Button, ScrollView, Pressable, Icon, Image } from "native-base";
-import { useState, useLayoutEffect, useCallback, useEffect } from "react";
+import { StyleSheet, TouchableOpacity } from "react-native";
+import { View, Text, Heading, Divider, Button, ScrollView, Icon } from "native-base";
+import React, { useState, useLayoutEffect, useCallback, useEffect } from "react";
 import CircularProgress from 'react-native-circular-progress-indicator';
 import { useQuery, useLazyQuery, useMutation } from "@apollo/client";
-import { GET_TODAYS_TASKS, GET_DATA_ML, GET_LAST_GENERATION} from "./helpers/queries";
+import { GET_TODAYS_TASKS, GET_DATA_ML} from "./helpers/queries";
 import { GENERATE_DATA_ML } from "./helpers/mutations";
 import { Fontisto } from '@expo/vector-icons';
 import { useDispatch, useSelector} from "react-redux";
 import { loadTasks, generateRec, updateGenerationCooldown } from "../redux/slices/storageSlice";
-import taskRobot from '../assets/taskrobot.png'
 import Countdown from "./Countdown";
-import * as SecureStore from 'expo-secure-store';
-import { useGetLastGeneration } from "./hooks/useGetLastGeneration";
+const LoadingComponent = React.lazy(() => import('./Loading'))
 
 
 
@@ -91,7 +89,7 @@ const Dashboard = ({navigation}) => {
 
   return (
     <View style={styles.mainContainer}>
-      <ScrollView contentContainerStyle={{alignItems: 'center', height:'150%', }} >
+      <ScrollView contentContainerStyle={{alignItems: 'center', height:'200%', }} >
         <View style={styles.headingContainer}>
           <Heading style={styles.heading}>
             {welcomeText}{<Heading style={styles.username}>{username}.</Heading>}{" "}
@@ -230,7 +228,7 @@ const MLContainer = ({ userID }) => {
 const MetricsContainer = ({userID, loading, toggleLoading}) => {
   return (
     <View style={styles.innerRecContainer}>
-      {loading && <LoadingComp />}
+      {loading && <LoadingComponent />}
       {!loading && <Text fontFamily="FamiljenGrotesk">UNDER CONSTRUCTION</Text>}
     </View>
   )
@@ -251,7 +249,7 @@ const RecommendationsContainer = ({userID, loading, toggleLoading}) => {
 
   return (
     <View style={styles.innerRecContainer}>
-            {loading && <LoadingComp />}
+            {loading && <LoadingComponent />}
             {recommendations && 
             recommendations.map((text, index) => <Recommendation key={index} text={text} />)}
     </View>
@@ -261,16 +259,6 @@ const RecommendationsContainer = ({userID, loading, toggleLoading}) => {
 
 
 
-
-const LoadingComp = () => {
-  return (
-    <View alignItems="center">
-      <Image source={taskRobot} alt="LoadingRobot" height={100} width={100} />
-      <Heading fontFamily="FamiljenBold" fontSize={20}>Analyzing Tasks</Heading>
-      <ActivityIndicator style={{alignSelf: 'center', marginTop: 30}} size="large" />
-    </View>
-  )
-}
 
 const styles = StyleSheet.create({
   mainContainer: {
@@ -331,7 +319,8 @@ const styles = StyleSheet.create({
     width: "80%",
     marginTop: 50,
     marginBottom: 30,
-    height: 580,
+    minHeight: 580,
+    maxHeight: 650,
     backgroundColor: '#DBE6EC',
     paddingBottom: 10,
     position: "relative",
@@ -353,7 +342,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     width: "80%",
     paddingBottom: 15,
-    marginTop: -80,
+    marginTop: -125,
     height: 355,
     backgroundColor: '#DBE6EC',
   },
@@ -468,7 +457,7 @@ const styles = StyleSheet.create({
     borderWidth: 0,
     borderBottomWidth: 1,
     minHeight: 325,
-    maxHeight: 325
+    maxHeight: 420
   },
   recommendationItemContainer: {
     width: "90%",
@@ -487,7 +476,7 @@ const styles = StyleSheet.create({
     shadowRadius: 3.84,
     elevation: 5,
     borderRadius: 10,
-    maxHeight: '33%'
+    maxHeight: '35%'
   },
   recommendationItem: {
     fontFamily: "FamiljenGrotesk",
