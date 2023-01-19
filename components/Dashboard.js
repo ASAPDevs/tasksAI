@@ -341,9 +341,9 @@ const styles = StyleSheet.create({
     elevation: 5,
     borderRadius: 10,
     width: "80%",
-    paddingBottom: 15,
+    paddingBottom: 25,
     marginTop: -125,
-    height: 355,
+    height: 365,
     backgroundColor: '#DBE6EC',
   },
   recHeaderContainer: {
